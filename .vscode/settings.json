@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "*.py": "python",
+        "*.cpp": "cpp",
+        "*.sim": "spice",
+        "*.circ": "spice",
+        "*.lock": "toml",
+        "*.spice": "spice",
+        "*.v": "verilog",
+        "*.vhd": "vhdl",
+        "atomic": "cpp",
+        "cstdint": "cpp"
+    }
+}

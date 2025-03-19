@@ -8,35 +8,44 @@
 from __future__ import absolute_import, print_function, division
 
 
-
 from sys import version_info as _swig_python_version_info
+
 if _swig_python_version_info >= (2, 7, 0):
+
     def swig_import_helper():
         import importlib
-        pkg = __name__.rpartition('.')[0]
-        mname = '.'.join((pkg, '_softposit')).lstrip('.')
+
+        pkg = __name__.rpartition(".")[0]
+        mname = ".".join((pkg, "_softposit")).lstrip(".")
         try:
             return importlib.import_module(mname)
         except ImportError:
-            return importlib.import_module('_softposit')
+            return importlib.import_module("_softposit")
+
     _softposit = swig_import_helper()
     del swig_import_helper
 elif _swig_python_version_info >= (2, 6, 0):
+
     def swig_import_helper():
         from os.path import dirname
         import imp
+
         fp = None
         try:
-            fp, pathname, description = imp.find_module('_softposit', [dirname(__file__)])
+            fp, pathname, description = imp.find_module(
+                "_softposit", [dirname(__file__)]
+            )
         except ImportError:
             import _softposit
+
             return _softposit
         try:
-            _mod = imp.load_module('_softposit', fp, pathname, description)
+            _mod = imp.load_module("_softposit", fp, pathname, description)
         finally:
             if fp is not None:
                 fp.close()
         return _mod
+
     _softposit = swig_import_helper()
     del swig_import_helper
 else:
@@ -53,17 +62,18 @@ try:
 except ImportError:
     import __builtin__
 
+
 def _swig_setattr_nondynamic(self, class_type, name, value, static=1):
-    if (name == "thisown"):
+    if name == "thisown":
         return self.this.own(value)
-    if (name == "this"):
-        if type(value).__name__ == 'SwigPyObject':
+    if name == "this":
+        if type(value).__name__ == "SwigPyObject":
             self.__dict__[name] = value
             return
     method = class_type.__swig_setmethods__.get(name, None)
     if method:
         return method(self, value)
-    if (not static):
+    if not static:
         if _newclass:
             object.__setattr__(self, name, value)
         else:
@@ -77,12 +87,14 @@ def _swig_setattr(self, class_type, name, value):
 
 
 def _swig_getattr(self, class_type, name):
-    if (name == "thisown"):
+    if name == "thisown":
         return self.this.own()
     method = class_type.__swig_getmethods__.get(name, None)
     if method:
         return method(self)
-    raise AttributeError("'%s' object has no attribute '%s'" % (class_type.__name__, name))
+    raise AttributeError(
+        "'%s' object has no attribute '%s'" % (class_type.__name__, name)
+    )
 
 
 def _swig_repr(self):
@@ -90,17 +102,26 @@ def _swig_repr(self):
         strthis = "proxy of " + self.this.__repr__()
     except __builtin__.Exception:
         strthis = ""
-    return "<%s.%s; %s >" % (self.__class__.__module__, self.__class__.__name__, strthis,)
+    return "<%s.%s; %s >" % (
+        self.__class__.__module__,
+        self.__class__.__name__,
+        strthis,
+    )
+
 
 try:
     _object = object
     _newclass = 1
 except __builtin__.Exception:
+
     class _object:
         pass
+
     _newclass = 0
 
 softposit_types_h = _softposit.softposit_types_h
+
+
 class posit8_t(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, posit8_t, name, value)
@@ -159,17 +180,17 @@ class posit8_t(_object):
 
     def __repr__(self):
         a = float(_softposit.convertP8ToDouble(self))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-            return "NaR"
-        else:
-            return str(a)
-    def __str__(self):
-        a = float(_softposit.convertP8ToDouble(self))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
 
+    def __str__(self):
+        a = float(_softposit.convertP8ToDouble(self))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
 
     def __init__(self):
         this = _softposit.new_posit8_t()
@@ -177,10 +198,14 @@ class posit8_t(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_posit8_t
     __del__ = lambda self: None
+
+
 posit8_t_swigregister = _softposit.posit8_t_swigregister
 posit8_t_swigregister(posit8_t)
+
 
 class posit16_t(_object):
     __swig_setmethods__ = {}
@@ -237,17 +262,17 @@ class posit16_t(_object):
 
     def __repr__(self):
         a = float(_softposit.convertP16ToDouble(self))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-            return "NaR"
-        else:
-            return str(a)
-    def __str__(self):
-        a = float(_softposit.convertP16ToDouble(self))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
 
+    def __str__(self):
+        a = float(_softposit.convertP16ToDouble(self))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
 
     def __init__(self):
         this = _softposit.new_posit16_t()
@@ -255,10 +280,14 @@ class posit16_t(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_posit16_t
     __del__ = lambda self: None
+
+
 posit16_t_swigregister = _softposit.posit16_t_swigregister
 posit16_t_swigregister(posit16_t)
+
 
 class posit32_t(_object):
     __swig_setmethods__ = {}
@@ -315,17 +344,17 @@ class posit32_t(_object):
 
     def __repr__(self):
         a = float(_softposit.convertP32ToDouble(self))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-            return "NaR"
-        else:
-            return str(a)
-    def __str__(self):
-        a = float(_softposit.convertP32ToDouble(self))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
 
+    def __str__(self):
+        a = float(_softposit.convertP32ToDouble(self))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
 
     def __init__(self):
         this = _softposit.new_posit32_t()
@@ -333,10 +362,14 @@ class posit32_t(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_posit32_t
     __del__ = lambda self: None
+
+
 posit32_t_swigregister = _softposit.posit32_t_swigregister
 posit32_t_swigregister(posit32_t)
+
 
 class posit64_t(_object):
     __swig_setmethods__ = {}
@@ -355,10 +388,14 @@ class posit64_t(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_posit64_t
     __del__ = lambda self: None
+
+
 posit64_t_swigregister = _softposit.posit64_t_swigregister
 posit64_t_swigregister(posit64_t)
+
 
 class posit128_t(_object):
     __swig_setmethods__ = {}
@@ -377,10 +414,14 @@ class posit128_t(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_posit128_t
     __del__ = lambda self: None
+
+
 posit128_t_swigregister = _softposit.posit128_t_swigregister
 posit128_t_swigregister(posit128_t)
+
 
 class quire8_t(_object):
     __swig_setmethods__ = {}
@@ -414,21 +455,25 @@ class quire8_t(_object):
 
     def __repr__(self):
         a = float(_softposit.convertP8ToDouble(_softposit.q8_to_p8(self)))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
+
     def __str__(self):
         a = float(_softposit.convertP8ToDouble(_softposit.q8_to_p8(self)))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
 
     __swig_destroy__ = _softposit.delete_quire8_t
     __del__ = lambda self: None
+
+
 quire8_t_swigregister = _softposit.quire8_t_swigregister
 quire8_t_swigregister(quire8_t)
+
 
 class quire16_t(_object):
     __swig_setmethods__ = {}
@@ -462,21 +507,25 @@ class quire16_t(_object):
 
     def __repr__(self):
         a = float(_softposit.convertP16ToDouble(_softposit.q16_to_p16(self)))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
+
     def __str__(self):
         a = float(_softposit.convertP16ToDouble(_softposit.q16_to_p16(self)))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
 
     __swig_destroy__ = _softposit.delete_quire16_t
     __del__ = lambda self: None
+
+
 quire16_t_swigregister = _softposit.quire16_t_swigregister
 quire16_t_swigregister(quire16_t)
+
 
 class quire32_t(_object):
     __swig_setmethods__ = {}
@@ -510,21 +559,25 @@ class quire32_t(_object):
 
     def __repr__(self):
         a = float(_softposit.convertP32ToDouble(_softposit.q32_to_p32(self)))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
+
     def __str__(self):
         a = float(_softposit.convertP32ToDouble(_softposit.q32_to_p32(self)))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
 
     __swig_destroy__ = _softposit.delete_quire32_t
     __del__ = lambda self: None
+
+
 quire32_t_swigregister = _softposit.quire32_t_swigregister
 quire32_t_swigregister(quire32_t)
+
 
 class posit_2_t(_object):
     __swig_setmethods__ = {}
@@ -584,17 +637,17 @@ class posit_2_t(_object):
 
     def __repr__(self):
         a = float(_softposit.convertPX2ToDouble(self))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-            return "NaR"
-        else:
-            return str(a)
-    def __str__(self):
-        a = float(_softposit.convertPX2ToDouble(self))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
 
+    def __str__(self):
+        a = float(_softposit.convertPX2ToDouble(self))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
 
     def __init__(self):
         this = _softposit.new_posit_2_t()
@@ -602,10 +655,14 @@ class posit_2_t(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_posit_2_t
     __del__ = lambda self: None
+
+
 posit_2_t_swigregister = _softposit.posit_2_t_swigregister
 posit_2_t_swigregister(posit_2_t)
+
 
 class quire_2_t(_object):
     __swig_setmethods__ = {}
@@ -639,21 +696,25 @@ class quire_2_t(_object):
 
     def __repr__(self, x):
         a = float(_softposit.convertPX2ToDouble(_softposit.qX2_to_pX2(self, x)))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
+
     def __str__(self, x):
         a = float(_softposit.convertPX2ToDouble(_softposit.qX2_to_pX2(self, x)))
-        if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
             return "NaR"
         else:
             return str(a)
 
     __swig_destroy__ = _softposit.delete_quire_2_t
     __del__ = lambda self: None
+
+
 quire_2_t_swigregister = _softposit.quire_2_t_swigregister
 quire_2_t_swigregister(quire_2_t)
+
 
 class ui8_p8(_object):
     __swig_setmethods__ = {}
@@ -676,10 +737,14 @@ class ui8_p8(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui8_p8
     __del__ = lambda self: None
+
+
 ui8_p8_swigregister = _softposit.ui8_p8_swigregister
 ui8_p8_swigregister(ui8_p8)
+
 
 class ui16_p16(_object):
     __swig_setmethods__ = {}
@@ -702,10 +767,14 @@ class ui16_p16(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui16_p16
     __del__ = lambda self: None
+
+
 ui16_p16_swigregister = _softposit.ui16_p16_swigregister
 ui16_p16_swigregister(ui16_p16)
+
 
 class ui32_p32(_object):
     __swig_setmethods__ = {}
@@ -728,10 +797,14 @@ class ui32_p32(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui32_p32
     __del__ = lambda self: None
+
+
 ui32_p32_swigregister = _softposit.ui32_p32_swigregister
 ui32_p32_swigregister(ui32_p32)
+
 
 class ui64_p64(_object):
     __swig_setmethods__ = {}
@@ -754,21 +827,29 @@ class ui64_p64(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui64_p64
     __del__ = lambda self: None
+
+
 ui64_p64_swigregister = _softposit.ui64_p64_swigregister
 ui64_p64_swigregister(ui64_p64)
 
+
 class ui128_p128c(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, ui128_p128c, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(
+        self, ui128_p128c, name, value
+    )
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, ui128_p128c, name)
     __repr__ = _swig_repr
     __swig_setmethods__["ui"] = _softposit.ui128_p128c_ui_set
     __swig_getmethods__["ui"] = _softposit.ui128_p128c_ui_get
     if _newclass:
-        ui = _swig_property(_softposit.ui128_p128c_ui_get, _softposit.ui128_p128c_ui_set)
+        ui = _swig_property(
+            _softposit.ui128_p128c_ui_get, _softposit.ui128_p128c_ui_set
+        )
     __swig_setmethods__["p"] = _softposit.ui128_p128c_p_set
     __swig_getmethods__["p"] = _softposit.ui128_p128c_p_get
     if _newclass:
@@ -780,10 +861,14 @@ class ui128_p128c(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui128_p128c
     __del__ = lambda self: None
+
+
 ui128_p128c_swigregister = _softposit.ui128_p128c_swigregister
 ui128_p128c_swigregister(ui128_p128c)
+
 
 class ui32_pX2(_object):
     __swig_setmethods__ = {}
@@ -806,21 +891,29 @@ class ui32_pX2(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui32_pX2
     __del__ = lambda self: None
+
+
 ui32_pX2_swigregister = _softposit.ui32_pX2_swigregister
 ui32_pX2_swigregister(ui32_pX2)
 
+
 class ui64_double(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, ui64_double, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(
+        self, ui64_double, name, value
+    )
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, ui64_double, name)
     __repr__ = _swig_repr
     __swig_setmethods__["ui"] = _softposit.ui64_double_ui_set
     __swig_getmethods__["ui"] = _softposit.ui64_double_ui_get
     if _newclass:
-        ui = _swig_property(_softposit.ui64_double_ui_get, _softposit.ui64_double_ui_set)
+        ui = _swig_property(
+            _softposit.ui64_double_ui_get, _softposit.ui64_double_ui_set
+        )
     __swig_setmethods__["d"] = _softposit.ui64_double_d_set
     __swig_getmethods__["d"] = _softposit.ui64_double_d_get
     if _newclass:
@@ -832,10 +925,14 @@ class ui64_double(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui64_double
     __del__ = lambda self: None
+
+
 ui64_double_swigregister = _softposit.ui64_double_swigregister
 ui64_double_swigregister(ui64_double)
+
 
 class ui32_q8(_object):
     __swig_setmethods__ = {}
@@ -858,10 +955,14 @@ class ui32_q8(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui32_q8
     __del__ = lambda self: None
+
+
 ui32_q8_swigregister = _softposit.ui32_q8_swigregister
 ui32_q8_swigregister(ui32_q8)
+
 
 class ui128_q16(_object):
     __swig_setmethods__ = {}
@@ -884,10 +985,14 @@ class ui128_q16(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui128_q16
     __del__ = lambda self: None
+
+
 ui128_q16_swigregister = _softposit.ui128_q16_swigregister
 ui128_q16_swigregister(ui128_q16)
+
 
 class ui512_q32(_object):
     __swig_setmethods__ = {}
@@ -910,10 +1015,14 @@ class ui512_q32(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui512_q32
     __del__ = lambda self: None
+
+
 ui512_q32_swigregister = _softposit.ui512_q32_swigregister
 ui512_q32_swigregister(ui512_q32)
+
 
 class ui512_qX2(_object):
     __swig_setmethods__ = {}
@@ -936,2024 +1045,3183 @@ class ui512_qX2(_object):
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
+
     __swig_destroy__ = _softposit.delete_ui512_qX2
     __del__ = lambda self: None
+
+
 ui512_qX2_swigregister = _softposit.ui512_qX2_swigregister
 ui512_qX2_swigregister(ui512_qX2)
 
 softposit_h = _softposit.softposit_h
 
+
 def ui32_to_p8(arg1):
     return _softposit.ui32_to_p8(arg1)
+
+
 ui32_to_p8 = _softposit.ui32_to_p8
+
 
 def ui32_to_p16(arg1):
     return _softposit.ui32_to_p16(arg1)
+
+
 ui32_to_p16 = _softposit.ui32_to_p16
+
 
 def ui32_to_p32(arg1):
     return _softposit.ui32_to_p32(arg1)
+
+
 ui32_to_p32 = _softposit.ui32_to_p32
+
 
 def ui64_to_p8(arg1):
     return _softposit.ui64_to_p8(arg1)
+
+
 ui64_to_p8 = _softposit.ui64_to_p8
+
 
 def ui64_to_p16(arg1):
     return _softposit.ui64_to_p16(arg1)
+
+
 ui64_to_p16 = _softposit.ui64_to_p16
+
 
 def ui64_to_p32(arg1):
     return _softposit.ui64_to_p32(arg1)
+
+
 ui64_to_p32 = _softposit.ui64_to_p32
+
 
 def i32_to_p8(arg1):
     return _softposit.i32_to_p8(arg1)
+
+
 i32_to_p8 = _softposit.i32_to_p8
+
 
 def i32_to_p16(arg1):
     return _softposit.i32_to_p16(arg1)
+
+
 i32_to_p16 = _softposit.i32_to_p16
+
 
 def i32_to_p32(arg1):
     return _softposit.i32_to_p32(arg1)
+
+
 i32_to_p32 = _softposit.i32_to_p32
+
 
 def i64_to_p8(arg1):
     return _softposit.i64_to_p8(arg1)
+
+
 i64_to_p8 = _softposit.i64_to_p8
+
 
 def i64_to_p16(arg1):
     return _softposit.i64_to_p16(arg1)
+
+
 i64_to_p16 = _softposit.i64_to_p16
+
 
 def i64_to_p32(arg1):
     return _softposit.i64_to_p32(arg1)
+
+
 i64_to_p32 = _softposit.i64_to_p32
+
 
 def p8_to_ui32(arg1):
     return _softposit.p8_to_ui32(arg1)
+
+
 p8_to_ui32 = _softposit.p8_to_ui32
+
 
 def p8_to_ui64(arg1):
     return _softposit.p8_to_ui64(arg1)
+
+
 p8_to_ui64 = _softposit.p8_to_ui64
+
 
 def p8_to_i32(arg1):
     return _softposit.p8_to_i32(arg1)
+
+
 p8_to_i32 = _softposit.p8_to_i32
+
 
 def p8_to_i64(arg1):
     return _softposit.p8_to_i64(arg1)
+
+
 p8_to_i64 = _softposit.p8_to_i64
+
 
 def p8_to_p16(arg1):
     return _softposit.p8_to_p16(arg1)
+
+
 p8_to_p16 = _softposit.p8_to_p16
+
 
 def p8_to_p32(arg1):
     return _softposit.p8_to_p32(arg1)
+
+
 p8_to_p32 = _softposit.p8_to_p32
+
 
 def p8_to_pX2(arg1, arg2):
     return _softposit.p8_to_pX2(arg1, arg2)
+
+
 p8_to_pX2 = _softposit.p8_to_pX2
+
 
 def p8_roundToInt(arg1):
     return _softposit.p8_roundToInt(arg1)
+
+
 p8_roundToInt = _softposit.p8_roundToInt
+
 
 def p8_add(arg1, arg2):
     return _softposit.p8_add(arg1, arg2)
+
+
 p8_add = _softposit.p8_add
+
 
 def p8_sub(arg1, arg2):
     return _softposit.p8_sub(arg1, arg2)
+
+
 p8_sub = _softposit.p8_sub
+
 
 def p8_mul(arg1, arg2):
     return _softposit.p8_mul(arg1, arg2)
+
+
 p8_mul = _softposit.p8_mul
+
 
 def p8_mulAdd(arg1, arg2, arg3):
     return _softposit.p8_mulAdd(arg1, arg2, arg3)
+
+
 p8_mulAdd = _softposit.p8_mulAdd
+
 
 def p8_div(arg1, arg2):
     return _softposit.p8_div(arg1, arg2)
+
+
 p8_div = _softposit.p8_div
+
 
 def p8_sqrt(arg1):
     return _softposit.p8_sqrt(arg1)
+
+
 p8_sqrt = _softposit.p8_sqrt
+
 
 def p8_eq(arg1, arg2):
     return _softposit.p8_eq(arg1, arg2)
+
+
 p8_eq = _softposit.p8_eq
+
 
 def p8_le(arg1, arg2):
     return _softposit.p8_le(arg1, arg2)
+
+
 p8_le = _softposit.p8_le
+
 
 def p8_lt(arg1, arg2):
     return _softposit.p8_lt(arg1, arg2)
+
+
 p8_lt = _softposit.p8_lt
+
 
 def q8_fdp_add(arg1, arg2, arg3):
     return _softposit.q8_fdp_add(arg1, arg2, arg3)
+
+
 q8_fdp_add = _softposit.q8_fdp_add
+
 
 def q8_fdp_sub(arg1, arg2, arg3):
     return _softposit.q8_fdp_sub(arg1, arg2, arg3)
+
+
 q8_fdp_sub = _softposit.q8_fdp_sub
+
 
 def q8_to_p8(arg1):
     return _softposit.q8_to_p8(arg1)
+
+
 q8_to_p8 = _softposit.q8_to_p8
+
 
 def p8_int(arg1):
     return _softposit.p8_int(arg1)
+
+
 p8_int = _softposit.p8_int
+
 
 def q8Clr():
     return _softposit.q8Clr()
+
+
 q8Clr = _softposit.q8Clr
+
 
 def convertP8ToDouble(arg1):
     return _softposit.convertP8ToDouble(arg1)
+
+
 convertP8ToDouble = _softposit.convertP8ToDouble
+
 
 def convertDoubleToP8(arg1):
     return _softposit.convertDoubleToP8(arg1)
+
+
 convertDoubleToP8 = _softposit.convertDoubleToP8
+
 
 def p16_to_ui32(arg1):
     return _softposit.p16_to_ui32(arg1)
+
+
 p16_to_ui32 = _softposit.p16_to_ui32
+
 
 def p16_to_ui64(arg1):
     return _softposit.p16_to_ui64(arg1)
+
+
 p16_to_ui64 = _softposit.p16_to_ui64
+
 
 def p16_to_i32(arg1):
     return _softposit.p16_to_i32(arg1)
+
+
 p16_to_i32 = _softposit.p16_to_i32
+
 
 def p16_to_i64(arg1):
     return _softposit.p16_to_i64(arg1)
+
+
 p16_to_i64 = _softposit.p16_to_i64
+
 
 def p16_to_p8(arg1):
     return _softposit.p16_to_p8(arg1)
+
+
 p16_to_p8 = _softposit.p16_to_p8
+
 
 def p16_to_p32(arg1):
     return _softposit.p16_to_p32(arg1)
+
+
 p16_to_p32 = _softposit.p16_to_p32
+
 
 def p16_to_pX2(arg1, arg2):
     return _softposit.p16_to_pX2(arg1, arg2)
+
+
 p16_to_pX2 = _softposit.p16_to_pX2
+
 
 def p16_roundToInt(arg1):
     return _softposit.p16_roundToInt(arg1)
+
+
 p16_roundToInt = _softposit.p16_roundToInt
+
 
 def p16_add(arg1, arg2):
     return _softposit.p16_add(arg1, arg2)
+
+
 p16_add = _softposit.p16_add
+
 
 def p16_sub(arg1, arg2):
     return _softposit.p16_sub(arg1, arg2)
+
+
 p16_sub = _softposit.p16_sub
+
 
 def p16_mul(arg1, arg2):
     return _softposit.p16_mul(arg1, arg2)
+
+
 p16_mul = _softposit.p16_mul
+
 
 def p16_mulAdd(arg1, arg2, arg3):
     return _softposit.p16_mulAdd(arg1, arg2, arg3)
+
+
 p16_mulAdd = _softposit.p16_mulAdd
+
 
 def p16_div(arg1, arg2):
     return _softposit.p16_div(arg1, arg2)
+
+
 p16_div = _softposit.p16_div
+
 
 def p16_sqrt(arg1):
     return _softposit.p16_sqrt(arg1)
+
+
 p16_sqrt = _softposit.p16_sqrt
+
 
 def p16_eq(arg1, arg2):
     return _softposit.p16_eq(arg1, arg2)
+
+
 p16_eq = _softposit.p16_eq
+
 
 def p16_le(arg1, arg2):
     return _softposit.p16_le(arg1, arg2)
+
+
 p16_le = _softposit.p16_le
+
 
 def p16_lt(arg1, arg2):
     return _softposit.p16_lt(arg1, arg2)
+
+
 p16_lt = _softposit.p16_lt
+
 
 def q16_fdp_add(arg1, arg2, arg3):
     return _softposit.q16_fdp_add(arg1, arg2, arg3)
+
+
 q16_fdp_add = _softposit.q16_fdp_add
+
 
 def q16_fdp_sub(arg1, arg2, arg3):
     return _softposit.q16_fdp_sub(arg1, arg2, arg3)
+
+
 q16_fdp_sub = _softposit.q16_fdp_sub
+
 
 def convertQ16ToP16(arg1):
     return _softposit.convertQ16ToP16(arg1)
+
+
 convertQ16ToP16 = _softposit.convertQ16ToP16
+
 
 def q16_to_p16(arg1):
     return _softposit.q16_to_p16(arg1)
+
+
 q16_to_p16 = _softposit.q16_to_p16
+
 
 def q16_TwosComplement(arg1):
     return _softposit.q16_TwosComplement(arg1)
+
+
 q16_TwosComplement = _softposit.q16_TwosComplement
+
 
 def p16_int(arg1):
     return _softposit.p16_int(arg1)
+
+
 p16_int = _softposit.p16_int
+
 
 def printBinary(arg1, arg2):
     return _softposit.printBinary(arg1, arg2)
+
+
 printBinary = _softposit.printBinary
+
 
 def printBinaryPX(arg1, arg2):
     return _softposit.printBinaryPX(arg1, arg2)
+
+
 printBinaryPX = _softposit.printBinaryPX
+
 
 def printHex(arg1):
     return _softposit.printHex(arg1)
+
+
 printHex = _softposit.printHex
+
 
 def printHex64(arg1):
     return _softposit.printHex64(arg1)
+
+
 printHex64 = _softposit.printHex64
+
 
 def printHexPX(arg1, arg2):
     return _softposit.printHexPX(arg1, arg2)
+
+
 printHexPX = _softposit.printHexPX
+
 
 def q16Clr():
     return _softposit.q16Clr()
+
+
 q16Clr = _softposit.q16Clr
+
 
 def convertP16ToDouble(arg1):
     return _softposit.convertP16ToDouble(arg1)
+
+
 convertP16ToDouble = _softposit.convertP16ToDouble
+
 
 def convertFloatToP16(arg1):
     return _softposit.convertFloatToP16(arg1)
+
+
 convertFloatToP16 = _softposit.convertFloatToP16
+
 
 def convertDoubleToP16(arg1):
     return _softposit.convertDoubleToP16(arg1)
+
+
 convertDoubleToP16 = _softposit.convertDoubleToP16
+
 
 def p32_to_ui32(arg1):
     return _softposit.p32_to_ui32(arg1)
+
+
 p32_to_ui32 = _softposit.p32_to_ui32
+
 
 def p32_to_ui64(arg1):
     return _softposit.p32_to_ui64(arg1)
+
+
 p32_to_ui64 = _softposit.p32_to_ui64
+
 
 def p32_to_i32(arg1):
     return _softposit.p32_to_i32(arg1)
+
+
 p32_to_i32 = _softposit.p32_to_i32
+
 
 def p32_to_i64(arg1):
     return _softposit.p32_to_i64(arg1)
+
+
 p32_to_i64 = _softposit.p32_to_i64
+
 
 def p32_to_p8(arg1):
     return _softposit.p32_to_p8(arg1)
+
+
 p32_to_p8 = _softposit.p32_to_p8
+
 
 def p32_to_p16(arg1):
     return _softposit.p32_to_p16(arg1)
+
+
 p32_to_p16 = _softposit.p32_to_p16
+
 
 def p32_roundToInt(arg1):
     return _softposit.p32_roundToInt(arg1)
+
+
 p32_roundToInt = _softposit.p32_roundToInt
+
 
 def p32_add(arg1, arg2):
     return _softposit.p32_add(arg1, arg2)
+
+
 p32_add = _softposit.p32_add
+
 
 def p32_sub(arg1, arg2):
     return _softposit.p32_sub(arg1, arg2)
+
+
 p32_sub = _softposit.p32_sub
+
 
 def p32_mul(arg1, arg2):
     return _softposit.p32_mul(arg1, arg2)
+
+
 p32_mul = _softposit.p32_mul
+
 
 def p32_mulAdd(arg1, arg2, arg3):
     return _softposit.p32_mulAdd(arg1, arg2, arg3)
+
+
 p32_mulAdd = _softposit.p32_mulAdd
+
 
 def p32_div(arg1, arg2):
     return _softposit.p32_div(arg1, arg2)
+
+
 p32_div = _softposit.p32_div
+
 
 def p32_sqrt(arg1):
     return _softposit.p32_sqrt(arg1)
+
+
 p32_sqrt = _softposit.p32_sqrt
+
 
 def p32_eq(arg1, arg2):
     return _softposit.p32_eq(arg1, arg2)
+
+
 p32_eq = _softposit.p32_eq
+
 
 def p32_le(arg1, arg2):
     return _softposit.p32_le(arg1, arg2)
+
+
 p32_le = _softposit.p32_le
+
 
 def p32_lt(arg1, arg2):
     return _softposit.p32_lt(arg1, arg2)
+
+
 p32_lt = _softposit.p32_lt
+
 
 def p32_to_pX2(arg1, arg2):
     return _softposit.p32_to_pX2(arg1, arg2)
+
+
 p32_to_pX2 = _softposit.p32_to_pX2
+
 
 def p32_int(arg1):
     return _softposit.p32_int(arg1)
+
+
 p32_int = _softposit.p32_int
+
 
 def q32_fdp_add(arg1, arg2, arg3):
     return _softposit.q32_fdp_add(arg1, arg2, arg3)
+
+
 q32_fdp_add = _softposit.q32_fdp_add
+
 
 def q32_fdp_sub(arg1, arg2, arg3):
     return _softposit.q32_fdp_sub(arg1, arg2, arg3)
+
+
 q32_fdp_sub = _softposit.q32_fdp_sub
+
 
 def q32_to_p32(arg1):
     return _softposit.q32_to_p32(arg1)
+
+
 q32_to_p32 = _softposit.q32_to_p32
+
 
 def q32_TwosComplement(arg1):
     return _softposit.q32_TwosComplement(arg1)
+
+
 q32_TwosComplement = _softposit.q32_TwosComplement
+
 
 def q32Clr():
     return _softposit.q32Clr()
+
+
 q32Clr = _softposit.q32Clr
+
 
 def convertP32ToDouble(arg1):
     return _softposit.convertP32ToDouble(arg1)
+
+
 convertP32ToDouble = _softposit.convertP32ToDouble
+
 
 def convertFloatToP32(arg1):
     return _softposit.convertFloatToP32(arg1)
+
+
 convertFloatToP32 = _softposit.convertFloatToP32
+
 
 def convertDoubleToP32(arg1):
     return _softposit.convertDoubleToP32(arg1)
+
+
 convertDoubleToP32 = _softposit.convertDoubleToP32
+
 
 def pX2_add(arg1, arg2, arg3):
     return _softposit.pX2_add(arg1, arg2, arg3)
+
+
 pX2_add = _softposit.pX2_add
+
 
 def pX2_sub(arg1, arg2, arg3):
     return _softposit.pX2_sub(arg1, arg2, arg3)
+
+
 pX2_sub = _softposit.pX2_sub
+
 
 def pX2_mul(arg1, arg2, arg3):
     return _softposit.pX2_mul(arg1, arg2, arg3)
+
+
 pX2_mul = _softposit.pX2_mul
+
 
 def pX2_div(arg1, arg2, arg3):
     return _softposit.pX2_div(arg1, arg2, arg3)
+
+
 pX2_div = _softposit.pX2_div
+
 
 def pX2_mulAdd(arg1, arg2, arg3, arg4):
     return _softposit.pX2_mulAdd(arg1, arg2, arg3, arg4)
+
+
 pX2_mulAdd = _softposit.pX2_mulAdd
+
 
 def pX2_roundToInt(arg1, arg2):
     return _softposit.pX2_roundToInt(arg1, arg2)
+
+
 pX2_roundToInt = _softposit.pX2_roundToInt
+
 
 def ui32_to_pX2(arg1, arg2):
     return _softposit.ui32_to_pX2(arg1, arg2)
+
+
 ui32_to_pX2 = _softposit.ui32_to_pX2
+
 
 def ui64_to_pX2(arg1, arg2):
     return _softposit.ui64_to_pX2(arg1, arg2)
+
+
 ui64_to_pX2 = _softposit.ui64_to_pX2
+
 
 def i32_to_pX2(arg1, arg2):
     return _softposit.i32_to_pX2(arg1, arg2)
+
+
 i32_to_pX2 = _softposit.i32_to_pX2
+
 
 def i64_to_pX2(arg1, arg2):
     return _softposit.i64_to_pX2(arg1, arg2)
+
+
 i64_to_pX2 = _softposit.i64_to_pX2
+
 
 def pX2_sqrt(arg1, arg2):
     return _softposit.pX2_sqrt(arg1, arg2)
+
+
 pX2_sqrt = _softposit.pX2_sqrt
+
 
 def pX2_to_ui32(arg1):
     return _softposit.pX2_to_ui32(arg1)
+
+
 pX2_to_ui32 = _softposit.pX2_to_ui32
+
 
 def pX2_to_ui64(arg1):
     return _softposit.pX2_to_ui64(arg1)
+
+
 pX2_to_ui64 = _softposit.pX2_to_ui64
+
 
 def pX2_to_i32(arg1):
     return _softposit.pX2_to_i32(arg1)
+
+
 pX2_to_i32 = _softposit.pX2_to_i32
+
 
 def pX2_to_i64(arg1):
     return _softposit.pX2_to_i64(arg1)
+
+
 pX2_to_i64 = _softposit.pX2_to_i64
+
 
 def pX2_int(arg1):
     return _softposit.pX2_int(arg1)
+
+
 pX2_int = _softposit.pX2_int
+
 
 def pX2_eq(arg1, arg2):
     return _softposit.pX2_eq(arg1, arg2)
+
+
 pX2_eq = _softposit.pX2_eq
+
 
 def pX2_le(arg1, arg2):
     return _softposit.pX2_le(arg1, arg2)
+
+
 pX2_le = _softposit.pX2_le
+
 
 def pX2_lt(arg1, arg2):
     return _softposit.pX2_lt(arg1, arg2)
+
+
 pX2_lt = _softposit.pX2_lt
+
 
 def pX2_to_p8(arg1):
     return _softposit.pX2_to_p8(arg1)
+
+
 pX2_to_p8 = _softposit.pX2_to_p8
+
 
 def pX2_to_p16(arg1):
     return _softposit.pX2_to_p16(arg1)
+
+
 pX2_to_p16 = _softposit.pX2_to_p16
+
 
 def pX2_to_pX2(arg1, arg2):
     return _softposit.pX2_to_pX2(arg1, arg2)
+
+
 pX2_to_pX2 = _softposit.pX2_to_pX2
+
 
 def pX2_to_p32(pA):
     return _softposit.pX2_to_p32(pA)
+
+
 pX2_to_p32 = _softposit.pX2_to_p32
+
 
 def convertDoubleToPX2(arg1, arg2):
     return _softposit.convertDoubleToPX2(arg1, arg2)
+
+
 convertDoubleToPX2 = _softposit.convertDoubleToPX2
+
 
 def convertPX2ToDouble(arg1):
     return _softposit.convertPX2ToDouble(arg1)
+
+
 convertPX2ToDouble = _softposit.convertPX2ToDouble
+
 
 def qX2_fdp_add(q, pA, arg3):
     return _softposit.qX2_fdp_add(q, pA, arg3)
+
+
 qX2_fdp_add = _softposit.qX2_fdp_add
+
 
 def qX2_fdp_sub(q, pA, arg3):
     return _softposit.qX2_fdp_sub(q, pA, arg3)
+
+
 qX2_fdp_sub = _softposit.qX2_fdp_sub
+
 
 def qX2_to_pX2(arg1, arg2):
     return _softposit.qX2_to_pX2(arg1, arg2)
+
+
 qX2_to_pX2 = _softposit.qX2_to_pX2
+
 
 def qX2_TwosComplement(arg1):
     return _softposit.qX2_TwosComplement(arg1)
+
+
 qX2_TwosComplement = _softposit.qX2_TwosComplement
+
 
 def qX2Clr():
     return _softposit.qX2Clr()
+
+
 qX2Clr = _softposit.qX2Clr
 
 
 def convertToColor(i, ps, es):
-   orig="{0:b}".format(i).zfill(ps)
-   m=0
-   regime=1
-   exponent=0
-   firstFrac = 1
-   colored=""
-   if es>0:
-       exponent = 1
-       e=0
-   for c in orig:
-       if m==0:
-           colored+="\033[1;37;41m"+c+"\033[0m"
-       elif regime==1:
-           if m==1:
-              regS = c
-              colored+="\033[1;30;43m"+c
-           else:
-              if c==regS:
-                 colored+=c
-              else:
-                 regime = 0
-                 colored+=c+"\033[0m"           
-       elif exponent==1:
-           if e==0:
-              colored+="\033[1;37;44m"+c
-           else:
-              colored+=c
-           e+=1
-           if e==es:
-              colored+="\033[0m"
-              exponent = 0
-       else:
-           if firstFrac==1:
-              colored+="\033[1;37;40m"+c
-              firstFrac=0
-           else:
-              colored+=c
-       m+=1
-       if (m!=ps and m%8==0):
-           colored+=" "
+    orig = "{0:b}".format(i).zfill(ps)
+    m = 0
+    regime = 1
+    exponent = 0
+    firstFrac = 1
+    colored = ""
+    if es > 0:
+        exponent = 1
+        e = 0
+    for c in orig:
+        if m == 0:
+            colored += "\033[1;37;41m" + c + "\033[0m"
+        elif regime == 1:
+            if m == 1:
+                regS = c
+                colored += "\033[1;30;43m" + c
+            else:
+                if c == regS:
+                    colored += c
+                else:
+                    regime = 0
+                    colored += c + "\033[0m"
+        elif exponent == 1:
+            if e == 0:
+                colored += "\033[1;37;44m" + c
+            else:
+                colored += c
+            e += 1
+            if e == es:
+                colored += "\033[0m"
+                exponent = 0
+        else:
+            if firstFrac == 1:
+                colored += "\033[1;37;40m" + c
+                firstFrac = 0
+            else:
+                colored += c
+        m += 1
+        if m != ps and m % 8 == 0:
+            colored += " "
 
-   return colored+"\033[0m"
+    return colored + "\033[0m"
+
 
 class posit8:
-   def __init__(self, value=None, bits=None):
-       try:
-           if bits is not None:
-               if isinstance(bits, (int)):
-                   self.v = posit8_t()
-                   self.v.v = bits & 0xFF
-               else:
-                   raise Exception("Bits can only be set with integer values")
-           else:
-               if value is None:
-                   self.v = posit8_t()
-                   self.v.v = 0
-               elif isinstance(value, (int)):
-                   self.v = _softposit.i64_to_p8(value)
-               else:
-                   self.v = _softposit.convertDoubleToP8(value)
-       except Exception as error:
-           print(repr(error))
-   def type(self):
-       return 'posit8'
-   def __add__(self, other):
-       try:
-          a = posit8(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p8_add(self.v, _softposit.i64_to_p8(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p8_add(self.v, _softposit.convertDoubleToP8(other))
-          else:           
-              a.v = _softposit.p8_add(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for +: posit8 and ",other.type())          
-   def __radd__(self, other):
-       return self.__add__(other)  
-   def __sub__(self, other):
-       try:
-          a = posit8(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p8_sub(self.v, _softposit.i64_to_p8(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p8_sub(self.v, _softposit.convertDoubleToP8(other))
-          else:
-              a.v = _softposit.p8_sub(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for -: posit8 and ",other.type())      
-   def __rsub__(self, other):
-       try:
-          a = posit8(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p8_sub(_softposit.i64_to_p8(other), self.v)
-          elif isinstance(other, (float)):
-              a.v = _softposit.p8_sub(_softposit.convertDoubleToP8(other), self.v)
-          else:
-              a.v = _softposit.p8_sub(other.v, self.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for -: posit8 and ",other.type())  
-   def __mul__(self, other):
-       try:
-          a = posit8(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p8_mul(self.v, _softposit.i64_to_p8(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p8_mul(self.v, _softposit.convertDoubleToP8(other))
-          else:
-              a.v = _softposit.p8_mul(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for *: posit8 and ",other.type())   
-   def __rmul__(self, other):
-       return self.__mul__(other)  
-   def __div__(self, other):
-       try:
-          a = posit8(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p8_div(self.v, _softposit.i64_to_p8(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p8_div(self.v, _softposit.convertDoubleToP8(other))
-          else:
-              a.v = _softposit.p8_div(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for /: posit8 and ",other.type())   
-   def __truediv__(self, other):
-       return self.__div__(other)      
-   def __rdiv__(self, other):
-       try:
-          a = posit8(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p8_div(_softposit.i64_to_p8(other), self.v)
-          elif isinstance(other, (float)):
-              a.v = _softposit.p8_div(_softposit.convertDoubleToP8(other), self.v)
-          else:
-              a.v = _softposit.p8_div(other.v, self.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for *: posit8 and ",other.type())  
-   def __rtruediv__(self, other):
-       return self.__rdiv__(other)
-   def __eq__(self, other):
-       try:
-          if isinstance(other, (int)):
-              return _softposit.p8_eq(self.v, _softposit.i64_to_p8(other))
-          elif isinstance(other, (float)):
-              return _softposit.p8_eq(self.v, _softposit.convertDoubleToP8(other))
-          else:
-              return _softposit.p8_eq(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for ==: posit8 and ",other.type())   
-   def __ne__(self, other):
-       try:                                                                                     
-          if isinstance(other, (int)):
-              return not(_softposit.p8_eq(self.v, _softposit.i64_to_p8(other)))
-          elif isinstance(other, (float)):
-              return not(_softposit.p8_eq(self.v, _softposit.convertDoubleToP8(other)))
-          else:
-              return not(_softposit.p8_eq(self.v, other.v))
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for !=: posit8 and ",other.type())
-   def __le__(self, other):
-       try:        
-          if isinstance(other, (int)):
-              return _softposit.p8_le(self.v, _softposit.i64_to_p8(other))
-          elif isinstance(other, (float)):
-              return _softposit.p8_le(self.v, _softposit.convertDoubleToP8(other))
-          else:
-              return _softposit.p8_le(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for <=: posit8 and ",other.type()) 
-   def __lt__(self, other):
-       try:   
-          if isinstance(other, (int)):
-              return _softposit.p8_lt(self.v, _softposit.i64_to_p8(other))
-          elif isinstance(other, (float)):
-              return _softposit.p8_lt(self.v, _softposit.convertDoubleToP8(other))
-          else:
-              return _softposit.p8_lt(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for <: posit8 and ",other.type())
-   def __ge__(self, other):
-       try:   
-          if isinstance(other, (int)):
-              return _softposit.p8_le(_softposit.i64_to_p8(other), self.v)
-          elif isinstance(other, (float)):
-              return _softposit.p8_le(_softposit.convertDoubleToP8(other), self.v)
-          else:
-              return _softposit.p8_le(other.v, self.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for >=: posit8 and ",other.type())
-   def __gt__(self, other):
-       try:   
-          if isinstance(other, (int)):
-              return _softposit.p8_lt(_softposit.i64_to_p8(other), self.v)
-          elif isinstance(other, (float)):
-              return _softposit.p8_lt(_softposit.convertDoubleToP8(other), self.v)
-          else:
-              return _softposit.p8_lt(other.v, self.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for >: posit8 and ",other.type())
-   def __rshift__(self, other):
-       a = posit8(0)
-       a.v = self.v.__rshift__(other)
-       return a
-   def __lshift__(self, other):
-       a = posit8(0)
-       a.v = self.v.__lshift__(other)
-       return a
-   def __pos__(self):
-       return self
-   def __neg__(self):
-       a = posit8(0)
-       a.v = self.v.__neg__()
-       return a
-   def __abs__(self):
-       a = posit8(0)
-       a.v = self.v.__abs__()
-       return a
-   def __invert__(self):
-       self.v = self.v.__invert__()
-       return self   
-   def __and__(self, other):
-       a = posit8(0)
-       a.v = self.v.__and__(other.v)
-       return a
-   def __xor__(self, other):
-       a = posit8(0)
-       a.v = self.v.__xor__(other.v)
-       return a
-   def __or__(self, other):
-       a = posit8(0)
-       a.v = self.v.__or__(other.v)
-       return a
-   def fma(self, other1, other2):
-       try:   
-          a = posit8(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p8_mulAdd(_softposit.i64_to_p8(other1), _softposit.i64_to_p8(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p8_mulAdd(_softposit.i64_to_p8(other1), _softposit.convertDoubleToP8(other2), self.v)
-              else:
-                  a.v = _softposit.p8_mulAdd(_softposit.i64_to_p8(other1), other2.v, self.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p8_mulAdd(_softposit.convertDoubleToP8(other1), _softposit.i64_to_p8(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p8_mulAdd(_softposit.convertDoubleToP8(other1), _softposit.convertDoubleToP8(other2), self.v)
-              else:
-                  a.v = _softposit.p8_mulAdd(_softposit.convertDoubleToP8(other1), other2.v, self.v)
-          else:
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p8_mulAdd(self.v, other1.v, _softposit.i64_to_p8(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p8_mulAdd(other1.v, _softposit.convertDoubleToP8(other2), self.v)
-              else:
-                  a.v = _softposit.p8_mulAdd(other1.v, other2.v, self.v)   
-          return a
-       except TypeError:
-          print("TypeError: Unsupported fused operand (fma) among mixed precison posit types")
-   def toPosit16(self):
-       a = posit16(0)
-       a.v = _softposit.p8_to_p16(self.v)
-       return a
-   def toPosit32(self):
-       a = posit32(0)
-       a.v = _softposit.p8_to_p32(self.v)
-       return a
-   def toPosit_2(self, x):
-       a = posit_2(0, x)
-       a.v = _softposit.p8_to_pX2(self.v, x)
-       return a
-   def toRInt(self):
-       return _softposit.p8_to_i64(self.v)
-   def toInt(self):
-       return _softposit.p8_int(self.v)
-   def rint(self):
-       self.v = _softposit.p8_roundToInt(self.v)
-       return self
-   def sqrt(self):
-       a = posit8(0)
-       a.v = _softposit.p8_sqrt(self.v)
-       return a
-   def __repr__(self):
-       a = float(_softposit.convertP8ToDouble(self.v))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __str__(self):
-       a = float(_softposit.convertP8ToDouble(self.v))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __int__(self):
-       return _softposit.p8_int(self.v)
-   def __float__(self):
-       return float(_softposit.convertP8ToDouble(self.v))
-   def isNaR(self):
-       return self.v.isNaR();
-   def toNaR(self):
-       a = posit8(0)
-       a.v.toNaR();
-       return a
-   def fromBits(self, value):
-       self.v.fromBits(value)
-   def toBinary(self):
-       self.v.toBits()
-   def toBinaryFormatted(self):
-       print(convertToColor(self.v.v, 8, 0))
-   def toHex(self):
-       self.v.toHex()
+    def __init__(self, value=None, bits=None):
+        try:
+            if bits is not None:
+                if isinstance(bits, (int)):
+                    self.v = posit8_t()
+                    self.v.v = bits & 0xFF
+                else:
+                    raise Exception("Bits can only be set with integer values")
+            else:
+                if value is None:
+                    self.v = posit8_t()
+                    self.v.v = 0
+                elif isinstance(value, (int)):
+                    self.v = _softposit.i64_to_p8(value)
+                else:
+                    self.v = _softposit.convertDoubleToP8(value)
+        except Exception as error:
+            print(repr(error))
+
+    def type(self):
+        return "posit8"
+
+    def __add__(self, other):
+        try:
+            a = posit8(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p8_add(self.v, _softposit.i64_to_p8(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p8_add(self.v, _softposit.convertDoubleToP8(other))
+            else:
+                a.v = _softposit.p8_add(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for +: posit8 and ",
+                other.type(),
+            )
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        try:
+            a = posit8(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p8_sub(self.v, _softposit.i64_to_p8(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p8_sub(self.v, _softposit.convertDoubleToP8(other))
+            else:
+                a.v = _softposit.p8_sub(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for -: posit8 and ",
+                other.type(),
+            )
+
+    def __rsub__(self, other):
+        try:
+            a = posit8(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p8_sub(_softposit.i64_to_p8(other), self.v)
+            elif isinstance(other, (float)):
+                a.v = _softposit.p8_sub(_softposit.convertDoubleToP8(other), self.v)
+            else:
+                a.v = _softposit.p8_sub(other.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for -: posit8 and ",
+                other.type(),
+            )
+
+    def __mul__(self, other):
+        try:
+            a = posit8(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p8_mul(self.v, _softposit.i64_to_p8(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p8_mul(self.v, _softposit.convertDoubleToP8(other))
+            else:
+                a.v = _softposit.p8_mul(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for *: posit8 and ",
+                other.type(),
+            )
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __div__(self, other):
+        try:
+            a = posit8(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p8_div(self.v, _softposit.i64_to_p8(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p8_div(self.v, _softposit.convertDoubleToP8(other))
+            else:
+                a.v = _softposit.p8_div(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for /: posit8 and ",
+                other.type(),
+            )
+
+    def __truediv__(self, other):
+        return self.__div__(other)
+
+    def __rdiv__(self, other):
+        try:
+            a = posit8(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p8_div(_softposit.i64_to_p8(other), self.v)
+            elif isinstance(other, (float)):
+                a.v = _softposit.p8_div(_softposit.convertDoubleToP8(other), self.v)
+            else:
+                a.v = _softposit.p8_div(other.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for *: posit8 and ",
+                other.type(),
+            )
+
+    def __rtruediv__(self, other):
+        return self.__rdiv__(other)
+
+    def __eq__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p8_eq(self.v, _softposit.i64_to_p8(other))
+            elif isinstance(other, (float)):
+                return _softposit.p8_eq(self.v, _softposit.convertDoubleToP8(other))
+            else:
+                return _softposit.p8_eq(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for ==: posit8 and ",
+                other.type(),
+            )
+
+    def __ne__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return not (_softposit.p8_eq(self.v, _softposit.i64_to_p8(other)))
+            elif isinstance(other, (float)):
+                return not (
+                    _softposit.p8_eq(self.v, _softposit.convertDoubleToP8(other))
+                )
+            else:
+                return not (_softposit.p8_eq(self.v, other.v))
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for !=: posit8 and ",
+                other.type(),
+            )
+
+    def __le__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p8_le(self.v, _softposit.i64_to_p8(other))
+            elif isinstance(other, (float)):
+                return _softposit.p8_le(self.v, _softposit.convertDoubleToP8(other))
+            else:
+                return _softposit.p8_le(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for <=: posit8 and ",
+                other.type(),
+            )
+
+    def __lt__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p8_lt(self.v, _softposit.i64_to_p8(other))
+            elif isinstance(other, (float)):
+                return _softposit.p8_lt(self.v, _softposit.convertDoubleToP8(other))
+            else:
+                return _softposit.p8_lt(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for <: posit8 and ",
+                other.type(),
+            )
+
+    def __ge__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p8_le(_softposit.i64_to_p8(other), self.v)
+            elif isinstance(other, (float)):
+                return _softposit.p8_le(_softposit.convertDoubleToP8(other), self.v)
+            else:
+                return _softposit.p8_le(other.v, self.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for >=: posit8 and ",
+                other.type(),
+            )
+
+    def __gt__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p8_lt(_softposit.i64_to_p8(other), self.v)
+            elif isinstance(other, (float)):
+                return _softposit.p8_lt(_softposit.convertDoubleToP8(other), self.v)
+            else:
+                return _softposit.p8_lt(other.v, self.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for >: posit8 and ",
+                other.type(),
+            )
+
+    def __rshift__(self, other):
+        a = posit8(0)
+        a.v = self.v.__rshift__(other)
+        return a
+
+    def __lshift__(self, other):
+        a = posit8(0)
+        a.v = self.v.__lshift__(other)
+        return a
+
+    def __pos__(self):
+        return self
+
+    def __neg__(self):
+        a = posit8(0)
+        a.v = self.v.__neg__()
+        return a
+
+    def __abs__(self):
+        a = posit8(0)
+        a.v = self.v.__abs__()
+        return a
+
+    def __invert__(self):
+        self.v = self.v.__invert__()
+        return self
+
+    def __and__(self, other):
+        a = posit8(0)
+        a.v = self.v.__and__(other.v)
+        return a
+
+    def __xor__(self, other):
+        a = posit8(0)
+        a.v = self.v.__xor__(other.v)
+        return a
+
+    def __or__(self, other):
+        a = posit8(0)
+        a.v = self.v.__or__(other.v)
+        return a
+
+    def fma(self, other1, other2):
+        try:
+            a = posit8(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p8_mulAdd(
+                        _softposit.i64_to_p8(other1),
+                        _softposit.i64_to_p8(other2),
+                        self.v,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p8_mulAdd(
+                        _softposit.i64_to_p8(other1),
+                        _softposit.convertDoubleToP8(other2),
+                        self.v,
+                    )
+                else:
+                    a.v = _softposit.p8_mulAdd(
+                        _softposit.i64_to_p8(other1), other2.v, self.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p8_mulAdd(
+                        _softposit.convertDoubleToP8(other1),
+                        _softposit.i64_to_p8(other2),
+                        self.v,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p8_mulAdd(
+                        _softposit.convertDoubleToP8(other1),
+                        _softposit.convertDoubleToP8(other2),
+                        self.v,
+                    )
+                else:
+                    a.v = _softposit.p8_mulAdd(
+                        _softposit.convertDoubleToP8(other1), other2.v, self.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p8_mulAdd(
+                        self.v, other1.v, _softposit.i64_to_p8(other2), self.v
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p8_mulAdd(
+                        other1.v, _softposit.convertDoubleToP8(other2), self.v
+                    )
+                else:
+                    a.v = _softposit.p8_mulAdd(other1.v, other2.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (fma) among mixed precison posit types"
+            )
+
+    def toPosit16(self):
+        a = posit16(0)
+        a.v = _softposit.p8_to_p16(self.v)
+        return a
+
+    def toPosit32(self):
+        a = posit32(0)
+        a.v = _softposit.p8_to_p32(self.v)
+        return a
+
+    def toPosit_2(self, x):
+        a = posit_2(0, x)
+        a.v = _softposit.p8_to_pX2(self.v, x)
+        return a
+
+    def toRInt(self):
+        return _softposit.p8_to_i64(self.v)
+
+    def toInt(self):
+        return _softposit.p8_int(self.v)
+
+    def rint(self):
+        self.v = _softposit.p8_roundToInt(self.v)
+        return self
+
+    def sqrt(self):
+        a = posit8(0)
+        a.v = _softposit.p8_sqrt(self.v)
+        return a
+
+    def __repr__(self):
+        a = float(_softposit.convertP8ToDouble(self.v))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __str__(self):
+        a = float(_softposit.convertP8ToDouble(self.v))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __int__(self):
+        return _softposit.p8_int(self.v)
+
+    def __float__(self):
+        return float(_softposit.convertP8ToDouble(self.v))
+
+    def isNaR(self):
+        return self.v.isNaR()
+
+    def toNaR(self):
+        a = posit8(0)
+        a.v.toNaR()
+        return a
+
+    def fromBits(self, value):
+        self.v.fromBits(value)
+
+    def toBinary(self):
+        self.v.toBits()
+
+    def toBinaryFormatted(self):
+        print(convertToColor(self.v.v, 8, 0))
+
+    def toHex(self):
+        self.v.toHex()
+
 
 class quire8:
-   def __init__(self):
-       self.v = _softposit.q8Clr();
-   def type(self):
-       return 'quire8'
-   def qma(self, other1, other2):
-       try:
-          a = posit8(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q8_fdp_add(self.v, _softposit.i64_to_p8(other1), _softposit.i64_to_p8(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q8_fdp_add(self.v, _softposit.i64_to_p8(other1), _softposit.convertDoubleToP8(other2))
-              else:
-                  self.v = _softposit.q8_fdp_add(self.v, _softposit.i64_to_p8(other1), other2.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q8_fdp_add(self.v, _softposit.convertDoubleToP8(other1), _softposit.i64_to_p8(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q8_fdp_add(self.v, _softposit.convertDoubleToP8(other1), _softposit.convertDoubleToP8(other2))
-              else:
-                  self.v = _softposit.q8_fdp_add(self.v, _softposit.convertDoubleToP8(other1), other2.v)
-          else:
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q8_fdp_add(self.v, other1.v, _softposit.i64_to_p8(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q8_fdp_add(self.v, other1.v, _softposit.convertDoubleToP8(other2))
-              else:
-                  self.v = _softposit.q8_fdp_add(self.v, other1.v, other2.v)
-          return self
-       except TypeError:
-          print("TypeError: Unsupported fused operand (qma) between quire8 and non-posit8 types")     
-   def qms(self, other1, other2):
-       try:
-          a = posit8(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q8_fdp_sub(self.v, _softposit.i64_to_p8(other1), _softposit.i64_to_p8(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q8_fdp_sub(self.v, _softposit.i64_to_p8(other1), _softposit.convertDoubleToP8(other2))
-              else:
-                  self.v = _softposit.q8_fdp_sub(self.v, _softposit.i64_to_p8(other1), other2.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q8_fdp_sub(self.v, _softposit.convertDoubleToP8(other1), _softposit.i64_to_p8(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q8_fdp_sub(self.v, _softposit.convertDoubleToP8(other1), _softposit.convertDoubleToP8(other2))
-              else:
-                  self.v = _softposit.q8_fdp_sub(self.v, _softposit.convertDoubleToP8(other1), other2.v)
-          else:
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q8_fdp_sub(self.v, other1.v, _softposit.i64_to_p8(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q8_fdp_sub(self.v, other1.v, _softposit.convertDoubleToP8(other2))
-              else:
-                  self.v = _softposit.q8_fdp_sub(self.v, other1.v, other2.v)
-          return self
-       except TypeError:
-          print("TypeError: Unsupported fused operand (qms) between quire8 and non-posit8 types")    
-   def toPosit(self): 
-       a = posit8(0)      
-       a.v = _softposit.q8_to_p8(self.v);
-       return a
-   def clr(self):       
-       self.v = _softposit.q8Clr();
-   def isNaR(self):       
-       return self.v.isNaR();
-   def __repr__(self):
-       a = float(_softposit.convertP8ToDouble(_softposit.q8_to_p8(self.v)))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __str__(self):
-       a = float(_softposit.convertP8ToDouble(_softposit.q8_to_p8(self.v)))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def toBinary(self):
-       self.v.toBits()
-   def toHex(self):
-       self.v.toHex()
+    def __init__(self):
+        self.v = _softposit.q8Clr()
+
+    def type(self):
+        return "quire8"
+
+    def qma(self, other1, other2):
+        try:
+            a = posit8(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q8_fdp_add(
+                        self.v,
+                        _softposit.i64_to_p8(other1),
+                        _softposit.i64_to_p8(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q8_fdp_add(
+                        self.v,
+                        _softposit.i64_to_p8(other1),
+                        _softposit.convertDoubleToP8(other2),
+                    )
+                else:
+                    self.v = _softposit.q8_fdp_add(
+                        self.v, _softposit.i64_to_p8(other1), other2.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q8_fdp_add(
+                        self.v,
+                        _softposit.convertDoubleToP8(other1),
+                        _softposit.i64_to_p8(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q8_fdp_add(
+                        self.v,
+                        _softposit.convertDoubleToP8(other1),
+                        _softposit.convertDoubleToP8(other2),
+                    )
+                else:
+                    self.v = _softposit.q8_fdp_add(
+                        self.v, _softposit.convertDoubleToP8(other1), other2.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q8_fdp_add(
+                        self.v, other1.v, _softposit.i64_to_p8(other2)
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q8_fdp_add(
+                        self.v, other1.v, _softposit.convertDoubleToP8(other2)
+                    )
+                else:
+                    self.v = _softposit.q8_fdp_add(self.v, other1.v, other2.v)
+            return self
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (qma) between quire8 and non-posit8 types"
+            )
+
+    def qms(self, other1, other2):
+        try:
+            a = posit8(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q8_fdp_sub(
+                        self.v,
+                        _softposit.i64_to_p8(other1),
+                        _softposit.i64_to_p8(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q8_fdp_sub(
+                        self.v,
+                        _softposit.i64_to_p8(other1),
+                        _softposit.convertDoubleToP8(other2),
+                    )
+                else:
+                    self.v = _softposit.q8_fdp_sub(
+                        self.v, _softposit.i64_to_p8(other1), other2.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q8_fdp_sub(
+                        self.v,
+                        _softposit.convertDoubleToP8(other1),
+                        _softposit.i64_to_p8(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q8_fdp_sub(
+                        self.v,
+                        _softposit.convertDoubleToP8(other1),
+                        _softposit.convertDoubleToP8(other2),
+                    )
+                else:
+                    self.v = _softposit.q8_fdp_sub(
+                        self.v, _softposit.convertDoubleToP8(other1), other2.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q8_fdp_sub(
+                        self.v, other1.v, _softposit.i64_to_p8(other2)
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q8_fdp_sub(
+                        self.v, other1.v, _softposit.convertDoubleToP8(other2)
+                    )
+                else:
+                    self.v = _softposit.q8_fdp_sub(self.v, other1.v, other2.v)
+            return self
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (qms) between quire8 and non-posit8 types"
+            )
+
+    def toPosit(self):
+        a = posit8(0)
+        a.v = _softposit.q8_to_p8(self.v)
+        return a
+
+    def clr(self):
+        self.v = _softposit.q8Clr()
+
+    def isNaR(self):
+        return self.v.isNaR()
+
+    def __repr__(self):
+        a = float(_softposit.convertP8ToDouble(_softposit.q8_to_p8(self.v)))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __str__(self):
+        a = float(_softposit.convertP8ToDouble(_softposit.q8_to_p8(self.v)))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def toBinary(self):
+        self.v.toBits()
+
+    def toHex(self):
+        self.v.toHex()
+
 
 class posit16:
-   def __init__(self, value=None, bits=None):
-       try:
-           if bits is not None:
-               if isinstance(bits, (int)):
-                   self.v = posit16_t()
-                   self.v.v = bits & 0xFFFF
-               else:
-                   raise Exception("Bits can only be set with integer values")
-           else:
-               if value is None:
-                   self.v = posit16_t()
-                   self.v.v = 0
-               elif isinstance(value, (int)):
-                   self.v = _softposit.i64_to_p16(value)
-               else:
-                   self.v = _softposit.convertDoubleToP16(value)
-       except Exception as error:
-           print(repr(error))
-   def type(self):
-       return 'posit16'
-   def __add__(self, other):
-       try:
-          a = posit16(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p16_add(self.v, _softposit.i64_to_p16(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p16_add(self.v, _softposit.convertDoubleToP16(other))
-          else:
-              a.v = _softposit.p16_add(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for +: posit16 and ",other.type())     
-   def __radd__(self, other):
-       return self.__add__(other)  
-   def __sub__(self, other):
-       try:
-          a = posit16(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p16_sub(self.v, _softposit.i64_to_p16(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p16_sub(self.v, _softposit.convertDoubleToP16(other))
-          else:
-              a.v = _softposit.p16_sub(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for -: posit16 and ",other.type()) 
-   def __rsub__(self, other):
-       try:
-          a = posit16(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p16_sub(_softposit.i64_to_p16(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p16_sub(_softposit.convertDoubleToP16(other), self.v)
-          else:
-              a.v = _softposit.p16_sub(other.v, self.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for -: posit16 and ",other.type())  
-   def __mul__(self, other):
-       try:
-          a = posit16(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p16_mul(self.v, _softposit.i64_to_p16(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p16_mul(self.v, _softposit.convertDoubleToP16(other))
-          else:
-              a.v = _softposit.p16_mul(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for *: posit16 and ",other.type()) 
-   def __rmul__(self, other):
-       return self.__mul__(other)  
-   def __div__(self, other):
-       try:
-          a = posit16(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p16_div(self.v, _softposit.i64_to_p16(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p16_div(self.v, _softposit.convertDoubleToP16(other))
-          else:
-              a.v = _softposit.p16_div(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for /: posit16 and ",other.type()) 
-   def __truediv__(self, other):
-       return self.__div__(other)
-   def __rdiv__(self, other):
-       try:
-          a = posit16(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p16_div(_softposit.i64_to_p16(other), self.v)
-          elif isinstance(other, (float)):
-              a.v = _softposit.p16_div(_softposit.convertDoubleToP16(other), self.v)
-          else:
-              a.v = _softposit.p16_div(other.v, self.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for /: posit16 and ",other.type()) 
-   def __rtruediv__(self, other):
-       return self.__rdiv__(other)
-   def __eq__(self, other):
-       try:
-          if isinstance(other, (int)):
-              return _softposit.p16_eq(self.v, _softposit.i64_to_p16(other))
-          elif isinstance(other, (float)):
-              return _softposit.p16_eq(self.v, _softposit.convertDoubleToP16(other))
-          else:
-              return _softposit.p16_eq(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for ==: posit16 and ",other.type()) 
-   def __ne__(self, other):  
-       try:                                                                                          
-          if isinstance(other, (int)):
-              return not(_softposit.p16_eq(self.v, _softposit.i64_to_p16(other)))
-          elif isinstance(other, (float)):
-              return not(_softposit.p16_eq(self.v, _softposit.convertDoubleToP16(other)))
-          else:
-              return not(_softposit.p16_eq(self.v, other.v))
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for !=: posit16 and ",other.type())
-   def __le__(self, other):
-       try:             
-          if isinstance(other, (int)):
-              return _softposit.p16_le(self.v, _softposit.i64_to_p16(other))
-          elif isinstance(other, (float)):
-              return _softposit.p16_le(self.v, _softposit.convertDoubleToP16(other))
-          else:
-              return _softposit.p16_le(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for <=: posit16 and ",other.type()) 
-   def __lt__(self, other):
-       try:             
-          if isinstance(other, (int)):
-              return _softposit.p16_lt(self.v, _softposit.i64_to_p16(other))
-          elif isinstance(other, (float)):
-              return _softposit.p16_lt(self.v, _softposit.convertDoubleToP16(other))
-          else:
-              return _softposit.p16_lt(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for <: posit16 and ",other.type()) 
-   def __ge__(self, other):
-       try:    
-          if isinstance(other, (int)):
-              return _softposit.p16_le(_softposit.i64_to_p16(other), self.v)
-          elif isinstance(other, (float)):
-              return _softposit.p16_le(_softposit.convertDoubleToP16(other), self.v)
-          else:
-              return _softposit.p16_le(other.v, self.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for >=: posit16 and ",other.type())  
-   def __gt__(self, other):
-       if isinstance(other, (int)):
-           return _softposit.p16_lt(_softposit.i64_to_p16(other), self.v)
-       elif isinstance(other, (float)):
-           return _softposit.p16_lt(_softposit.convertDoubleToP16(other), self.v)
-       else:
-           return _softposit.p16_lt(other.v, self.v)
-   def __rshift__(self, other):
-       a = posit16(0)
-       a.v = self.v.__rshift__(other)
-       return a
-   def __lshift__(self, other):
-       a = posit16(0)
-       a.v = self.v.__lshift__(other)
-       return a
-   def __pos__(self):
-       return self
-   def __neg__(self):
-       a = posit16(0)
-       a.v = self.v.__neg__()
-       return a
-   def __abs__(self):
-       a = posit16(0)
-       a.v = self.v.__abs__()
-       return a
-   def __invert__(self):
-       self.v = self.v.__invert__()
-       return self   
-   def __and__(self, other):
-       a = posit16(0)
-       a.v = self.v.__and__(other.v)
-       return a
-   def __xor__(self, other):
-       a = posit16(0)
-       a.v = self.v.__xor__(other.v)
-       return a
-   def __or__(self, other):
-       a = posit16(0)
-       a.v = self.v.__or__(other.v)
-       return a
-   def fma(self, other1, other2):
-       try:
-          a = posit16(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p16_mulAdd(_softposit.i64_to_p16(other1), _softposit.i64_to_p16(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p16_mulAdd(_softposit.i64_to_p16(other1), _softposit.convertDoubleToP16(other2), self.v)
-              else:
-                  a.v = _softposit.p16_mulAdd(_softposit.i64_to_p16(other1), other2.v, self.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p16_mulAdd(_softposit.convertDoubleToP16(other1), _softposit.i64_to_p16(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p16_mulAdd(_softposit.convertDoubleToP16(other1), _softposit.convertDoubleToP16(other2), self.v)
-              else:
-                  a.v = _softposit.p16_mulAdd(_softposit.convertDoubleToP16(other1), other2.v, self.v)
-          else:
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p16_mulAdd(other1.v, _softposit.i64_to_p16(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p16_mulAdd(other1.v, _softposit.convertDoubleToP16(other2), self.v)
-              else:
-                  a.v = _softposit.p16_mulAdd(other1.v, other2.v, self.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported fused operand (fma) among mixed precison posit types")
-   def toPosit8(self):
-       a = posit8(0)
-       a.v = _softposit.p16_to_p8(self.v)
-       return a
-   def toPosit32(self):
-       a = posit32(0)
-       a.v = _softposit.p16_to_p32(self.v)
-       return a
-   def toPosit_2(self, x):
-       a = posit_2(0, x)
-       a.v = _softposit.p16_to_pX2(self.v, x)
-       return a
-   def toRInt(self):
-       return _softposit.p16_to_i64(self.v)
-   def toInt(self):
-       return _softposit.p16_int(self.v)
-   def rint(self):
-       self.v = _softposit.p16_roundToInt(self.v)
-       return self
-   def sqrt(self):
-       a = posit16(0)
-       a.v = _softposit.p16_sqrt(self.v)
-       return a
-   def __repr__(self):
-       a = float(_softposit.convertP16ToDouble(self.v))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __str__(self):
-       a = float(_softposit.convertP16ToDouble(self.v))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __int__(self):
-       return _softposit.p16_int(self.v) 
-   def __float__(self):
-       return float(_softposit.convertP16ToDouble(self.v))
-   def isNaR(self):
-       return self.v.isNaR()
-   def toNaR(self):
-       a = posit16(0)
-       a.v.toNaR()
-       return a
-   def fromBits(self, value):
-       self.v.fromBits(value)
-   def toBinary(self):
-       self.v.toBits()
-   def toBinaryFormatted(self):
-       print(convertToColor(self.v.v, 16, 1))
-   def toHex(self):
-       self.v.toHex()
+    def __init__(self, value=None, bits=None):
+        try:
+            if bits is not None:
+                if isinstance(bits, (int)):
+                    self.v = posit16_t()
+                    self.v.v = bits & 0xFFFF
+                else:
+                    raise Exception("Bits can only be set with integer values")
+            else:
+                if value is None:
+                    self.v = posit16_t()
+                    self.v.v = 0
+                elif isinstance(value, (int)):
+                    self.v = _softposit.i64_to_p16(value)
+                else:
+                    self.v = _softposit.convertDoubleToP16(value)
+        except Exception as error:
+            print(repr(error))
+
+    def type(self):
+        return "posit16"
+
+    def __add__(self, other):
+        try:
+            a = posit16(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p16_add(self.v, _softposit.i64_to_p16(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p16_add(self.v, _softposit.convertDoubleToP16(other))
+            else:
+                a.v = _softposit.p16_add(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for +: posit16 and ",
+                other.type(),
+            )
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        try:
+            a = posit16(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p16_sub(self.v, _softposit.i64_to_p16(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p16_sub(self.v, _softposit.convertDoubleToP16(other))
+            else:
+                a.v = _softposit.p16_sub(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for -: posit16 and ",
+                other.type(),
+            )
+
+    def __rsub__(self, other):
+        try:
+            a = posit16(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p16_sub(_softposit.i64_to_p16(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p16_sub(_softposit.convertDoubleToP16(other), self.v)
+            else:
+                a.v = _softposit.p16_sub(other.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for -: posit16 and ",
+                other.type(),
+            )
+
+    def __mul__(self, other):
+        try:
+            a = posit16(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p16_mul(self.v, _softposit.i64_to_p16(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p16_mul(self.v, _softposit.convertDoubleToP16(other))
+            else:
+                a.v = _softposit.p16_mul(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for *: posit16 and ",
+                other.type(),
+            )
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __div__(self, other):
+        try:
+            a = posit16(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p16_div(self.v, _softposit.i64_to_p16(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p16_div(self.v, _softposit.convertDoubleToP16(other))
+            else:
+                a.v = _softposit.p16_div(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for /: posit16 and ",
+                other.type(),
+            )
+
+    def __truediv__(self, other):
+        return self.__div__(other)
+
+    def __rdiv__(self, other):
+        try:
+            a = posit16(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p16_div(_softposit.i64_to_p16(other), self.v)
+            elif isinstance(other, (float)):
+                a.v = _softposit.p16_div(_softposit.convertDoubleToP16(other), self.v)
+            else:
+                a.v = _softposit.p16_div(other.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for /: posit16 and ",
+                other.type(),
+            )
+
+    def __rtruediv__(self, other):
+        return self.__rdiv__(other)
+
+    def __eq__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p16_eq(self.v, _softposit.i64_to_p16(other))
+            elif isinstance(other, (float)):
+                return _softposit.p16_eq(self.v, _softposit.convertDoubleToP16(other))
+            else:
+                return _softposit.p16_eq(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for ==: posit16 and ",
+                other.type(),
+            )
+
+    def __ne__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return not (_softposit.p16_eq(self.v, _softposit.i64_to_p16(other)))
+            elif isinstance(other, (float)):
+                return not (
+                    _softposit.p16_eq(self.v, _softposit.convertDoubleToP16(other))
+                )
+            else:
+                return not (_softposit.p16_eq(self.v, other.v))
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for !=: posit16 and ",
+                other.type(),
+            )
+
+    def __le__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p16_le(self.v, _softposit.i64_to_p16(other))
+            elif isinstance(other, (float)):
+                return _softposit.p16_le(self.v, _softposit.convertDoubleToP16(other))
+            else:
+                return _softposit.p16_le(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for <=: posit16 and ",
+                other.type(),
+            )
+
+    def __lt__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p16_lt(self.v, _softposit.i64_to_p16(other))
+            elif isinstance(other, (float)):
+                return _softposit.p16_lt(self.v, _softposit.convertDoubleToP16(other))
+            else:
+                return _softposit.p16_lt(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for <: posit16 and ",
+                other.type(),
+            )
+
+    def __ge__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p16_le(_softposit.i64_to_p16(other), self.v)
+            elif isinstance(other, (float)):
+                return _softposit.p16_le(_softposit.convertDoubleToP16(other), self.v)
+            else:
+                return _softposit.p16_le(other.v, self.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for >=: posit16 and ",
+                other.type(),
+            )
+
+    def __gt__(self, other):
+        if isinstance(other, (int)):
+            return _softposit.p16_lt(_softposit.i64_to_p16(other), self.v)
+        elif isinstance(other, (float)):
+            return _softposit.p16_lt(_softposit.convertDoubleToP16(other), self.v)
+        else:
+            return _softposit.p16_lt(other.v, self.v)
+
+    def __rshift__(self, other):
+        a = posit16(0)
+        a.v = self.v.__rshift__(other)
+        return a
+
+    def __lshift__(self, other):
+        a = posit16(0)
+        a.v = self.v.__lshift__(other)
+        return a
+
+    def __pos__(self):
+        return self
+
+    def __neg__(self):
+        a = posit16(0)
+        a.v = self.v.__neg__()
+        return a
+
+    def __abs__(self):
+        a = posit16(0)
+        a.v = self.v.__abs__()
+        return a
+
+    def __invert__(self):
+        self.v = self.v.__invert__()
+        return self
+
+    def __and__(self, other):
+        a = posit16(0)
+        a.v = self.v.__and__(other.v)
+        return a
+
+    def __xor__(self, other):
+        a = posit16(0)
+        a.v = self.v.__xor__(other.v)
+        return a
+
+    def __or__(self, other):
+        a = posit16(0)
+        a.v = self.v.__or__(other.v)
+        return a
+
+    def fma(self, other1, other2):
+        try:
+            a = posit16(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p16_mulAdd(
+                        _softposit.i64_to_p16(other1),
+                        _softposit.i64_to_p16(other2),
+                        self.v,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p16_mulAdd(
+                        _softposit.i64_to_p16(other1),
+                        _softposit.convertDoubleToP16(other2),
+                        self.v,
+                    )
+                else:
+                    a.v = _softposit.p16_mulAdd(
+                        _softposit.i64_to_p16(other1), other2.v, self.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p16_mulAdd(
+                        _softposit.convertDoubleToP16(other1),
+                        _softposit.i64_to_p16(other2),
+                        self.v,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p16_mulAdd(
+                        _softposit.convertDoubleToP16(other1),
+                        _softposit.convertDoubleToP16(other2),
+                        self.v,
+                    )
+                else:
+                    a.v = _softposit.p16_mulAdd(
+                        _softposit.convertDoubleToP16(other1), other2.v, self.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p16_mulAdd(
+                        other1.v, _softposit.i64_to_p16(other2), self.v
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p16_mulAdd(
+                        other1.v, _softposit.convertDoubleToP16(other2), self.v
+                    )
+                else:
+                    a.v = _softposit.p16_mulAdd(other1.v, other2.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (fma) among mixed precison posit types"
+            )
+
+    def toPosit8(self):
+        a = posit8(0)
+        a.v = _softposit.p16_to_p8(self.v)
+        return a
+
+    def toPosit32(self):
+        a = posit32(0)
+        a.v = _softposit.p16_to_p32(self.v)
+        return a
+
+    def toPosit_2(self, x):
+        a = posit_2(0, x)
+        a.v = _softposit.p16_to_pX2(self.v, x)
+        return a
+
+    def toRInt(self):
+        return _softposit.p16_to_i64(self.v)
+
+    def toInt(self):
+        return _softposit.p16_int(self.v)
+
+    def rint(self):
+        self.v = _softposit.p16_roundToInt(self.v)
+        return self
+
+    def sqrt(self):
+        a = posit16(0)
+        a.v = _softposit.p16_sqrt(self.v)
+        return a
+
+    def __repr__(self):
+        a = float(_softposit.convertP16ToDouble(self.v))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __str__(self):
+        a = float(_softposit.convertP16ToDouble(self.v))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __int__(self):
+        return _softposit.p16_int(self.v)
+
+    def __float__(self):
+        return float(_softposit.convertP16ToDouble(self.v))
+
+    def isNaR(self):
+        return self.v.isNaR()
+
+    def toNaR(self):
+        a = posit16(0)
+        a.v.toNaR()
+        return a
+
+    def fromBits(self, value):
+        self.v.fromBits(value)
+
+    def toBinary(self):
+        self.v.toBits()
+
+    def toBinaryFormatted(self):
+        print(convertToColor(self.v.v, 16, 1))
+
+    def toHex(self):
+        self.v.toHex()
 
 
 class quire16:
-   def __init__(self):
-       self.v = _softposit.q16Clr();
-   def type(self):
-       return 'quire16'
-   def qma(self, other1, other2):
-       try:
-          a = posit16(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q16_fdp_add(self.v, _softposit.i64_to_p16(other1), _softposit.i64_to_p16(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q16_fdp_add(self.v, _softposit.i64_to_p16(other1), _softposit.convertDoubleToP16(other2))
-              else:
-                  self.v = _softposit.q16_fdp_add(self.v, _softposit.i64_to_p16(other1), other2.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q16_fdp_add(self.v, _softposit.convertDoubleToP16(other1), _softposit.i64_to_p16(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q16_fdp_add(self.v, _softposit.convertDoubleToP16(other1), _softposit.convertDoubleToP16(other2))
-              else:
-                  self.v = _softposit.q16_fdp_add(self.v, _softposit.convertDoubleToP16(other1), other2.v)
-          else:
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q16_fdp_add(self.v, other1.v, _softposit.i64_to_p16(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q16_fdp_add(self.v, other1.v, _softposit.convertDoubleToP16(other2))
-              else:
-                  self.v = _softposit.q16_fdp_add(self.v, other1.v, other2.v)
-          return self
-       except TypeError:
-          print("TypeError: Unsupported fused operand (qms) between quire16 and non-posit16 types")  
-   def qms(self, other1, other2):
-       try:
-          a = posit16(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q16_fdp_sub(self.v, _softposit.i64_to_p16(other1), _softposit.i64_to_p16(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q16_fdp_sub(self.v, _softposit.i64_to_p16(other1), _softposit.convertDoubleToP16(other2))
-              else:
-                  self.v = _softposit.q16_fdp_sub(self.v, _softposit.i64_to_p16(other1), other2.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q16_fdp_sub(self.v, _softposit.convertDoubleToP16(other1), _softposit.i64_to_p16(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q16_fdp_sub(self.v, _softposit.convertDoubleToP16(other1), _softposit.convertDoubleToP16(other2))
-              else:
-                  self.v = _softposit.q16_fdp_sub(self.v, _softposit.convertDoubleToP16(other1), other2.v)
-          else:
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q16_fdp_sub(self.v, other1.v, _softposit.i64_to_p16(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q16_fdp_sub(self.v, other1.v, _softposit.convertDoubleToP16(other2))
-              else:
-                  self.v = _softposit.q16_fdp_sub(self.v, other1.v, other2.v)
-          return self
-       except TypeError:
-          print("TypeError: Unsupported fused operand (qms) between quire16 and non-posit16 types")   
-   def toPosit(self): 
-       a = posit16(0)      
-       a.v = _softposit.q16_to_p16(self.v);
-       return a
-   def clr(self):       
-       self.v = _softposit.q16Clr();
-   def isNaR(self):       
-       return self.v.isNaR();
-   def __repr__(self):
-       a = float(_softposit.convertP16ToDouble(_softposit.q16_to_p16(self.v)))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __str__(self):
-       a = float(_softposit.convertP16ToDouble(_softposit.q16_to_p16(self.v)))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def toBinary(self):
-       self.v.toBits()
-   def toHex(self):
-       self.v.toHex()
+    def __init__(self):
+        self.v = _softposit.q16Clr()
+
+    def type(self):
+        return "quire16"
+
+    def qma(self, other1, other2):
+        try:
+            a = posit16(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q16_fdp_add(
+                        self.v,
+                        _softposit.i64_to_p16(other1),
+                        _softposit.i64_to_p16(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q16_fdp_add(
+                        self.v,
+                        _softposit.i64_to_p16(other1),
+                        _softposit.convertDoubleToP16(other2),
+                    )
+                else:
+                    self.v = _softposit.q16_fdp_add(
+                        self.v, _softposit.i64_to_p16(other1), other2.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q16_fdp_add(
+                        self.v,
+                        _softposit.convertDoubleToP16(other1),
+                        _softposit.i64_to_p16(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q16_fdp_add(
+                        self.v,
+                        _softposit.convertDoubleToP16(other1),
+                        _softposit.convertDoubleToP16(other2),
+                    )
+                else:
+                    self.v = _softposit.q16_fdp_add(
+                        self.v, _softposit.convertDoubleToP16(other1), other2.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q16_fdp_add(
+                        self.v, other1.v, _softposit.i64_to_p16(other2)
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q16_fdp_add(
+                        self.v, other1.v, _softposit.convertDoubleToP16(other2)
+                    )
+                else:
+                    self.v = _softposit.q16_fdp_add(self.v, other1.v, other2.v)
+            return self
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (qms) between quire16 and non-posit16 types"
+            )
+
+    def qms(self, other1, other2):
+        try:
+            a = posit16(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q16_fdp_sub(
+                        self.v,
+                        _softposit.i64_to_p16(other1),
+                        _softposit.i64_to_p16(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q16_fdp_sub(
+                        self.v,
+                        _softposit.i64_to_p16(other1),
+                        _softposit.convertDoubleToP16(other2),
+                    )
+                else:
+                    self.v = _softposit.q16_fdp_sub(
+                        self.v, _softposit.i64_to_p16(other1), other2.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q16_fdp_sub(
+                        self.v,
+                        _softposit.convertDoubleToP16(other1),
+                        _softposit.i64_to_p16(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q16_fdp_sub(
+                        self.v,
+                        _softposit.convertDoubleToP16(other1),
+                        _softposit.convertDoubleToP16(other2),
+                    )
+                else:
+                    self.v = _softposit.q16_fdp_sub(
+                        self.v, _softposit.convertDoubleToP16(other1), other2.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q16_fdp_sub(
+                        self.v, other1.v, _softposit.i64_to_p16(other2)
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q16_fdp_sub(
+                        self.v, other1.v, _softposit.convertDoubleToP16(other2)
+                    )
+                else:
+                    self.v = _softposit.q16_fdp_sub(self.v, other1.v, other2.v)
+            return self
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (qms) between quire16 and non-posit16 types"
+            )
+
+    def toPosit(self):
+        a = posit16(0)
+        a.v = _softposit.q16_to_p16(self.v)
+        return a
+
+    def clr(self):
+        self.v = _softposit.q16Clr()
+
+    def isNaR(self):
+        return self.v.isNaR()
+
+    def __repr__(self):
+        a = float(_softposit.convertP16ToDouble(_softposit.q16_to_p16(self.v)))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __str__(self):
+        a = float(_softposit.convertP16ToDouble(_softposit.q16_to_p16(self.v)))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def toBinary(self):
+        self.v.toBits()
+
+    def toHex(self):
+        self.v.toHex()
+
 
 class posit32:
-   def __init__(self, value=None, bits=None):
-       try:
-           if bits is not None:
-               if isinstance(bits, (int)):
-                   self.v = posit32_t()
-                   self.v.v = bits&0xFFFFFFFF
-               else:
-                   raise Exception("Bits can only be set with integer values")
-           else:
-               if value is None:
-                   self.v = posit32_t()
-                   self.v.v = 0
-               elif isinstance(value, (int)):
-                   self.v = _softposit.i64_to_p32(value)
-               else:
-                   self.v = _softposit.convertDoubleToP32(value)
-       except Exception as error:
-           print(repr(error))
-   def type(self):
-       return 'posit32'
-   def __add__(self, other):
-       try:
-          a = posit32(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p32_add(self.v, _softposit.i64_to_p32(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p32_add(self.v, _softposit.convertDoubleToP32(other))
-          else:
-              a.v = _softposit.p32_add(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for +: posit32 and ",other.type())     
-   def __radd__(self, other):
-       return self.__add__(other)  
-   def __sub__(self, other):
-       try:
-          a = posit32(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p32_sub(self.v, _softposit.i64_to_p32(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p32_sub(self.v, _softposit.convertDoubleToP32(other))
-          else:
-              a.v = _softposit.p32_sub(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for -: posit32 and ",other.type())  
-   def __rsub__(self, other):
-       try:
-          a = posit32(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p32_sub(_softposit.i64_to_p32(other), self.v)
-          elif isinstance(other, (float)):
-              a.v = _softposit.p32_sub(_softposit.convertDoubleToP32(other), self.v)
-          else:
-              a.v = _softposit.p32_sub(other.v, self.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for -: posit32 and ",other.type())    
-   def __mul__(self, other):
-       try:
-          a = posit32(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p32_mul(self.v, _softposit.i64_to_p32(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p32_mul(self.v, _softposit.convertDoubleToP32(other))
-          else:
-              a.v = _softposit.p32_mul(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for *: posit32 and ",other.type())     
-   def __rmul__(self, other):
-       return self.__mul__(other)  
-   def __div__(self, other):
-       try:
-          a = posit32(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p32_div(self.v, _softposit.i64_to_p32(other))
-          elif isinstance(other, (float)):
-              a.v = _softposit.p32_div(self.v, _softposit.convertDoubleToP32(other))
-          else:
-              a.v = _softposit.p32_div(self.v, other.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for /: posit32 and ",other.type())   
-   def __truediv__(self, other):
-       return self.__div__(other)
-   def __rdiv__(self, other):
-       try:
-          a = posit32(0)
-          if isinstance(other, (int)):
-              a.v = _softposit.p32_div(_softposit.i64_to_p32(other), self.v)
-          elif isinstance(other, (float)):
-              a.v = _softposit.p32_div(_softposit.convertDoubleToP32(other), self.v)
-          else:
-              a.v = _softposit.p32_div(other.v, self.v)
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for /: posit32 and ",other.type())     
-   def __rtruediv__(self, other):
-       return self.__rdiv__(other)
-   def __eq__(self, other):
-       try:
-          if isinstance(other, (int)):
-              return _softposit.p32_eq(self.v, _softposit.i64_to_p32(other))
-          elif isinstance(other, (float)):
-              return _softposit.p32_eq(self.v, _softposit.convertDoubleToP32(other))
-          else:
-              return _softposit.p32_eq(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for ==: posit32 and ",other.type())     
-   def __ne__(self, other):  
-       try:                                                                                
-          if isinstance(other, (int)):
-              return not(_softposit.p32_eq(self.v, _softposit.i64_to_p32(other)))
-          elif isinstance(other, (float)):
-              return not(_softposit.p32_eq(self.v, _softposit.convertDoubleToP32(other)))
-          else:
-              return not(_softposit.p32_eq(self.v, other.v))
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for !=: posit32 and ",other.type())    
-   def __le__(self, other):
-       try:
-          if isinstance(other, (int)):
-              return _softposit.p32_le(self.v, _softposit.i64_to_p32(other))
-          elif isinstance(other, (float)):
-              return _softposit.p32_le(self.v, _softposit.convertDoubleToP32(other))
-          else:
-              return _softposit.p32_le(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for <=: posit32 and ",other.type())  
-   def __lt__(self, other):
-       try:
-          if isinstance(other, (int)):
-              return _softposit.p32_lt(self.v, _softposit.i64_to_p32(other))
-          elif isinstance(other, (float)):
-              return _softposit.p32_lt(self.v, _softposit.convertDoubleToP32(other))
-          else:
-              return _softposit.p32_lt(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for <: posit32 and ",other.type())  
-   def __ge__(self, other):
-       try:
-          if isinstance(other, (int)):
-              return _softposit.p32_le(_softposit.i64_to_p32(other), self.v)
-          elif isinstance(other, (float)):
-              return _softposit.p32_le(_softposit.convertDoubleToP32(other), self.v)
-          else:
-              return _softposit.p32_le(other.v, self.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for >=: posit32 and ",other.type())  
-   def __gt__(self, other):
-       try:
-          if isinstance(other, (int)):
-              return _softposit.p32_lt(_softposit.i64_to_p32(other), self.v)
-          elif isinstance(other, (float)):
-              return _softposit.p32_lt(_softposit.convertDoubleToP32(other), self.v)
-          else:
-              return _softposit.p32_lt(other.v, self.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for >: posit32 and ",other.type())  
-   def __rshift__(self, other):
-       a = posit32(0)
-       a.v = self.v.__rshift__(other)
-       return a
-   def __lshift__(self, other):
-       a = posit32(0)
-       a.v = self.v.__lshift__(other)
-       return a
-   def __pos__(self):
-       return self
-   def __neg__(self):
-       a = posit32(0)
-       a.v = self.v.__neg__()
-       return a
-   def __abs__(self):
-       a = posit32(0)
-       a.v = self.v.__abs__()
-       return a
-   def __invert__(self):
-       self.v = self.v.__invert__()
-       return self   
-   def __and__(self, other):
-       a = posit32(0)
-       a.v = self.v.__and__(other.v)
-       return a
-   def __xor__(self, other):
-       a = posit32(0)
-       a.v = self.v.__xor__(other.v)
-       return a
-   def __or__(self, other):
-       a = posit32(0)
-       a.v = self.v.__or__(other.v)
-       return a
-   def fma(self, other1, other2):
-       try:
-          a = posit32(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p32_mulAdd(_softposit.i64_to_p32(other1), _softposit.i64_to_p32(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p32_mulAdd(_softposit.i64_to_p32(other1), _softposit.convertDoubleToP32(other2), self.v)
-              else:
-                  a.v = _softposit.p32_mulAdd(_softposit.i64_to_p32(other1), other2.v, self.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p32_mulAdd(_softposit.convertDoubleToP32(other1), _softposit.i64_to_p32(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p32_mulAdd(_softposit.convertDoubleToP32(other1), _softposit.convertDoubleToP32(other2), self.v)
-              else:
-                  a.v = _softposit.p32_mulAdd(_softposit.convertDoubleToP32(other1), other2.v, self.v)
-          else:
-              if isinstance(other2, (int)):
-                  a.v = _softposit.p32_mulAdd(other1.v, _softposit.i64_to_p32(other2), self.v)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.p32_mulAdd(other1.v, _softposit.convertDoubleToP32(other2), self.v)
-              else:
-                  a.v = _softposit.p32_mulAdd(other1.v, other2.v, self.v)   
-          return a
-       except TypeError:
-          print("TypeError: Unsupported fused operand (fma) among mixed precison posit types")
-   def toPosit8(self):
-       a = posit8(0)
-       a.v = _softposit.p32_to_p8(self.v)
-       return a
-   def toPosit16(self):
-       a = posit16(0)
-       a.v = _softposit.p32_to_p16(self.v)
-       return a
-   def toPosit_2(self, x):
-       a = posit_2(0, x)
-       a.v = _softposit.p32_to_pX2(self.v, x)
-       a.x = x
-       return a
-   def toRInt(self):
-       return _softposit.p32_to_i64(self.v)
-   def toInt(self):
-       return _softposit.p32_int(self.v)
-   def rint(self):
-       self.v = _softposit.p32_roundToInt(self.v)
-       return self
-   def sqrt(self):
-       a = posit32(0)
-       a.v = _softposit.p32_sqrt(self.v)
-       return a
-   def __repr__(self):
-       a = float(_softposit.convertP32ToDouble(self.v))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __str__(self):
-       a = float(_softposit.convertP32ToDouble(self.v))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __int__(self):
-       return _softposit.p32_int(self.v) 
-   def __float__(self):
-       return float(_softposit.convertP32ToDouble(self.v))
-   def isNaR(self):
-       return self.v.isNaR();
-   def toNaR(self):
-       a = posit32(0)
-       a.v.toNaR();
-       return a
-   def toBinary(self):
-       self.v.toBits()
-   def fromBits(self, value):
-       self.v.fromBits(value)
-   def toBinaryFormatted(self):
-       print(convertToColor(self.v.v, 32, 2))
-   def toHex(self):
-       self.v.toHex()
+    def __init__(self, value=None, bits=None):
+        try:
+            if bits is not None:
+                if isinstance(bits, (int)):
+                    self.v = posit32_t()
+                    self.v.v = bits & 0xFFFFFFFF
+                else:
+                    raise Exception("Bits can only be set with integer values")
+            else:
+                if value is None:
+                    self.v = posit32_t()
+                    self.v.v = 0
+                elif isinstance(value, (int)):
+                    self.v = _softposit.i64_to_p32(value)
+                else:
+                    self.v = _softposit.convertDoubleToP32(value)
+        except Exception as error:
+            print(repr(error))
+
+    def type(self):
+        return "posit32"
+
+    def __add__(self, other):
+        try:
+            a = posit32(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p32_add(self.v, _softposit.i64_to_p32(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p32_add(self.v, _softposit.convertDoubleToP32(other))
+            else:
+                a.v = _softposit.p32_add(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for +: posit32 and ",
+                other.type(),
+            )
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        try:
+            a = posit32(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p32_sub(self.v, _softposit.i64_to_p32(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p32_sub(self.v, _softposit.convertDoubleToP32(other))
+            else:
+                a.v = _softposit.p32_sub(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for -: posit32 and ",
+                other.type(),
+            )
+
+    def __rsub__(self, other):
+        try:
+            a = posit32(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p32_sub(_softposit.i64_to_p32(other), self.v)
+            elif isinstance(other, (float)):
+                a.v = _softposit.p32_sub(_softposit.convertDoubleToP32(other), self.v)
+            else:
+                a.v = _softposit.p32_sub(other.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for -: posit32 and ",
+                other.type(),
+            )
+
+    def __mul__(self, other):
+        try:
+            a = posit32(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p32_mul(self.v, _softposit.i64_to_p32(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p32_mul(self.v, _softposit.convertDoubleToP32(other))
+            else:
+                a.v = _softposit.p32_mul(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for *: posit32 and ",
+                other.type(),
+            )
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __div__(self, other):
+        try:
+            a = posit32(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p32_div(self.v, _softposit.i64_to_p32(other))
+            elif isinstance(other, (float)):
+                a.v = _softposit.p32_div(self.v, _softposit.convertDoubleToP32(other))
+            else:
+                a.v = _softposit.p32_div(self.v, other.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for /: posit32 and ",
+                other.type(),
+            )
+
+    def __truediv__(self, other):
+        return self.__div__(other)
+
+    def __rdiv__(self, other):
+        try:
+            a = posit32(0)
+            if isinstance(other, (int)):
+                a.v = _softposit.p32_div(_softposit.i64_to_p32(other), self.v)
+            elif isinstance(other, (float)):
+                a.v = _softposit.p32_div(_softposit.convertDoubleToP32(other), self.v)
+            else:
+                a.v = _softposit.p32_div(other.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for /: posit32 and ",
+                other.type(),
+            )
+
+    def __rtruediv__(self, other):
+        return self.__rdiv__(other)
+
+    def __eq__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p32_eq(self.v, _softposit.i64_to_p32(other))
+            elif isinstance(other, (float)):
+                return _softposit.p32_eq(self.v, _softposit.convertDoubleToP32(other))
+            else:
+                return _softposit.p32_eq(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for ==: posit32 and ",
+                other.type(),
+            )
+
+    def __ne__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return not (_softposit.p32_eq(self.v, _softposit.i64_to_p32(other)))
+            elif isinstance(other, (float)):
+                return not (
+                    _softposit.p32_eq(self.v, _softposit.convertDoubleToP32(other))
+                )
+            else:
+                return not (_softposit.p32_eq(self.v, other.v))
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for !=: posit32 and ",
+                other.type(),
+            )
+
+    def __le__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p32_le(self.v, _softposit.i64_to_p32(other))
+            elif isinstance(other, (float)):
+                return _softposit.p32_le(self.v, _softposit.convertDoubleToP32(other))
+            else:
+                return _softposit.p32_le(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for <=: posit32 and ",
+                other.type(),
+            )
+
+    def __lt__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p32_lt(self.v, _softposit.i64_to_p32(other))
+            elif isinstance(other, (float)):
+                return _softposit.p32_lt(self.v, _softposit.convertDoubleToP32(other))
+            else:
+                return _softposit.p32_lt(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for <: posit32 and ",
+                other.type(),
+            )
+
+    def __ge__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p32_le(_softposit.i64_to_p32(other), self.v)
+            elif isinstance(other, (float)):
+                return _softposit.p32_le(_softposit.convertDoubleToP32(other), self.v)
+            else:
+                return _softposit.p32_le(other.v, self.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for >=: posit32 and ",
+                other.type(),
+            )
+
+    def __gt__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.p32_lt(_softposit.i64_to_p32(other), self.v)
+            elif isinstance(other, (float)):
+                return _softposit.p32_lt(_softposit.convertDoubleToP32(other), self.v)
+            else:
+                return _softposit.p32_lt(other.v, self.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for >: posit32 and ",
+                other.type(),
+            )
+
+    def __rshift__(self, other):
+        a = posit32(0)
+        a.v = self.v.__rshift__(other)
+        return a
+
+    def __lshift__(self, other):
+        a = posit32(0)
+        a.v = self.v.__lshift__(other)
+        return a
+
+    def __pos__(self):
+        return self
+
+    def __neg__(self):
+        a = posit32(0)
+        a.v = self.v.__neg__()
+        return a
+
+    def __abs__(self):
+        a = posit32(0)
+        a.v = self.v.__abs__()
+        return a
+
+    def __invert__(self):
+        self.v = self.v.__invert__()
+        return self
+
+    def __and__(self, other):
+        a = posit32(0)
+        a.v = self.v.__and__(other.v)
+        return a
+
+    def __xor__(self, other):
+        a = posit32(0)
+        a.v = self.v.__xor__(other.v)
+        return a
+
+    def __or__(self, other):
+        a = posit32(0)
+        a.v = self.v.__or__(other.v)
+        return a
+
+    def fma(self, other1, other2):
+        try:
+            a = posit32(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p32_mulAdd(
+                        _softposit.i64_to_p32(other1),
+                        _softposit.i64_to_p32(other2),
+                        self.v,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p32_mulAdd(
+                        _softposit.i64_to_p32(other1),
+                        _softposit.convertDoubleToP32(other2),
+                        self.v,
+                    )
+                else:
+                    a.v = _softposit.p32_mulAdd(
+                        _softposit.i64_to_p32(other1), other2.v, self.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p32_mulAdd(
+                        _softposit.convertDoubleToP32(other1),
+                        _softposit.i64_to_p32(other2),
+                        self.v,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p32_mulAdd(
+                        _softposit.convertDoubleToP32(other1),
+                        _softposit.convertDoubleToP32(other2),
+                        self.v,
+                    )
+                else:
+                    a.v = _softposit.p32_mulAdd(
+                        _softposit.convertDoubleToP32(other1), other2.v, self.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    a.v = _softposit.p32_mulAdd(
+                        other1.v, _softposit.i64_to_p32(other2), self.v
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.p32_mulAdd(
+                        other1.v, _softposit.convertDoubleToP32(other2), self.v
+                    )
+                else:
+                    a.v = _softposit.p32_mulAdd(other1.v, other2.v, self.v)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (fma) among mixed precison posit types"
+            )
+
+    def toPosit8(self):
+        a = posit8(0)
+        a.v = _softposit.p32_to_p8(self.v)
+        return a
+
+    def toPosit16(self):
+        a = posit16(0)
+        a.v = _softposit.p32_to_p16(self.v)
+        return a
+
+    def toPosit_2(self, x):
+        a = posit_2(0, x)
+        a.v = _softposit.p32_to_pX2(self.v, x)
+        a.x = x
+        return a
+
+    def toRInt(self):
+        return _softposit.p32_to_i64(self.v)
+
+    def toInt(self):
+        return _softposit.p32_int(self.v)
+
+    def rint(self):
+        self.v = _softposit.p32_roundToInt(self.v)
+        return self
+
+    def sqrt(self):
+        a = posit32(0)
+        a.v = _softposit.p32_sqrt(self.v)
+        return a
+
+    def __repr__(self):
+        a = float(_softposit.convertP32ToDouble(self.v))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __str__(self):
+        a = float(_softposit.convertP32ToDouble(self.v))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __int__(self):
+        return _softposit.p32_int(self.v)
+
+    def __float__(self):
+        return float(_softposit.convertP32ToDouble(self.v))
+
+    def isNaR(self):
+        return self.v.isNaR()
+
+    def toNaR(self):
+        a = posit32(0)
+        a.v.toNaR()
+        return a
+
+    def toBinary(self):
+        self.v.toBits()
+
+    def fromBits(self, value):
+        self.v.fromBits(value)
+
+    def toBinaryFormatted(self):
+        print(convertToColor(self.v.v, 32, 2))
+
+    def toHex(self):
+        self.v.toHex()
+
 
 class quire32:
-   def __init__(self):
-       self.v = _softposit.q32Clr();
-   def type(self):
-       return 'quire32'
-   def qma(self, other1, other2):
-       try:
-          a = posit32(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q32_fdp_add(self.v, _softposit.i64_to_p32(other1), _softposit.i64_to_p32(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q32_fdp_add(self.v, _softposit.i64_to_p32(other1), _softposit.convertDoubleToP32(other2))
-              else:
-                  self.v = _softposit.q32_fdp_add(self.v, _softposit.i64_to_p32(other1), other2.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q32_fdp_add(self.v, _softposit.convertDoubleToP32(other1), _softposit.i64_to_p32(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q32_fdp_add(self.v, _softposit.convertDoubleToP32(other1), _softposit.convertDoubleToP32(other2))
-              else:
-                  self.v = _softposit.q32_fdp_add(self.v, _softposit.convertDoubleToP32(other1), other2.v)
-          else:
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q32_fdp_add(self.v, other1.v, _softposit.i64_to_p32(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q32_fdp_add(self.v, other1.v, _softposit.convertDoubleToP32(other2))
-              else:
-                  self.v = _softposit.q32_fdp_add(self.v, other1.v, other2.v)
-          return self
-       except TypeError:
-          print("TypeError: Unsupported fused operand (qma) between quire32 and non-posit32 types")   
-   def qms(self, other1, other2):
-       try:
-          a = posit32(0)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q32_fdp_sub(self.v, _softposit.i64_to_p32(other1), _softposit.i64_to_p32(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q32_fdp_sub(self.v, _softposit.i64_to_p32(other1), _softposit.convertDoubleToP32(other2))
-              else:
-                  self.v = _softposit.q32_fdp_sub(self.v, _softposit.i64_to_p32(other1), other2.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q32_fdp_sub(self.v, _softposit.convertDoubleToP32(other1), _softposit.i64_to_p32(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q32_fdp_sub(self.v, _softposit.convertDoubleToP32(other1), _softposit.convertDoubleToP32(other2))
-              else:
-                  self.v = _softposit.q32_fdp_sub(self.v, _softposit.convertDoubleToP32(other1), other2.v)
-          else:
-              if isinstance(other2, (int)):
-                  self.v = _softposit.q32_fdp_sub(self.v, other1.v, _softposit.i64_to_p32(other2))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.q32_fdp_sub(self.v, other1.v, _softposit.convertDoubleToP32(other2))
-              else:
-                  self.v = _softposit.q32_fdp_sub(self.v, other1.v, other2.v)
-          return self
-       except TypeError:
-           print("TypeError: Unsupported fused operand (qmd) between quire32 and non-posit32 types")   
-   def toPosit(self):   
-       a = posit32(0)
-       a.v = _softposit.q32_to_p32(self.v);
-       return a
-   def clr(self):       
-       self.v = _softposit.q32Clr();
-   def isNaR(self):       
-       return self.v.isNaR();
-   def __repr__(self):
-       a = float(_softposit.convertP32ToDouble(_softposit.q32_to_p32(self.v)))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __str__(self):
-       a = float(_softposit.convertP32ToDouble(_softposit.q32_to_p32(self.v)))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def toBinary(self):
-       self.v.toBits()
-   def toHex(self):
-       self.v.toHex()
+    def __init__(self):
+        self.v = _softposit.q32Clr()
+
+    def type(self):
+        return "quire32"
+
+    def qma(self, other1, other2):
+        try:
+            a = posit32(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q32_fdp_add(
+                        self.v,
+                        _softposit.i64_to_p32(other1),
+                        _softposit.i64_to_p32(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q32_fdp_add(
+                        self.v,
+                        _softposit.i64_to_p32(other1),
+                        _softposit.convertDoubleToP32(other2),
+                    )
+                else:
+                    self.v = _softposit.q32_fdp_add(
+                        self.v, _softposit.i64_to_p32(other1), other2.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q32_fdp_add(
+                        self.v,
+                        _softposit.convertDoubleToP32(other1),
+                        _softposit.i64_to_p32(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q32_fdp_add(
+                        self.v,
+                        _softposit.convertDoubleToP32(other1),
+                        _softposit.convertDoubleToP32(other2),
+                    )
+                else:
+                    self.v = _softposit.q32_fdp_add(
+                        self.v, _softposit.convertDoubleToP32(other1), other2.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q32_fdp_add(
+                        self.v, other1.v, _softposit.i64_to_p32(other2)
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q32_fdp_add(
+                        self.v, other1.v, _softposit.convertDoubleToP32(other2)
+                    )
+                else:
+                    self.v = _softposit.q32_fdp_add(self.v, other1.v, other2.v)
+            return self
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (qma) between quire32 and non-posit32 types"
+            )
+
+    def qms(self, other1, other2):
+        try:
+            a = posit32(0)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q32_fdp_sub(
+                        self.v,
+                        _softposit.i64_to_p32(other1),
+                        _softposit.i64_to_p32(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q32_fdp_sub(
+                        self.v,
+                        _softposit.i64_to_p32(other1),
+                        _softposit.convertDoubleToP32(other2),
+                    )
+                else:
+                    self.v = _softposit.q32_fdp_sub(
+                        self.v, _softposit.i64_to_p32(other1), other2.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q32_fdp_sub(
+                        self.v,
+                        _softposit.convertDoubleToP32(other1),
+                        _softposit.i64_to_p32(other2),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q32_fdp_sub(
+                        self.v,
+                        _softposit.convertDoubleToP32(other1),
+                        _softposit.convertDoubleToP32(other2),
+                    )
+                else:
+                    self.v = _softposit.q32_fdp_sub(
+                        self.v, _softposit.convertDoubleToP32(other1), other2.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    self.v = _softposit.q32_fdp_sub(
+                        self.v, other1.v, _softposit.i64_to_p32(other2)
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.q32_fdp_sub(
+                        self.v, other1.v, _softposit.convertDoubleToP32(other2)
+                    )
+                else:
+                    self.v = _softposit.q32_fdp_sub(self.v, other1.v, other2.v)
+            return self
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (qmd) between quire32 and non-posit32 types"
+            )
+
+    def toPosit(self):
+        a = posit32(0)
+        a.v = _softposit.q32_to_p32(self.v)
+        return a
+
+    def clr(self):
+        self.v = _softposit.q32Clr()
+
+    def isNaR(self):
+        return self.v.isNaR()
+
+    def __repr__(self):
+        a = float(_softposit.convertP32ToDouble(_softposit.q32_to_p32(self.v)))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __str__(self):
+        a = float(_softposit.convertP32ToDouble(_softposit.q32_to_p32(self.v)))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def toBinary(self):
+        self.v.toBits()
+
+    def toHex(self):
+        self.v.toHex()
 
 
 class posit_2:
-   def __init__(self, value=None, x=None, bits=None):
-       self.x = x  
-       try:
-           if x is None:
-               raise Exception("Needs to specific posit size, x")
-           if bits is not None:
-               if isinstance(bits, (int)):
-                   self.v = posit_2_t()
-                   self.v.v = bits<<(32-x)
-               else:
-                   raise Exception("Bits can only be set with integer values")
-           else:
-               if value is None:
-                   self.v = posit_2_t()
-                   self.v.v = 0
-               elif isinstance(value, (int)):
-                   self.v = _softposit.i64_to_pX2(value, x)
-               else:
-                   self.v = _softposit.convertDoubleToPX2(value, x)
-       except Exception as error:
-           print(repr(error))
-   def type(self):
-       return 'posit' + str(self.x) +'_2'
-   def __add__(self, other):
-       try:
-          a = posit_2(0, self.x)
-          if isinstance(other, (int)):
-              a.v = _softposit.pX2_add(self.v, _softposit.i64_to_pX2(other, self.x), self.x)
-          elif isinstance(other, (float)):
-              a.v = _softposit.pX2_add(self.v, _softposit.convertDoubleToPX2(other, self.x), self.x)
-          else:
-              if(self.x==other.x):
-                  a.v = _softposit.pX2_add(self.v, other.v, self.x)
-              else:	             
-                  print("TypeError:  Unsupported operand type(s) for +: posit"+str(self.x)+"_2 and ",other.type()) 
-                  a.v.isNaR();
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for +: posit"+str(self.x)+"_2 and ",other.type())          
-   def __radd__(self, other):
-       return self.__add__(other)  
-   def __sub__(self, other):
-       try:
-          a = posit_2(0, self.x)
-          if isinstance(other, (int)):
-              a.v = _softposit.pX2_sub(self.v, _softposit.i64_to_pX2(other, self.x), self.x)
-          elif isinstance(other, (float)):
-              a.v = _softposit.pX2_sub(self.v, _softposit.convertDoubleToPX2(other, self.x), self.x)
-          else:
-              if(self.x==other.x):
-                  a.v = _softposit.pX2_sub(self.v, other.v, self.x)
-              else:	             
-                  print("TypeError:  Unsupported operand type(s) for +: posit"+str(self.x)+"_2 and ",other.type()) 
-                  a.v.isNaR();              
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for -: posit_2 and ",other.type())      
-   def __rsub__(self, other):
-       try:
-          a = posit_2(0, self.x)
-          if isinstance(other, (int)):
-              a.v = _softposit.pX2_sub(_softposit.i64_to_pX2(other, self.x), self.v, self.x)
-          elif isinstance(other, (float)):
-              a.v = _softposit.pX2_sub(_softposit.convertDoubleToPX2(other, self.x), self.v, self.x)
-          else:
-              if(self.x==other.x):
-                  a.v = _softposit.pX2_sub(other.v, self.v, self.x)
-              else:	             
-                  print("TypeError:  Unsupported operand type(s) for +: posit"+str(self.x)+"_2 and ",other.type()) 
-                  a.v.isNaR();              
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for -: posit_2 and ",other.type())  
-   def __mul__(self, other):
-       try:
-          a = posit_2(0, self.x)
-          if isinstance(other, (int)):
-              a.v = _softposit.pX2_mul(self.v, _softposit.i64_to_pX2(other, self.x), self.x)
-          elif isinstance(other, (float)):
-              a.v = _softposit.pX2_mul(self.v, _softposit.convertDoubleToPX2(other, self.x), self.x)
-          else:              
-              if(self.x==other.x):
-                  a.v = _softposit.pX2_mul(self.v, other.v, self.x)
-              else:	             
-                  print("TypeError:  Unsupported operand type(s) for +: posit"+str(self.x)+"_2 and ",other.type()) 
-                  a.v.isNaR();       
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for *: posit_2 and ",other.type())   
-   def __rmul__(self, other):
-       return self.__mul__(other)  
-   def __div__(self, other):
-       try:
-          a = posit_2(0, self.x)
-          if isinstance(other, (int)):
-              a.v = _softposit.pX2_div(self.v, _softposit.i64_to_pX2(other, self.x), self.x)
-          elif isinstance(other, (float)):
-              a.v = _softposit.pX2_div(self.v, _softposit.convertDoubleToPX2(other, self.x), self.x)
-          else:
-              if(self.x==other.x):
-                  a.v = _softposit.pX2_div(self.v, other.v, self.x)
-              else:	             
-                  print("TypeError:  Unsupported operand type(s) for +: posit"+str(self.x)+"_2 and ",other.type()) 
-                  a.v.isNaR();       
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for /: posit_2 and ",other.type())   
-   def __truediv__(self, other):
-       return self.__div__(other)
-   def __rdiv__(self, other):
-       try:
-          a = posit_2(0, self.x)
-          if isinstance(other, (int)):
-              a.v = _softposit.pX2_div(_softposit.i64_to_pX2(other, self.x), self.v, self.x)
-          elif isinstance(other, (float)):
-              a.v = _softposit.pX2_div(_softposit.convertDoubleToPX2(other, self.x), self.v, self.x)
-          else:              
-              if(self.x==other.x):
-                  a.v = _softposit.pX2_div(other.v, self.v, self.x)
-              else:	             
-                  print("TypeError:  Unsupported operand type(s) for +: posit"+str(self.x)+"_2 and ",other.type()) 
-                  a.v.isNaR();       
-          return a
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for *: posit"+str(self.x)+"_2 and ",other.type())  
-   def __rtruediv__(self, other):
-       return self.__rdiv__(other)
-   def __eq__(self, other):
-       try:
-          if isinstance(other, (int)):
-              return _softposit.pX2_eq(self.v, _softposit.i64_to_pX2(other, self.x))
-          elif isinstance(other, (float)):
-              return _softposit.pX2_eq(self.v, _softposit.convertDoubleToPX2(other, self.x))
-          else:
-              return _softposit.pX2_eq(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for ==: posit"+str(self.x)+"_2 and ",other.type())   
-   def __ne__(self, other):
-       try:                                                                                     
-          if isinstance(other, (int)):
-              return not(_softposit.pX2_eq(self.v, _softposit.i64_to_pX2(other, self.x)))
-          elif isinstance(other, (float)):
-              return not(_softposit.pX2_eq(self.v, _softposit.convertDoubleToPX2(other, self.x)))
-          else:
-              return not(_softposit.pX2_eq(self.v, other.v))
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for !=: posit"+str(self.x)+"_2 and ",other.type())
-   def __le__(self, other):
-       try:        
-          if isinstance(other, (int)):
-              return _softposit.pX2_le(self.v, _softposit.i64_to_pX2(other, self.x))
-          elif isinstance(other, (float)):
-              return _softposit.pX2_le(self.v, _softposit.convertDoubleToPX2(other, self.x))
-          else:
-              return _softposit.pX2_le(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for <=: posit"+str(self.x)+"_2 and ",other.type()) 
-   def __lt__(self, other):
-       try:   
-          if isinstance(other, (int)):
-              return _softposit.pX2_lt(self.v, _softposit.i64_to_pX2(other, self.x))
-          elif isinstance(other, (float)):
-              return _softposit.pX2_lt(self.v, _softposit.convertDoubleToPX2(other, self.x))
-          else:
-              return _softposit.pX2_lt(self.v, other.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for <: posit"+str(self.x)+"_2 and ",other.type())
-   def __ge__(self, other):
-       try:   
-          if isinstance(other, (int)):
-              return _softposit.pX2_le(_softposit.i64_to_pX2(other, self.x), self.v)
-          elif isinstance(other, (float)):
-              return _softposit.pX2_le(_softposit.convertDoubleToPX2(other, self.x), self.v)
-          else:
-              return _softposit.pX2_le(other.v, self.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for >=: posit"+str(self.x)+"_2 and ",other.type())
-   def __gt__(self, other):
-       try:   
-          if isinstance(other, (int)):
-              return _softposit.pX2_lt(_softposit.i64_to_pX2(other, self.x), self.v)
-          elif isinstance(other, (float)):
-              return _softposit.pX2_lt(_softposit.convertDoubleToPX2(other, self.x), self.v)
-          else:
-              return _softposit.pX2_lt(other.v, self.v)
-       except TypeError:
-          print("TypeError: Unsupported operand type(s) for >: posit"+str(self.x)+"_2 and ",other.type())
-   def __rshift__(self, other):
-       a = posit_2(0, self.x)
-       a.v = self.v.__rshift__(other, self.x)
-       return a
-   def __lshift__(self, other):
-       a = posit_2(0, self.x)
-       a.v = self.v.__lshift__(other, self.x)
-       return a
-   def __pos__(self):
-       return self
-   def __neg__(self):
-       a = posit_2(0, self.x)
-       a.v = self.v.__neg__(self.x)
-       return a
-   def __abs__(self):
-       a = posit_2(0, self.x)
-       a.v = self.v.__abs__(self.x)
-       return a
-   def __invert__(self):
-       self.v = self.v.__invert__(self.x)
-       return self   
-   def __and__(self, other):
-       a = posit_2(0, self.x)
-       a.v = self.v.__and__(other.v, self.x)
-       return a
-   def __xor__(self, other):
-       a = posit_2(0, self.x)
-       a.v = self.v.__xor__(other.v, self.x)
-       return a
-   def __or__(self, other):
-       a = posit_2(0, self.x)
-       a.v = self.v.__or__(other.v, self.x)
-       return a
-   def fma(self, other1, other2):
-       try:   
-          a = posit_2(0, self.x)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  a.v = _softposit.pX2_mulAdd(_softposit.i64_to_pX2(other1, self.x), _softposit.i64_to_pX2(other2, self.x), self.v, self.x)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.pX2_mulAdd(_softposit.i64_to_pX2(other1, self.x), _softposit.convertDoubleToPX2(other2, self.x), self.v, self.x)
-              else:
-                  a.v = _softposit.pX2_mulAdd(_softposit.i64_to_pX2(other1, self.x), other2.v, self.v, self.x)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  a.v = _softposit.pX2_mulAdd(_softposit.convertDoubleToPX2(other1, self.x), _softposit.i64_to_pX2(other2, self.x), self.v, self.x)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.pX2_mulAdd(_softposit.convertDoubleToPX2(other1, self.x), _softposit.convertDoubleToPX2(other2, self.x), self.v, self.x)
-              else:
-                  a.v = _softposit.pX2_mulAdd(_softposit.convertDoubleToPX2(other1, self.x), other2.v, self.v, self.x)
-          else:
-              if isinstance(other2, (int)):
-                  a.v = _softposit.pX2_mulAdd(self.v, other1.v, _softposit.i64_to_pX2(other2, self.x), self.v, self.x)
-              elif isinstance(other2, (float)):
-                  a.v = _softposit.pX2_mulAdd(other1.v, _softposit.convertDoubleToPX2(other2, self.x), self.v, self.x)
-              else:
-                  a.v = _softposit.pX2_mulAdd(other1.v, other2.v, self.v, self.x)   
-          return a
-       except TypeError:
-          print("TypeError: Unsupported fused operand (fma) among mixed precison posit types")
-   def toPosit8(self):
-       a = posit8(0)
-       a.v = _softposit.pX2_to_p8(self.v)
-       return a
-   def toPosit16(self):
-       a = posit16(0)
-       a.v = _softposit.pX2_to_p16(self.v)
-       return a
-   def toPosit32(self):
-       a = posit32(0)
-       a.v = _softposit.pX2_to_p32(self.v)
-       return a
-   def toPosit_2(self, x):
-       a = posit_2(0, x)
-       a.v = _softposit.pX2_to_pX2(self.v, x)       
-       a.x = x
-       return a
-   def toRInt(self):
-       return _softposit.pX2_to_i64(self.v)
-   def toInt(self):
-       return _softposit.pX2_int(self.v)
-   def rint(self):
-       self.v = _softposit.pX2_roundToInt(self.v, self.x)
-       return self
-   def sqrt(self):
-       a = posit_2(0, self.x)
-       a.v = _softposit.pX2_sqrt(self.v, self.x)
-       return a
-   def __repr__(self):
-       a = float(_softposit.convertPX2ToDouble(self.v))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __str__(self):
-       a = float(_softposit.convertPX2ToDouble(self.v))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __int__(self):
-       return _softposit.pX2_int(self.v)
-   def __float__(self):
-       return float(_softposit.convertPX2ToDouble(self.v))
-   def isNaR(self):
-       return self.v.isNaR();
-   def toNaR(self):
-       a = posit_2(0)
-       a.v.toNaR();
-       return a
-   def fromBits(self, value):
-       self.v.fromBits(value)
-   def toBinary(self):
-       self.v.toBits(self.x)
-   def toBinaryFormatted(self):
-       print(convertToColor((self.v.v)>>(32-self.x), self.x, 2))
-   def toHex(self):
-       self.v.toHex(self.x)
+    def __init__(self, value=None, x=None, bits=None):
+        self.x = x
+        try:
+            if x is None:
+                raise Exception("Needs to specific posit size, x")
+            if bits is not None:
+                if isinstance(bits, (int)):
+                    self.v = posit_2_t()
+                    self.v.v = bits << (32 - x)
+                else:
+                    raise Exception("Bits can only be set with integer values")
+            else:
+                if value is None:
+                    self.v = posit_2_t()
+                    self.v.v = 0
+                elif isinstance(value, (int)):
+                    self.v = _softposit.i64_to_pX2(value, x)
+                else:
+                    self.v = _softposit.convertDoubleToPX2(value, x)
+        except Exception as error:
+            print(repr(error))
+
+    def type(self):
+        return "posit" + str(self.x) + "_2"
+
+    def __add__(self, other):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other, (int)):
+                a.v = _softposit.pX2_add(
+                    self.v, _softposit.i64_to_pX2(other, self.x), self.x
+                )
+            elif isinstance(other, (float)):
+                a.v = _softposit.pX2_add(
+                    self.v, _softposit.convertDoubleToPX2(other, self.x), self.x
+                )
+            else:
+                if self.x == other.x:
+                    a.v = _softposit.pX2_add(self.v, other.v, self.x)
+                else:
+                    print(
+                        "TypeError:  Unsupported operand type(s) for +: posit"
+                        + str(self.x)
+                        + "_2 and ",
+                        other.type(),
+                    )
+                    a.v.isNaR()
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for +: posit"
+                + str(self.x)
+                + "_2 and ",
+                other.type(),
+            )
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other, (int)):
+                a.v = _softposit.pX2_sub(
+                    self.v, _softposit.i64_to_pX2(other, self.x), self.x
+                )
+            elif isinstance(other, (float)):
+                a.v = _softposit.pX2_sub(
+                    self.v, _softposit.convertDoubleToPX2(other, self.x), self.x
+                )
+            else:
+                if self.x == other.x:
+                    a.v = _softposit.pX2_sub(self.v, other.v, self.x)
+                else:
+                    print(
+                        "TypeError:  Unsupported operand type(s) for +: posit"
+                        + str(self.x)
+                        + "_2 and ",
+                        other.type(),
+                    )
+                    a.v.isNaR()
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for -: posit_2 and ",
+                other.type(),
+            )
+
+    def __rsub__(self, other):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other, (int)):
+                a.v = _softposit.pX2_sub(
+                    _softposit.i64_to_pX2(other, self.x), self.v, self.x
+                )
+            elif isinstance(other, (float)):
+                a.v = _softposit.pX2_sub(
+                    _softposit.convertDoubleToPX2(other, self.x), self.v, self.x
+                )
+            else:
+                if self.x == other.x:
+                    a.v = _softposit.pX2_sub(other.v, self.v, self.x)
+                else:
+                    print(
+                        "TypeError:  Unsupported operand type(s) for +: posit"
+                        + str(self.x)
+                        + "_2 and ",
+                        other.type(),
+                    )
+                    a.v.isNaR()
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for -: posit_2 and ",
+                other.type(),
+            )
+
+    def __mul__(self, other):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other, (int)):
+                a.v = _softposit.pX2_mul(
+                    self.v, _softposit.i64_to_pX2(other, self.x), self.x
+                )
+            elif isinstance(other, (float)):
+                a.v = _softposit.pX2_mul(
+                    self.v, _softposit.convertDoubleToPX2(other, self.x), self.x
+                )
+            else:
+                if self.x == other.x:
+                    a.v = _softposit.pX2_mul(self.v, other.v, self.x)
+                else:
+                    print(
+                        "TypeError:  Unsupported operand type(s) for +: posit"
+                        + str(self.x)
+                        + "_2 and ",
+                        other.type(),
+                    )
+                    a.v.isNaR()
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for *: posit_2 and ",
+                other.type(),
+            )
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __div__(self, other):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other, (int)):
+                a.v = _softposit.pX2_div(
+                    self.v, _softposit.i64_to_pX2(other, self.x), self.x
+                )
+            elif isinstance(other, (float)):
+                a.v = _softposit.pX2_div(
+                    self.v, _softposit.convertDoubleToPX2(other, self.x), self.x
+                )
+            else:
+                if self.x == other.x:
+                    a.v = _softposit.pX2_div(self.v, other.v, self.x)
+                else:
+                    print(
+                        "TypeError:  Unsupported operand type(s) for +: posit"
+                        + str(self.x)
+                        + "_2 and ",
+                        other.type(),
+                    )
+                    a.v.isNaR()
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for /: posit_2 and ",
+                other.type(),
+            )
+
+    def __truediv__(self, other):
+        return self.__div__(other)
+
+    def __rdiv__(self, other):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other, (int)):
+                a.v = _softposit.pX2_div(
+                    _softposit.i64_to_pX2(other, self.x), self.v, self.x
+                )
+            elif isinstance(other, (float)):
+                a.v = _softposit.pX2_div(
+                    _softposit.convertDoubleToPX2(other, self.x), self.v, self.x
+                )
+            else:
+                if self.x == other.x:
+                    a.v = _softposit.pX2_div(other.v, self.v, self.x)
+                else:
+                    print(
+                        "TypeError:  Unsupported operand type(s) for +: posit"
+                        + str(self.x)
+                        + "_2 and ",
+                        other.type(),
+                    )
+                    a.v.isNaR()
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for *: posit"
+                + str(self.x)
+                + "_2 and ",
+                other.type(),
+            )
+
+    def __rtruediv__(self, other):
+        return self.__rdiv__(other)
+
+    def __eq__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.pX2_eq(self.v, _softposit.i64_to_pX2(other, self.x))
+            elif isinstance(other, (float)):
+                return _softposit.pX2_eq(
+                    self.v, _softposit.convertDoubleToPX2(other, self.x)
+                )
+            else:
+                return _softposit.pX2_eq(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for ==: posit"
+                + str(self.x)
+                + "_2 and ",
+                other.type(),
+            )
+
+    def __ne__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return not (
+                    _softposit.pX2_eq(self.v, _softposit.i64_to_pX2(other, self.x))
+                )
+            elif isinstance(other, (float)):
+                return not (
+                    _softposit.pX2_eq(
+                        self.v, _softposit.convertDoubleToPX2(other, self.x)
+                    )
+                )
+            else:
+                return not (_softposit.pX2_eq(self.v, other.v))
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for !=: posit"
+                + str(self.x)
+                + "_2 and ",
+                other.type(),
+            )
+
+    def __le__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.pX2_le(self.v, _softposit.i64_to_pX2(other, self.x))
+            elif isinstance(other, (float)):
+                return _softposit.pX2_le(
+                    self.v, _softposit.convertDoubleToPX2(other, self.x)
+                )
+            else:
+                return _softposit.pX2_le(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for <=: posit"
+                + str(self.x)
+                + "_2 and ",
+                other.type(),
+            )
+
+    def __lt__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.pX2_lt(self.v, _softposit.i64_to_pX2(other, self.x))
+            elif isinstance(other, (float)):
+                return _softposit.pX2_lt(
+                    self.v, _softposit.convertDoubleToPX2(other, self.x)
+                )
+            else:
+                return _softposit.pX2_lt(self.v, other.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for <: posit"
+                + str(self.x)
+                + "_2 and ",
+                other.type(),
+            )
+
+    def __ge__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.pX2_le(_softposit.i64_to_pX2(other, self.x), self.v)
+            elif isinstance(other, (float)):
+                return _softposit.pX2_le(
+                    _softposit.convertDoubleToPX2(other, self.x), self.v
+                )
+            else:
+                return _softposit.pX2_le(other.v, self.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for >=: posit"
+                + str(self.x)
+                + "_2 and ",
+                other.type(),
+            )
+
+    def __gt__(self, other):
+        try:
+            if isinstance(other, (int)):
+                return _softposit.pX2_lt(_softposit.i64_to_pX2(other, self.x), self.v)
+            elif isinstance(other, (float)):
+                return _softposit.pX2_lt(
+                    _softposit.convertDoubleToPX2(other, self.x), self.v
+                )
+            else:
+                return _softposit.pX2_lt(other.v, self.v)
+        except TypeError:
+            print(
+                "TypeError: Unsupported operand type(s) for >: posit"
+                + str(self.x)
+                + "_2 and ",
+                other.type(),
+            )
+
+    def __rshift__(self, other):
+        a = posit_2(0, self.x)
+        a.v = self.v.__rshift__(other, self.x)
+        return a
+
+    def __lshift__(self, other):
+        a = posit_2(0, self.x)
+        a.v = self.v.__lshift__(other, self.x)
+        return a
+
+    def __pos__(self):
+        return self
+
+    def __neg__(self):
+        a = posit_2(0, self.x)
+        a.v = self.v.__neg__(self.x)
+        return a
+
+    def __abs__(self):
+        a = posit_2(0, self.x)
+        a.v = self.v.__abs__(self.x)
+        return a
+
+    def __invert__(self):
+        self.v = self.v.__invert__(self.x)
+        return self
+
+    def __and__(self, other):
+        a = posit_2(0, self.x)
+        a.v = self.v.__and__(other.v, self.x)
+        return a
+
+    def __xor__(self, other):
+        a = posit_2(0, self.x)
+        a.v = self.v.__xor__(other.v, self.x)
+        return a
+
+    def __or__(self, other):
+        a = posit_2(0, self.x)
+        a.v = self.v.__or__(other.v, self.x)
+        return a
+
+    def fma(self, other1, other2):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    a.v = _softposit.pX2_mulAdd(
+                        _softposit.i64_to_pX2(other1, self.x),
+                        _softposit.i64_to_pX2(other2, self.x),
+                        self.v,
+                        self.x,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.pX2_mulAdd(
+                        _softposit.i64_to_pX2(other1, self.x),
+                        _softposit.convertDoubleToPX2(other2, self.x),
+                        self.v,
+                        self.x,
+                    )
+                else:
+                    a.v = _softposit.pX2_mulAdd(
+                        _softposit.i64_to_pX2(other1, self.x), other2.v, self.v, self.x
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    a.v = _softposit.pX2_mulAdd(
+                        _softposit.convertDoubleToPX2(other1, self.x),
+                        _softposit.i64_to_pX2(other2, self.x),
+                        self.v,
+                        self.x,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.pX2_mulAdd(
+                        _softposit.convertDoubleToPX2(other1, self.x),
+                        _softposit.convertDoubleToPX2(other2, self.x),
+                        self.v,
+                        self.x,
+                    )
+                else:
+                    a.v = _softposit.pX2_mulAdd(
+                        _softposit.convertDoubleToPX2(other1, self.x),
+                        other2.v,
+                        self.v,
+                        self.x,
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    a.v = _softposit.pX2_mulAdd(
+                        self.v,
+                        other1.v,
+                        _softposit.i64_to_pX2(other2, self.x),
+                        self.v,
+                        self.x,
+                    )
+                elif isinstance(other2, (float)):
+                    a.v = _softposit.pX2_mulAdd(
+                        other1.v,
+                        _softposit.convertDoubleToPX2(other2, self.x),
+                        self.v,
+                        self.x,
+                    )
+                else:
+                    a.v = _softposit.pX2_mulAdd(other1.v, other2.v, self.v, self.x)
+            return a
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (fma) among mixed precison posit types"
+            )
+
+    def toPosit8(self):
+        a = posit8(0)
+        a.v = _softposit.pX2_to_p8(self.v)
+        return a
+
+    def toPosit16(self):
+        a = posit16(0)
+        a.v = _softposit.pX2_to_p16(self.v)
+        return a
+
+    def toPosit32(self):
+        a = posit32(0)
+        a.v = _softposit.pX2_to_p32(self.v)
+        return a
+
+    def toPosit_2(self, x):
+        a = posit_2(0, x)
+        a.v = _softposit.pX2_to_pX2(self.v, x)
+        a.x = x
+        return a
+
+    def toRInt(self):
+        return _softposit.pX2_to_i64(self.v)
+
+    def toInt(self):
+        return _softposit.pX2_int(self.v)
+
+    def rint(self):
+        self.v = _softposit.pX2_roundToInt(self.v, self.x)
+        return self
+
+    def sqrt(self):
+        a = posit_2(0, self.x)
+        a.v = _softposit.pX2_sqrt(self.v, self.x)
+        return a
+
+    def __repr__(self):
+        a = float(_softposit.convertPX2ToDouble(self.v))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __str__(self):
+        a = float(_softposit.convertPX2ToDouble(self.v))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __int__(self):
+        return _softposit.pX2_int(self.v)
+
+    def __float__(self):
+        return float(_softposit.convertPX2ToDouble(self.v))
+
+    def isNaR(self):
+        return self.v.isNaR()
+
+    def toNaR(self):
+        a = posit_2(0)
+        a.v.toNaR()
+        return a
+
+    def fromBits(self, value):
+        self.v.fromBits(value)
+
+    def toBinary(self):
+        self.v.toBits(self.x)
+
+    def toBinaryFormatted(self):
+        print(convertToColor((self.v.v) >> (32 - self.x), self.x, 2))
+
+    def toHex(self):
+        self.v.toHex(self.x)
+
 
 class quire_2:
-   def __init__(self, x):
-       self.v = _softposit.qX2Clr();
-       self.x = x
-   def type(self):
-       return 'quire' + str(self.x) +'_2'
-   def qma(self, other1, other2):
-       try:
-          a = posit_2(0, self.x)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.qX2_fdp_add(self.v, _softposit.i64_to_pX2(other1, self.x), _softposit.i64_to_pX2(other2, self.x))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.qX2_fdp_add(self.v, _softposit.i64_to_pX2(other1, self.x), _softposit.convertDoubleToPX2(other2, self.x))
-              else:
-                  self.v = _softposit.qX2_fdp_add(self.v, _softposit.i64_to_pX2(other1, self.x), other2.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.qX2_fdp_add(self.v, _softposit.convertDoubleToPX2(other1, self.x), _softposit.i64_to_pX2(other2, self.x))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.qX2_fdp_add(self.v, _softposit.convertDoubleToPX2(other1, self.x), _softposit.convertDoubleToPX2(other2, self.x))
-              else:
-                  self.v = _softposit.qX2_fdp_add(self.v, _softposit.convertDoubleToPX2(other1, self.x), other2.v)
-          else:
-              if isinstance(other2, (int)):
-                  self.v = _softposit.qX2_fdp_add(self.v, other1.v, _softposit.i64_to_pX2(other2, self.x))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.qX2_fdp_add(self.v, other1.v, _softposit.convertDoubleToPX2(other2, self.x))
-              else:
-                  self.v = _softposit.qX2_fdp_add(self.v, other1.v, other2.v)
-          return self
-       except TypeError:
-          print("TypeError: Unsupported fused operand (qma) between quire"+self.x+"_2 and non-posit8 types")     
-   def qms(self, other1, other2):
-       try:
-          a = posit_2(0, self.x)
-          if isinstance(other1, (int)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.qX2_fdp_sub(self.v, _softposit.i64_to_pX2(other1, self.x), _softposit.i64_to_pX2(other2, self.x))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.qX2_fdp_sub(self.v, _softposit.i64_to_pX2(other1, self.x), _softposit.convertDoubleToPX2(other2, self.x))
-              else:
-                  self.v = _softposit.qX2_fdp_sub(self.v, _softposit.i64_to_pX2(other1, self.x), other2.v)
-          elif isinstance(other1, (float)):
-              if isinstance(other2, (int)):
-                  self.v = _softposit.qX2_fdp_sub(self.v, _softposit.convertDoubleToPX2(other1, self.x), _softposit.i64_to_pX2(other2, self.x))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.qX2_fdp_sub(self.v, _softposit.convertDoubleToPX2(other1, self.x), _softposit.convertDoubleToPX2(other2, self.x))
-              else:
-                  self.v = _softposit.qX2_fdp_sub(self.v, _softposit.convertDoubleToPX2(other1, self.x), other2.v)
-          else:
-              if isinstance(other2, (int)):
-                  self.v = _softposit.qX2_fdp_sub(self.v, other1.v, _softposit.i64_to_pX2(other2, self.x))
-              elif isinstance(other2, (float)):
-                  self.v = _softposit.qX2_fdp_sub(self.v, other1.v, _softposit.convertDoubleToPX2(other2, self.x))
-              else:
-                  self.v = _softposit.qX2_fdp_sub(self.v, other1.v, other2.v)
-          return self
-       except TypeError:
-          print("TypeError: Unsupported fused operand (qms) between quire"+x+"_2 and non-posit_2 types")    
-   def toPosit(self): 
-       a = posit_2(0, self.x)      
-       a.v = _softposit.qX2_to_pX2(self.v, self.x);
-       return a
-   def clr(self):       
-       self.v = _softposit.qX2Clr();
-   def isNaR(self):       
-       return self.v.isNaR();
-   def __repr__(self):
-       a = float(_softposit.convertPX2ToDouble(_softposit.qX2_to_pX2(self.v, self.x)))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def __str__(self):
-       a = float(_softposit.convertPX2ToDouble(_softposit.qX2_to_pX2(self.v, self.x)))
-       if (a == float('inf')) or (a==float('-inf')) or (a==float('nan')):
-           return "NaR"
-       else:
-           return str(a)
-   def toBinary(self):
-       self.v.toBits()
-   def toHex(self):
-       self.v.toHex()
+    def __init__(self, x):
+        self.v = _softposit.qX2Clr()
+        self.x = x
+
+    def type(self):
+        return "quire" + str(self.x) + "_2"
+
+    def qma(self, other1, other2):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.qX2_fdp_add(
+                        self.v,
+                        _softposit.i64_to_pX2(other1, self.x),
+                        _softposit.i64_to_pX2(other2, self.x),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.qX2_fdp_add(
+                        self.v,
+                        _softposit.i64_to_pX2(other1, self.x),
+                        _softposit.convertDoubleToPX2(other2, self.x),
+                    )
+                else:
+                    self.v = _softposit.qX2_fdp_add(
+                        self.v, _softposit.i64_to_pX2(other1, self.x), other2.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.qX2_fdp_add(
+                        self.v,
+                        _softposit.convertDoubleToPX2(other1, self.x),
+                        _softposit.i64_to_pX2(other2, self.x),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.qX2_fdp_add(
+                        self.v,
+                        _softposit.convertDoubleToPX2(other1, self.x),
+                        _softposit.convertDoubleToPX2(other2, self.x),
+                    )
+                else:
+                    self.v = _softposit.qX2_fdp_add(
+                        self.v, _softposit.convertDoubleToPX2(other1, self.x), other2.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    self.v = _softposit.qX2_fdp_add(
+                        self.v, other1.v, _softposit.i64_to_pX2(other2, self.x)
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.qX2_fdp_add(
+                        self.v, other1.v, _softposit.convertDoubleToPX2(other2, self.x)
+                    )
+                else:
+                    self.v = _softposit.qX2_fdp_add(self.v, other1.v, other2.v)
+            return self
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (qma) between quire"
+                + self.x
+                + "_2 and non-posit8 types"
+            )
+
+    def qms(self, other1, other2):
+        try:
+            a = posit_2(0, self.x)
+            if isinstance(other1, (int)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.qX2_fdp_sub(
+                        self.v,
+                        _softposit.i64_to_pX2(other1, self.x),
+                        _softposit.i64_to_pX2(other2, self.x),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.qX2_fdp_sub(
+                        self.v,
+                        _softposit.i64_to_pX2(other1, self.x),
+                        _softposit.convertDoubleToPX2(other2, self.x),
+                    )
+                else:
+                    self.v = _softposit.qX2_fdp_sub(
+                        self.v, _softposit.i64_to_pX2(other1, self.x), other2.v
+                    )
+            elif isinstance(other1, (float)):
+                if isinstance(other2, (int)):
+                    self.v = _softposit.qX2_fdp_sub(
+                        self.v,
+                        _softposit.convertDoubleToPX2(other1, self.x),
+                        _softposit.i64_to_pX2(other2, self.x),
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.qX2_fdp_sub(
+                        self.v,
+                        _softposit.convertDoubleToPX2(other1, self.x),
+                        _softposit.convertDoubleToPX2(other2, self.x),
+                    )
+                else:
+                    self.v = _softposit.qX2_fdp_sub(
+                        self.v, _softposit.convertDoubleToPX2(other1, self.x), other2.v
+                    )
+            else:
+                if isinstance(other2, (int)):
+                    self.v = _softposit.qX2_fdp_sub(
+                        self.v, other1.v, _softposit.i64_to_pX2(other2, self.x)
+                    )
+                elif isinstance(other2, (float)):
+                    self.v = _softposit.qX2_fdp_sub(
+                        self.v, other1.v, _softposit.convertDoubleToPX2(other2, self.x)
+                    )
+                else:
+                    self.v = _softposit.qX2_fdp_sub(self.v, other1.v, other2.v)
+            return self
+        except TypeError:
+            print(
+                "TypeError: Unsupported fused operand (qms) between quire"
+                + x
+                + "_2 and non-posit_2 types"
+            )
+
+    def toPosit(self):
+        a = posit_2(0, self.x)
+        a.v = _softposit.qX2_to_pX2(self.v, self.x)
+        return a
+
+    def clr(self):
+        self.v = _softposit.qX2Clr()
+
+    def isNaR(self):
+        return self.v.isNaR()
+
+    def __repr__(self):
+        a = float(_softposit.convertPX2ToDouble(_softposit.qX2_to_pX2(self.v, self.x)))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def __str__(self):
+        a = float(_softposit.convertPX2ToDouble(_softposit.qX2_to_pX2(self.v, self.x)))
+        if (a == float("inf")) or (a == float("-inf")) or (a == float("nan")):
+            return "NaR"
+        else:
+            return str(a)
+
+    def toBinary(self):
+        self.v.toBits()
+
+    def toHex(self):
+        self.v.toHex()
 
 
 # This file is compatible with both classic and new-style classes.
-
-
