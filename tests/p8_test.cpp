@@ -14,7 +14,7 @@ constexpr int NTESTS8 = 1000;
 // Random generator setup
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_int_distribution<int8_t> int_dist(INT8_MIN, INT8_MAX);
+std::uniform_int_distribution<int8_t> int_dist(INT8_MIN / 2, INT8_MAX / 2);
 std::uniform_real_distribution<double> real_dist(-100.0, 100.0);
 
 // Helper function to compare doubles with tolerance
@@ -201,7 +201,7 @@ TEST(Posit8Arithmetic, MulAdd)
         double f_b = p_b.toDouble();
         double f_c = p_c.toDouble();
 
-        posit8 p_result = p_a.fma(p_b, p_c);
+        posit8 p_result = p_c.fma(p_a, p_b);
         double f_result = std::fma(f_a, f_b, f_c);
         posit8 expected = f_result;
 

@@ -85,7 +85,7 @@ posit8_t softposit_mulAddP8( uint_fast8_t, uint_fast8_t, uint_fast8_t, uint_fast
 
 posit16_t softposit_addMagsP16( uint_fast16_t, uint_fast16_t );
 posit16_t softposit_subMagsP16( uint_fast16_t, uint_fast16_t );
-posit16_t softposit_mulAddP16( uint_fast16_t, uint_fast16_t, uint_fast16_t, uint_fast16_t );
+posit16_t softposit_mulAddP16(uint_fast16_t uiA, uint_fast16_t uiB, uint_fast16_t uiC, uint_fast16_t opcode);
 
 
 /*----------------------------------------------------------------------------
