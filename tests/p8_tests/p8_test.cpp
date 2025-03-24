@@ -2,6 +2,7 @@
 
 // Random distributions for p8 tests
 std::uniform_int_distribution<int8_t> int_dist8(INT8_MIN, INT8_MAX);
+std::uniform_real_distribution<double> real_dist(-100.0, 100.0);
 
 //========================================================================================
 // POSIT8 TESTS
@@ -274,7 +275,6 @@ TEST(Posit8Conversion, ConvertP8ToF32) {
 
 // Test random conversion from double to posit8
 TEST(Posit8Conversion, ConvertF64ToP8Rand) {
-  std::uniform_real_distribution<double> real_dist(-100.0, 100.0);
   for (int i = 0; i < NTESTS8; i++) {
     double f = real_dist(gen);
     posit8 p = f;
@@ -289,7 +289,6 @@ TEST(Posit8Conversion, ConvertF64ToP8Rand) {
 
 // Test random conversion from float to posit8
 TEST(Posit8Conversion, ConvertF32ToP8Rand) {
-  std::uniform_real_distribution<double> real_dist(-100.0, 100.0);
   for (int i = 0; i < NTESTS8; i++) {
     float f = static_cast<float>(real_dist(gen));
     double d = static_cast<double>(f);
@@ -468,6 +467,84 @@ TEST(Posit8Operators, Decrement) {
 }
 
 //========================================================================================
+// BIT OPERATIONS TESTS
+//========================================================================================
+
+TEST(Posit8BitOperations, BitwiseNot) {
+  posit8 p;
+  p.value = 0x55;
+  posit8 not_p = ~p;
+  ASSERT_EQ(not_p.value, 0xAA);
+}
+
+TEST(Posit8BitOperations, BitwiseAnd) {
+  posit8 a, b;
+  a.value = 0x55;
+  b.value = 0x33;
+  posit8 result = a & b;
+  ASSERT_EQ(result.value, 0x11);
+}
+
+TEST(Posit8BitOperations, BitwiseOr) {
+  posit8 a, b;
+  a.value = 0x55;
+  b.value = 0x33;
+  posit8 result = a | b;
+  ASSERT_EQ(result.value, 0x77);
+}
+
+TEST(Posit8BitOperations, BitwiseXor) {
+  posit8 a, b;
+  a.value = 0x55;
+  b.value = 0x33;
+  posit8 result = a ^ b;
+  ASSERT_EQ(result.value, 0x66);
+}
+
+TEST(Posit8BitOperations, LeftShift) {
+  posit8 p;
+  p.value = 0x12;
+  posit8 result = p << 4;
+  ASSERT_EQ(result.value, 0x20);
+}
+
+TEST(Posit8BitOperations, RightShift) {
+  posit8 p;
+  p.value = 0x12;
+  posit8 result = p >> 4;
+  ASSERT_EQ(result.value, 0x01);
+}
+
+//========================================================================================
+// SPECIFIC VALUES TESTS
+//========================================================================================
+
+TEST(Posit8SpecificValues, Zero) {
+  posit8 p;
+  p.value = 0;
+  ASSERT_EQ(p.toDouble(), 0.0);
+
+  posit8 zero = 0.0;
+  ASSERT_EQ(zero.value, 0);
+}
+
+TEST(Posit8SpecificValues, One) {
+  posit8 one = 1.0;
+  ASSERT_EQ(one.toDouble(), 1.0);
+
+  // Check specific bit pattern for 1.0
+  ASSERT_EQ(one.value, 0x40);
+}
+
+TEST(Posit8SpecificValues, NegativeOne) {
+  posit8 neg_one = -1.0;
+  ASSERT_EQ(neg_one.toDouble(), -1.0);
+
+  // Check specific bit pattern for -1.0
+  ASSERT_EQ(neg_one.value, 0xC0);
+}
+
+//========================================================================================
 // ADVANCED TESTS
 //========================================================================================
 
@@ -493,7 +570,7 @@ TEST(Posit8Advanced, AddSubCancel) {
     posit8 original = sum - p_b;
 
     // Allow a slightly higher tolerance for posit8
-    ASSERT_TRUE(double_eq(original.toDouble(), p_a.toDouble(), 1e-12, 1e-1))
+    EXPECT_TRUE(double_eq(original.toDouble(), p_a.toDouble(), 1e-12, 1e-1))
         << "Failed: (" << p_a.toDouble() << " + " << p_b.toDouble() << ") - "
         << p_b.toDouble() << " = " << original.toDouble() << " but expected "
         << p_a.toDouble();
@@ -524,11 +601,57 @@ TEST(Posit8Advanced, MulDivCancel) {
     posit8 original = product / p_b;
 
     // Allow a slightly higher tolerance for posit8
-    ASSERT_TRUE(double_eq(original.toDouble(), p_a.toDouble(), 1e-12, 1e-1))
+    EXPECT_TRUE(double_eq(original.toDouble(), p_a.toDouble(), 1e-12, 1e-1))
         << "Failed: (" << p_a.toDouble() << " * " << p_b.toDouble() << ") / "
         << p_b.toDouble() << " = " << original.toDouble() << " but expected "
         << p_a.toDouble();
   }
+}
+
+// Test for overflow behavior
+TEST(Posit8Advanced, OverflowHandling) {
+  current_operation = "Overflow Handling";
+
+  // Test overflow with addition
+  posit8 max_posit = posit8().maxpos();
+  posit8 result = max_posit + max_posit;
+
+  // Should saturate to maxpos, not wrap around or become NaR
+  EXPECT_EQ(result.value, max_posit.value)
+      << "Overflow did not saturate to maxpos: " << std::hex << "0x"
+      << (int)result.value << " vs 0x" << (int)max_posit.value;
+
+  // Test underflow with subtraction
+  posit8 min_posit = posit8().minpos();
+  posit8 neg_max = -max_posit;
+  result = neg_max - max_posit;
+
+  // Should saturate to -maxpos, not wrap around
+  EXPECT_EQ(result.value, neg_max.value)
+      << "Underflow did not saturate to -maxpos: " << std::hex << "0x"
+      << (int)result.value << " vs 0x" << (int)neg_max.value;
+}
+
+// Test for subnormal values handling
+TEST(Posit8Advanced, SubnormalHandling) {
+  current_operation = "Subnormal Values";
+
+  // Test with very small positive values
+  posit8 min_positive = posit8().minpos();
+  posit8 half_min = min_positive / posit8(2.0);
+
+  // Should not be zero (posits don't have subnormals but have very small
+  // values)
+  EXPECT_NE(half_min.value, 0)
+      << "Half of minpos became zero, expected a small positive value";
+
+  // Test with very small negative values
+  posit8 max_negative = posit8().minneg();
+  posit8 half_max_neg = max_negative / posit8(2.0);
+
+  // Should not be zero
+  EXPECT_NE(half_max_neg.value, 0)
+      << "Half of minneg became zero, expected a small negative value";
 }
 
 // Main function
