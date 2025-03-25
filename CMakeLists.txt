@@ -129,58 +129,33 @@ if(BUILD_TESTS)
   # Include the tests directory in the include path
   include_directories(${TESTS_DIR})
 
-  # Add p8 tests
-  add_executable(p8_tests 
-    "${TESTS_DIR}/p8_tests/arithmetic_tests.cpp"
-    "${TESTS_DIR}/p8_tests/conversion_tests.cpp"
-    "${TESTS_DIR}/p8_tests/special_values_tests.cpp"
-    "${TESTS_DIR}/p8_tests/comparison_operator_tests.cpp"
-    "${TESTS_DIR}/p8_tests/increment_decrement_tests.cpp"
-    "${TESTS_DIR}/p8_tests/bit_operations_tests.cpp"
-    "${TESTS_DIR}/p8_tests/specific_values_tests.cpp"
-    "${TESTS_DIR}/p8_tests/advanced_tests.cpp"
-    "${TESTS_DIR}/main.cpp"
-    ${COMMON_TEST_SOURCES}
-  )
-  target_link_libraries(p8_tests gtest gtest_main pthread softposit)
-  add_test(NAME p8_tests COMMAND p8_tests)
+  # Function to add test executable with auto-discovered test files
+  function(add_posit_test_executable NAME SIZE)
+    # Auto-discover test files in the directory
+    file(GLOB TEST_SOURCES "${TESTS_DIR}/${NAME}_tests/*.cpp")
+    
+    # Add the test executable with all discovered files
+    add_executable(${NAME}_tests 
+      ${TEST_SOURCES}
+      "${TESTS_DIR}/main.cpp"
+      ${COMMON_TEST_SOURCES}
+    )
+    target_link_libraries(${NAME}_tests gtest gtest_main pthread softposit)
+    add_test(NAME ${NAME}_tests COMMAND ${NAME}_tests)
+  endfunction()
 
-  # Add p16 tests
-  add_executable(p16_tests 
-    "${TESTS_DIR}/p16_tests/arithmetic_tests.cpp"
-    "${TESTS_DIR}/p16_tests/conversion_tests.cpp"
-    "${TESTS_DIR}/p16_tests/special_values_tests.cpp"
-    "${TESTS_DIR}/p16_tests/comparison_operator_tests.cpp"
-    "${TESTS_DIR}/p16_tests/increment_decrement_tests.cpp"
-    "${TESTS_DIR}/p16_tests/bit_operations_tests.cpp"
-    "${TESTS_DIR}/p16_tests/specific_values_tests.cpp"
-    "${TESTS_DIR}/p16_tests/advanced_tests.cpp"
-    "${TESTS_DIR}/main.cpp"
-    ${COMMON_TEST_SOURCES}
-  )
-  target_link_libraries(p16_tests gtest gtest_main pthread softposit)
-  add_test(NAME p16_tests COMMAND p16_tests)
-
-  # Add p32 tests
-  add_executable(p32_tests 
-    "${TESTS_DIR}/p32_tests/arithmetic_tests.cpp"
-    "${TESTS_DIR}/p32_tests/conversion_tests.cpp"
-    "${TESTS_DIR}/p32_tests/special_values_tests.cpp"
-    "${TESTS_DIR}/p32_tests/comparison_operator_tests.cpp"
-    "${TESTS_DIR}/p32_tests/increment_decrement_tests.cpp"
-    "${TESTS_DIR}/p32_tests/bit_operations_tests.cpp"
-    "${TESTS_DIR}/p32_tests/specific_values_tests.cpp"
-    "${TESTS_DIR}/p32_tests/advanced_tests.cpp"
-    "${TESTS_DIR}/main.cpp"
-    ${COMMON_TEST_SOURCES}
-  )
-  target_link_libraries(p32_tests gtest gtest_main pthread softposit)
-  add_test(NAME p32_tests COMMAND p32_tests)
+  # Add all posit and quire tests
+  add_posit_test_executable(p8 8)
+  add_posit_test_executable(p16 16)
+  add_posit_test_executable(p32 32)
+  add_posit_test_executable(q8 8)
+  add_posit_test_executable(q16 16)
+  add_posit_test_executable(q32 32)
 
   # Add a custom target to run all tests
   add_custom_target(check
     COMMAND ${CMAKE_CTEST_COMMAND} --verbose
-    DEPENDS p8_tests p16_tests p32_tests
+    DEPENDS p8_tests p16_tests p32_tests q8_tests q16_tests q32_tests
   )
 endif()
 
@@ -213,62 +188,44 @@ if(BUILD_BENCHMARKS)
   # Ensure benchmarks can find Google Test headers
   include_directories(${gtest_SOURCE_DIR}/include)
 
-  # Add p8 benchmarks
-  if(EXISTS "${BENCHMARKS_DIR}/performance/p8_bench.cpp")
-    add_executable(p8_bench 
-      "${BENCHMARKS_DIR}/performance/p8_bench.cpp"
-      ${COMMON_BENCH_SOURCES}
-    )
-    target_link_libraries(p8_bench benchmark::benchmark softposit pthread)
-  endif()
+  # Function to add benchmark executable if the file exists
+  function(add_benchmark_if_exists NAME)
+    set(BENCH_FILE "${BENCHMARKS_DIR}/performance/${NAME}_bench.cpp")
+    if(EXISTS "${BENCH_FILE}")
+      add_executable(${NAME}_bench 
+        "${BENCH_FILE}"
+        ${COMMON_BENCH_SOURCES}
+      )
+      target_link_libraries(${NAME}_bench benchmark::benchmark softposit pthread)
+      
+      # Add individual benchmark run target
+      add_custom_target(run-${NAME}-bench
+        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_bench
+        DEPENDS ${NAME}_bench
+      )
+      set_property(GLOBAL APPEND PROPERTY BENCHMARK_TARGETS run-${NAME}-bench)
+    endif()
+  endfunction()
 
-  # Add p16 benchmarks
-  if(EXISTS "${BENCHMARKS_DIR}/performance/p16_bench.cpp")
-    add_executable(p16_bench 
-      "${BENCHMARKS_DIR}/performance/p16_bench.cpp"
-      ${COMMON_BENCH_SOURCES}
-    )
-    target_link_libraries(p16_bench benchmark::benchmark softposit pthread)
-  endif()
+  # Add benchmarks for all posit sizes
+  add_benchmark_if_exists(p8)
+  add_benchmark_if_exists(p16)
+  add_benchmark_if_exists(p32)
+  add_benchmark_if_exists(q8)
+  add_benchmark_if_exists(q16)
+  add_benchmark_if_exists(q32)
 
-  # Add p32 benchmarks
-  if(EXISTS "${BENCHMARKS_DIR}/performance/p32_bench.cpp")
-    add_executable(p32_bench 
-      "${BENCHMARKS_DIR}/performance/p32_bench.cpp"
-      ${COMMON_BENCH_SOURCES}
-    )
-    target_link_libraries(p32_bench benchmark::benchmark softposit pthread)
-  endif()
+  # Get all benchmark targets
+  get_property(BENCHMARK_TARGETS GLOBAL PROPERTY BENCHMARK_TARGETS)
 
   # Add a custom target to run all benchmarks
   add_custom_target(bench
     COMMAND ${CMAKE_COMMAND} -E echo "Running all benchmarks..."
-    DEPENDS p8_bench p16_bench p32_bench
   )
-
-  # Add individual benchmark run targets
-  if(EXISTS "${BENCHMARKS_DIR}/performance/p8_bench.cpp")
-    add_custom_target(run-p8-bench
-      COMMAND ${CMAKE_CURRENT_BINARY_DIR}/p8_bench
-      DEPENDS p8_bench
-    )
-    add_dependencies(bench run-p8-bench)
-  endif()
-
-  if(EXISTS "${BENCHMARKS_DIR}/performance/p16_bench.cpp")
-    add_custom_target(run-p16-bench
-      COMMAND ${CMAKE_CURRENT_BINARY_DIR}/p16_bench
-      DEPENDS p16_bench
-    )
-    add_dependencies(bench run-p16-bench)
-  endif()
-
-  if(EXISTS "${BENCHMARKS_DIR}/performance/p32_bench.cpp")
-    add_custom_target(run-p32-bench
-      COMMAND ${CMAKE_CURRENT_BINARY_DIR}/p32_bench
-      DEPENDS p32_bench
-    )
-    add_dependencies(bench run-p32-bench)
+  
+  # Add dependencies to the bench target
+  if(BENCHMARK_TARGETS)
+    add_dependencies(bench ${BENCHMARK_TARGETS})
   endif()
 endif()
 
@@ -289,9 +246,15 @@ file(REMOVE_RECURSE
   \${CMAKE_BINARY_DIR}/p8_tests
   \${CMAKE_BINARY_DIR}/p16_tests
   \${CMAKE_BINARY_DIR}/p32_tests
+  \${CMAKE_BINARY_DIR}/q8_tests
+  \${CMAKE_BINARY_DIR}/q16_tests
+  \${CMAKE_BINARY_DIR}/q32_tests
   \${CMAKE_BINARY_DIR}/p8_bench
   \${CMAKE_BINARY_DIR}/p16_bench
   \${CMAKE_BINARY_DIR}/p32_bench
+  \${CMAKE_BINARY_DIR}/q8_bench
+  \${CMAKE_BINARY_DIR}/q16_bench
+  \${CMAKE_BINARY_DIR}/q32_bench
 )
 "
 )
