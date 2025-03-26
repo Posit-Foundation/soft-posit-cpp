@@ -150,4 +150,77 @@ TEST(Posit8Arithmetic, MulAdd) {
                            << p_result.toDouble() << " (ULP diff: " << ulp_diff
                            << ")";
   }
-} 
+}
+
+// Test fused multiply-subtract operation (a*b-c)
+TEST(Posit8Arithmetic, MulSub) {
+  current_operation = "Fused Multiply-Subtract";
+  for (int i = 0; i < NTESTS8; i++) {
+    // Generate random posit values
+    posit8 p_a, p_b, p_c;
+    p_a.value = int_dist8(gen);
+    p_b.value = int_dist8(gen);
+    p_c.value = int_dist8(gen);
+
+    double f_a = p_a.toDouble();
+    double f_b = p_b.toDouble();
+    double f_c = p_c.toDouble();
+
+    // Test global function
+    posit8 p_result1 = fms(p_a, p_b, p_c);
+    // Test member function
+    posit8 p_result2 = p_c.fms(p_a, p_b);
+
+    double f_result = f_a * f_b - f_c;
+    posit8 expected = f_result;
+
+    // Allow up to 1 ULP difference for posit8
+    auto ulp_diff1 = ulp(p_result1, expected);
+    auto ulp_diff2 = ulp(p_result2, expected);
+
+    ASSERT_LE(ulp_diff1, 1)
+        << "fms(" << f_a << ", " << f_b << ", " << f_c << ") = " << f_result
+        << " but got " << p_result1.toDouble() << " (ULP diff: " << ulp_diff1
+        << ")";
+    ASSERT_LE(ulp_diff2, 1)
+        << "p_c.fms(" << f_a << ", " << f_b << ") = " << f_result << " but got "
+        << p_result2.toDouble() << " (ULP diff: " << ulp_diff2 << ")";
+  }
+}
+
+// Test negative fused multiply-add operation (c-a*b)
+TEST(Posit8Arithmetic, SubMul) {
+  current_operation = "Negative Fused Multiply-Add";
+  for (int i = 0; i < NTESTS8; i++) {
+    // Generate random posit values
+    posit8 p_a, p_b, p_c;
+    p_a.value = int_dist8(gen);
+    p_b.value = int_dist8(gen);
+    p_c.value = int_dist8(gen);
+
+    double f_a = p_a.toDouble();
+    double f_b = p_b.toDouble();
+    double f_c = p_c.toDouble();
+
+    // Test global function
+    posit8 p_result1 = nfma(p_a, p_b, p_c);
+    // Test member function
+    posit8 p_result2 = p_c.nfma(p_a, p_b);
+
+    double f_result = f_c - (f_a * f_b);
+    posit8 expected = f_result;
+
+    // Allow up to 1 ULP difference for posit8
+    auto ulp_diff1 = ulp(p_result1, expected);
+    auto ulp_diff2 = ulp(p_result2, expected);
+
+    ASSERT_LE(ulp_diff1, 1)
+        << "nfma(" << f_a << ", " << f_b << ", " << f_c << ") = " << f_result
+        << " but got " << p_result1.toDouble() << " (ULP diff: " << ulp_diff1
+        << ")";
+    ASSERT_LE(ulp_diff2, 1)
+        << "p_c.nfma(" << f_a << ", " << f_b << ") = " << f_result
+        << " but got " << p_result2.toDouble() << " (ULP diff: " << ulp_diff2
+        << ")";
+  }
+}

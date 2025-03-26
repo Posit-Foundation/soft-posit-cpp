@@ -253,6 +253,18 @@ struct posit8 {
         castUI(p8_mulAdd(castP8(a.value), castP8(b.value), castP8(value)));
     return ans;
   }
+  posit8 fms(posit8 a, posit8 b) { // - (a*b)
+    posit8 ans;
+    ans.value =
+        castUI(p8_mulSub(castP8(a.value), castP8(b.value), castP8(value)));
+    return ans;
+  }
+  posit8 nfma(posit8 a, posit8 b) { // (a*b) - this
+    posit8 ans;
+    ans.value =
+        castUI(p8_subMul(castP8(a.value), castP8(b.value), castP8(value)));
+    return ans;
+  }
   posit8 &toNaR() {
     value = 0x80;
     return *this;
@@ -1320,23 +1332,20 @@ inline posit8 fma(posit8 a, posit8 b, posit8 c) { // (a*b) + c
       castUI(p8_mulAdd(castP8(a.value), castP8(b.value), castP8(c.value)));
   return ans;
 }
-inline posit16 fma(posit16 a, posit16 b, posit16 c) { // (a*b) + c
-  posit16 ans;
+
+// fused-multiply-subtract
+inline posit8 fms(posit8 a, posit8 b, posit8 c) { // (a*b) - c
+  posit8 ans;
   ans.value =
-      castUI(p16_mulAdd(castP16(a.value), castP16(b.value), castP16(c.value)));
+      castUI(p8_mulSub(castP8(a.value), castP8(b.value), castP8(c.value)));
   return ans;
 }
-inline posit32 fma(posit32 a, posit32 b, posit32 c) { // (a*b) + c
-  posit32 ans;
+
+// negative fused-multiply-add
+inline posit8 nfma(posit8 a, posit8 b, posit8 c) { // c - (a*b)
+  posit8 ans;
   ans.value =
-      castUI(p32_mulAdd(castP32(a.value), castP32(b.value), castP32(c.value)));
-  return ans;
-}
-inline posit_2 fma(posit_2 a, posit_2 b, posit_2 c) { // (a*b) + c
-  posit_2 ans;
-  ans.value = castUI(
-      pX2_mulAdd(castPX2(a.value), castPX2(b.value), castPX2(c.value), c.x));
-  ans.x = c.x;
+      castUI(p8_subMul(castP8(a.value), castP8(b.value), castP8(c.value)));
   return ans;
 }
 
