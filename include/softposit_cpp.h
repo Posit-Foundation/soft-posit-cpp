@@ -247,19 +247,19 @@ struct posit8 {
     value = castUI(p8_roundToInt(castP8(value)));
     return *this;
   }
-  posit8 fma(posit8 a, posit8 b) { // + (a*b)
+  posit8 fma(posit8 a, posit8 b) { // this + (a*b)
     posit8 ans;
     ans.value =
         castUI(p8_mulAdd(castP8(a.value), castP8(b.value), castP8(value)));
     return ans;
   }
-  posit8 fms(posit8 a, posit8 b) { // - (a*b)
+  posit8 fms(posit8 a, posit8 b) { // (a*b) - this
     posit8 ans;
     ans.value =
         castUI(p8_mulSub(castP8(a.value), castP8(b.value), castP8(value)));
     return ans;
   }
-  posit8 nfma(posit8 a, posit8 b) { // (a*b) - this
+  posit8 nfma(posit8 a, posit8 b) { // this -  (a*b)
     posit8 ans;
     ans.value =
         castUI(p8_subMul(castP8(a.value), castP8(b.value), castP8(value)));
@@ -486,10 +486,22 @@ struct posit16 {
     value = castUI(p16_roundToInt(castP16(value)));
     return *this;
   }
-  posit16 fma(posit16 a, posit16 b) { // + (a*b)
+  posit16 fma(posit16 a, posit16 b) { // (a*b) + this
     posit16 ans;
     ans.value =
         castUI(p16_mulAdd(castP16(a.value), castP16(b.value), castP16(value)));
+    return ans;
+  }
+  posit16 fms(posit16 a, posit16 b) { // (a*b) - this
+    posit16 ans;
+    ans.value =
+        castUI(p16_mulSub(castP16(a.value), castP16(b.value), castP16(value)));
+    return ans;
+  }
+  posit16 nfma(posit16 a, posit16 b) { // this - (a*b)
+    posit16 ans;
+    ans.value =
+        castUI(p16_subMul(castP16(a.value), castP16(b.value), castP16(value)));
     return ans;
   }
   posit16 &toNaR() {
@@ -713,13 +725,24 @@ struct posit32 {
     value = castUI(p32_roundToInt(castP32(value)));
     return *this;
   }
-  posit32 fma(posit32 a, posit32 b) { // + (a*b)
+  posit32 fma(posit32 a, posit32 b) { // (a*b) + this
     posit32 ans;
     ans.value =
         castUI(p32_mulAdd(castP32(a.value), castP32(b.value), castP32(value)));
     return ans;
   }
-
+  posit32 fms(posit32 a, posit32 b) { // (a*b) - this
+    posit32 ans;
+    ans.value =
+        castUI(p32_mulSub(castP32(a.value), castP32(b.value), castP32(value)));
+    return ans;
+  }
+  posit32 nfma(posit32 a, posit32 b) { // this - (a*b)
+    posit32 ans;
+    ans.value =
+        castUI(p32_subMul(castP32(a.value), castP32(b.value), castP32(value)));
+    return ans;
+  }
   posit32 &toNaR() {
     value = 0x80000000;
     return *this;
@@ -946,7 +969,7 @@ struct posit_2 {
     value = castUI(pX2_roundToInt(castPX2(value), x));
     return *this;
   }
-  posit_2 fma(posit_2 a, posit_2 b) { // + (a*b)
+  posit_2 fma(posit_2 a, posit_2 b) { // this + (a*b)
     posit_2 ans;
     ans.value = castUI(
         pX2_mulAdd(castPX2(a.value), castPX2(b.value), castPX2(value), x));
@@ -1346,6 +1369,53 @@ inline posit8 nfma(posit8 a, posit8 b, posit8 c) { // c - (a*b)
   posit8 ans;
   ans.value =
       castUI(p8_subMul(castP8(a.value), castP8(b.value), castP8(c.value)));
+  return ans;
+}
+
+inline posit16 fma(posit16 a, posit16 b, posit16 c) { // (a*b) + c
+  posit16 ans;
+  ans.value =
+      castUI(p16_mulAdd(castP16(a.value), castP16(b.value), castP16(c.value)));
+  return ans;
+}
+
+// fused-multiply-subtract
+inline posit16 fms(posit16 a, posit16 b, posit16 c) { // (a*b) - c
+  posit16 ans;
+  ans.value =
+      castUI(p16_mulSub(castP16(a.value), castP16(b.value), castP16(c.value)));
+  return ans;
+}
+
+// negative fused-multiply-add
+inline posit16 nfma(posit16 a, posit16 b, posit16 c) { // c - (a*b)
+  posit16 ans;
+  ans.value =
+      castUI(p16_subMul(castP16(a.value), castP16(b.value), castP16(c.value)));
+  return ans;
+}
+
+// fused-multiply-add
+inline posit32 fma(posit32 a, posit32 b, posit32 c) { // (a*b) + c
+  posit32 ans;
+  ans.value =
+      castUI(p32_mulAdd(castP32(a.value), castP32(b.value), castP32(c.value)));
+  return ans;
+}
+
+// fused-multiply-subtract
+inline posit32 fms(posit32 a, posit32 b, posit32 c) { // (a*b) - c
+  posit32 ans;
+  ans.value =
+      castUI(p32_mulSub(castP32(a.value), castP32(b.value), castP32(c.value)));
+  return ans;
+}
+
+// negative fused-multiply-add
+inline posit32 nfma(posit32 a, posit32 b, posit32 c) { // c - (a*b)
+  posit32 ans;
+  ans.value =
+      castUI(p32_subMul(castP32(a.value), castP32(b.value), castP32(c.value)));
   return ans;
 }
 

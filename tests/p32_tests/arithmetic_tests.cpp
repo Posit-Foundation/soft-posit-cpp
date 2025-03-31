@@ -139,15 +139,97 @@ TEST(Posit32Arithmetic, MulAdd) {
     double f_b = p_b.toDouble();
     double f_c = p_c.toDouble();
 
-    posit32 p_result = p_c.fma(p_a, p_b);
+    // Test global function
+    posit32 p_result1 = fma(p_a, p_b, p_c);
+    // Test member function
+    posit32 p_result2 = p_c.fma(p_a, p_b);
+
     double f_result = std::fma(f_a, f_b, f_c);
     posit32 expected = f_result;
 
-    // Allow up to 1 ULP difference for posit32 - less precise than posit32
-    auto ulp_diff = ulp(p_result, expected);
-    ASSERT_LE(ulp_diff, 1) << "fma(" << f_a << ", " << f_b << ", " << f_c
-                           << ") = " << f_result << " but got "
-                           << p_result.toDouble() << " (ULP diff: " << ulp_diff
-                           << ")";
+    // Allow up to 1 ULP difference for posit32
+    auto ulp_diff1 = ulp(p_result1, expected);
+    auto ulp_diff2 = ulp(p_result2, expected);
+
+    ASSERT_LE(ulp_diff1, 1)
+        << "fma(" << f_a << ", " << f_b << ", " << f_c << ") = " << f_result
+        << " but got " << p_result1.toDouble() << " (ULP diff: " << ulp_diff1
+        << ")";
+    ASSERT_LE(ulp_diff2, 1)
+        << "p_c.fma(" << f_a << ", " << f_b << ") = " << f_result << " but got "
+        << p_result2.toDouble() << " (ULP diff: " << ulp_diff2 << ")";
+  }
+}
+
+// Test fused multiply-subtract operation (a*b-c)
+TEST(Posit32Arithmetic, MulSub) {
+  current_operation = "Fused Multiply-Subtract";
+  for (int i = 0; i < NTESTS32; i++) {
+    // Generate random posit values
+    posit32 p_a, p_b, p_c;
+    p_a.value = int_dist32(gen);
+    p_b.value = int_dist32(gen);
+    p_c.value = int_dist32(gen);
+
+    double f_a = p_a.toDouble();
+    double f_b = p_b.toDouble();
+    double f_c = p_c.toDouble();
+
+    // Test global function
+    posit32 p_result1 = fms(p_a, p_b, p_c);
+    // Test member function
+    posit32 p_result2 = p_c.fms(p_a, p_b);
+
+    double f_result = f_a * f_b - f_c;
+    posit32 expected = f_result;
+
+    // Allow up to 1 ULP difference for posit32
+    auto ulp_diff1 = ulp(p_result1, expected);
+    auto ulp_diff2 = ulp(p_result2, expected);
+
+    ASSERT_LE(ulp_diff1, 1)
+        << "fms(" << f_a << ", " << f_b << ", " << f_c << ") = " << f_result
+        << " but got " << p_result1.toDouble() << " (ULP diff: " << ulp_diff1
+        << ")";
+    ASSERT_LE(ulp_diff2, 1)
+        << "p_c.fms(" << f_a << ", " << f_b << ") = " << f_result << " but got "
+        << p_result2.toDouble() << " (ULP diff: " << ulp_diff2 << ")";
+  }
+}
+
+// Test negative fused multiply-add operation (c-a*b)
+TEST(Posit32Arithmetic, SubMul) {
+  current_operation = "Negative Fused Multiply-Add";
+  for (int i = 0; i < NTESTS32; i++) {
+    // Generate random posit values
+    posit32 p_a, p_b, p_c;
+    p_a.value = int_dist32(gen);
+    p_b.value = int_dist32(gen);
+    p_c.value = int_dist32(gen);
+
+    double f_a = p_a.toDouble();
+    double f_b = p_b.toDouble();
+    double f_c = p_c.toDouble();
+
+    // Test global function
+    posit32 p_result1 = nfma(p_a, p_b, p_c);
+    // Test member function
+    posit32 p_result2 = p_c.nfma(p_a, p_b);
+
+    double f_result = f_c - (f_a * f_b);
+    posit32 expected = f_result;
+
+    // Allow up to 1 ULP difference for posit32
+    auto ulp_diff1 = ulp(p_result1, expected);
+    auto ulp_diff2 = ulp(p_result2, expected);
+
+    ASSERT_LE(ulp_diff1, 1)
+        << "nfma(" << f_a << ", " << f_b << ", " << f_c << ") = " << f_result
+        << " but got " << p_result1.toDouble() << " (ULP diff: " << ulp_diff1
+        << ")";
+    ASSERT_LE(ulp_diff2, 1)
+        << "p_c.nfma(" << f_a << ", " << f_b << ") = " << f_result
+        << " but got " << p_result2.toDouble() << " (ULP diff: " << ulp_diff2
+        << ")";
   }
 }

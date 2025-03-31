@@ -56,7 +56,7 @@ extern "C" {
 #include <quadmath.h>
 #endif
 
-enum {
+enum MulAddType {
   softposit_mulAdd = 0,
   softposit_mulAdd_subC = 1,
   softposit_mulAdd_subProd = 2

@@ -1,4 +1,3 @@
-
 /*============================================================================
 
 This C source file is part of the SoftPosit Posit Arithmetic Package
@@ -57,7 +56,7 @@ posit16_t p16_mulAdd( posit16_t a, posit16_t b, posit16_t c )
     uiB = uB.ui;
     uC.p = c;
     uiC = uC.ui;
-    return softposit_mulAddP16( uiA, uiB, uiC, 0 );
+    return softposit_mulAddP16( uiA, uiB, uiC, softposit_mulAdd );
 
 }
 
