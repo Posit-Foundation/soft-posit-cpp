@@ -482,6 +482,10 @@ struct posit16 {
     value = castUI(p16_sqrt(castP16(value)));
     return *this;
   }
+  posit16 &exp() {
+    value = castUI(p16_exp(castP16(value)));
+    return *this;
+  }
   posit16 &rint() {
     value = castUI(p16_roundToInt(castP16(value)));
     return *this;
@@ -1726,157 +1730,19 @@ inline std::ostream &operator<<(std::ostream &os, const posit_2 &p) {
 
 // Math lib
 
-/*inline posit8 abs(posit8 a){
-        a.value = castUI(p8_abs(castP8(a.value)));
-        return a;
+// inline posit8 exp(posit8 a) {
+//   a.value = castUI(p8_exp(castP8(a.value)));
+//   return a;
+// }
+inline posit16 exp(posit16 a) {
+  a.value = castUI(p16_exp(castP16(a.value)));
+  return a;
 }
-
-inline posit16 abs(posit16 a){
-        a.value = castUI(p16_abs(castP16(a.value)));
-        return a;
-}
-
-
-inline posit32 abs(posit32 a){
-        a.value = castUI(p32_abs(castP32(a.value)));
-        return a;
-}
-
-
-inline posit8 ceil(posit8 a){
-        a.value = castUI(p8_ceil(castP8(a.value)));
-        return a;
-}
-
-inline posit16 ceil(posit16 a){
-        a.value = castUI(p16_ceil(castP16(a.value)));
-        return a;
-}
-
-inline posit32 ceil(posit32 a){
-        a.value = castUI(p32_ceil(castP32(a.value)));
-        return a;
-}
-
-
-inline posit8 floor(posit8 a){
-        a.value = castUI(p8_floor(castP8(a.value)));
-        return a;
-}
-inline posit16 floor(posit16 a){
-        a.value = castUI(p16_floor(castP16(a.value)));
-        return a;
-}
-inline posit32 floor(posit32 a){
-        a.value = castUI(p32_floor(castP32(a.value)));
-        return a;
-}
-
-
-inline posit8 exp(posit8 a){
-        a.value = castUI(p8_exp(castP8(a.value)));
-        return a;
-}
-inline posit16 exp(posit16 a){
-        a.value = castUI(p16_exp(castP16(a.value)));
-        return a;
-}
-inline posit32 exp(posit32 a){
-        a.value =
-castUI(convertDoubleToP32(exp(convertP32ToDouble(castP32(a.value))))); return a;
-}
-
-
-
-inline posit8 pow(posit8 a, posit8 b){
-        a.value =
-castUI(convertDoubleToP8(pow(convertP8ToDouble(castP8(a.value)),
-convertP8ToDouble(castP8(b.value))))); return a;
-}
-inline posit16 pow(posit16 a, posit16 b){
-        a.value =
-castUI(convertDoubleToP16(pow(convertP16ToDouble(castP16(a.value)),
-convertP16ToDouble(castP16(b.value))))); return a;
-}
-inline posit32 pow(posit32 a, posit32 b){
-        a.value =
-castUI(convertDoubleToP32(pow(convertP32ToDouble(castP32(a.value)),
-convertP32ToDouble(castP32(b.value))))); return a;
-}
-
-
-inline posit8 log(posit8 a){
-        a.value =
-castUI(convertDoubleToP8(log(convertP8ToDouble(castP8(a.value))))); return a;
-}
-inline posit16 log(posit16 a){
-        a.value =
-castUI(convertDoubleToP16(log(convertP16ToDouble(castP16(a.value))))); return a;
-}
-inline posit32 log(posit32 a){
-        a.value =
-castUI(convertDoubleToP32(log(convertP32ToDouble(castP32(a.value))))); return a;
-}
-
-
-inline posit8 log2(posit8 a){
-        a.value =
-castUI(convertDoubleToP8(log2(convertP8ToDouble(castP8(a.value))))); return a;
-}
-inline posit16 log2(posit16 a){
-        a.value =
-castUI(convertDoubleToP16(log2(convertP16ToDouble(castP16(a.value))))); return
-a;
-}
-inline posit32 log2(posit32 a){
-        a.value =
-castUI(convertDoubleToP32(log2(convertP32ToDouble(castP32(a.value))))); return
-a;
-}
-
-
-inline posit8 cos(posit8 a){
-        a.value =
-castUI(convertDoubleToP8(cos(convertP8ToDouble(castP8(a.value))))); return a;
-}
-inline posit16 cos(posit16 a){
-        a.value =
-castUI(convertDoubleToP16(cos(convertP16ToDouble(castP16(a.value))))); return a;
-}
-inline posit32 cos(posit32 a){
-        a.value =
-castUI(convertDoubleToP32(cos(convertP32ToDouble(castP32(a.value))))); return a;
-}
-
-
-inline posit8 sin(posit8 a){
-        a.value =
-castUI(convertDoubleToP8(sin(convertP8ToDouble(castP8(a.value))))); return a;
-}
-inline posit16 sin(posit16 a){
-        a.value =
-castUI(convertDoubleToP16(sin(convertP16ToDouble(castP16(a.value))))); return a;
-}
-inline posit32 sin(posit32 a){
-        a.value =
-castUI(convertDoubleToP32(sin(convertP32ToDouble(castP32(a.value))))); return a;
-}
-
-
-inline posit8 acos(posit8 a){
-        a.value =
-castUI(convertDoubleToP8(acos(convertP8ToDouble(castP8(a.value))))); return a;
-}
-inline posit16 acos(posit16 a){
-        a.value =
-castUI(convertDoubleToP16(acos(convertP16ToDouble(castP16(a.value))))); return
-a;
-}
-inline posit32 acos(posit32 a){
-        a.value =
-castUI(convertDoubleToP32(acos(convertP32ToDouble(castP32(a.value))))); return
-a;
-}*/
+// inline posit32 exp(posit32 a) {
+//   a.value =
+//       castUI(convertDoubleToP32(exp(convertP32ToDouble(castP32(a.value)))));
+//   return a;
+// }
 
 #endif // CPLUSPLUS
 

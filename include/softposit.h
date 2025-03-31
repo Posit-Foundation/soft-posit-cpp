@@ -204,6 +204,7 @@ posit16_t p16_mulSub(posit16_t, posit16_t, posit16_t);
 posit16_t p16_subMul(posit16_t, posit16_t, posit16_t);
 posit16_t p16_div(posit16_t, posit16_t);
 posit16_t p16_sqrt(posit16_t);
+posit16_t p16_exp(posit16_t);
 bool p16_eq(posit16_t, posit16_t);
 bool p16_le(posit16_t, posit16_t);
 bool p16_lt(posit16_t, posit16_t);
