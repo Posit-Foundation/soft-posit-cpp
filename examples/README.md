@@ -94,6 +94,25 @@ The visualization shows how numerical precision affects the stability and contro
 
 See [control_theory_stabilization/README.md](control_theory_stabilization/README.md) for more details.
 
+### Fourier Transform Image Processing
+
+This example demonstrates the precision advantages of POSIT numbers when performing Fast Fourier Transform (FFT) and Inverse Fast Fourier Transform (IFFT) operations on images.
+
+To run:
+```bash
+cd build/fourier_transform
+./fourier_transform_dynamic
+```
+
+The example implements FFT/IFFT algorithms using three different number formats:
+- Standard floating-point (float)
+- POSIT arithmetic (posit32)
+- POSIT with quire accumulation (maximum precision)
+
+The resulting images and error visualizations clearly show how POSIT arithmetic, especially with quire accumulation, provides better preservation of details and fewer artifacts when processing images through the frequency domain.
+
+See [fourier_transform/README.md](fourier_transform/README.md) for more details.
+
 ## Viewing PPM Images
 
 All examples produce PPM image files. You can view these with:
