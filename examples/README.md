@@ -58,6 +58,23 @@ This will generate multiple comparison images at different zoom levels, showing 
 
 See [julia_set_zoom/README.md](julia_set_zoom/README.md) for more details.
 
+### Matrix Multiplication Precision Comparison
+
+This example demonstrates the precision advantages of posit arithmetic compared to traditional floating-point when performing matrix multiplication with ill-conditioned matrices.
+
+To run:
+```bash
+cd build/matrix_precision
+./matrix_precision_dynamic
+```
+
+The program generates heatmap images that visualize where precision differences occur between:
+- Standard floating-point (float)
+- POSIT arithmetic (posit32)
+- POSIT with quire accumulation (maximum precision)
+
+See [matrix_precision/README.md](matrix_precision/README.md) for more details.
+
 ## Viewing PPM Images
 
 All examples produce PPM image files. You can view these with:
