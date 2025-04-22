@@ -28,7 +28,7 @@ mkdir build
 cd build
 
 # Configure with CMake
-cmake .. -DCMAKE_INSTALL_PREFIX=/path/to/install
+cmake .. -DCMAKE_INSTALL_PREFIX=../install -DBUILD_SHARED_LIBS=ON
 
 # Build and install
 make
@@ -48,7 +48,7 @@ mkdir build
 cd build
 
 # Configure with CMake
-cmake .. -DCMAKE_PREFIX_PATH=/path/to/install
+cmake .. -DCMAKE_PREFIX_PATH=../../install
 
 # Build the examples
 make
@@ -61,7 +61,17 @@ This will create two executables:
 
 ### Step 3: Run the Examples
 
-Run either of the executables:
+Before running the examples, ensure the library path is set:
+
+```bash
+# On Linux/macOS
+export LD_LIBRARY_PATH=../../install/lib:$LD_LIBRARY_PATH
+
+# On macOS (alternative)
+export DYLD_LIBRARY_PATH=../../install/lib:$DYLD_LIBRARY_PATH
+```
+
+Then run either of the executables:
 
 ```bash
 # Run the standard implementation
@@ -92,12 +102,10 @@ If you encounter issues:
 2. Verify that your compiler supports C++17
 3. Check that the SoftPosit library was built with shared libraries enabled
 4. Make sure the library path is in your system's library search path
-
-On Linux, you can add the library path:
-
-```bash
-export LD_LIBRARY_PATH=/path/to/install/lib:$LD_LIBRARY_PATH
-```
+5. If you get "library not found" errors, verify that:
+   - The library was built with `-DBUILD_SHARED_LIBS=ON`
+   - The library is installed in the correct location
+   - The library path is properly set in your environment
 
 ## License
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(SoftPosit C CXX)
+project(SoftPosit VERSION 1.0.0 LANGUAGES C CXX)
 
 # Options
 option(SOFTPOSIT_QUAD "Enable quad-precision support" OFF)
@@ -9,12 +9,14 @@ option(BUILD_PYTHON3_WRAPPER "Build Python3 wrapper" OFF)
 option(BUILD_JULIA_WRAPPER "Build Julia wrapper" OFF)
 option(BUILD_TESTS "Build tests" ON)
 option(BUILD_BENCHMARKS "Build benchmarks" ON)
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(INLINE_LEVEL "Inline level for optimization" 5)
 
 # Default build type if not specified
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
+
 
 # Architecture specialization
 set(SPECIALIZE_TYPE "8086-SSE" CACHE STRING "Specialization type for SoftPosit")
@@ -53,21 +55,59 @@ file(GLOB SOFTPOSIT_SOURCES
   "src/*.cpp"
 )
 
-# Create static library
+# Create libraries based on BUILD_SHARED_LIBS option
+if(BUILD_SHARED_LIBS)
+  add_library(softposit_shared SHARED ${SOFTPOSIT_SOURCES})
+  set_target_properties(softposit_shared PROPERTIES OUTPUT_NAME softposit)
+  target_link_libraries(softposit_shared ${EXTRA_LIBS})
+  install(TARGETS softposit_shared
+    EXPORT SoftPositTargets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+  )
+endif()
+
+# Always build static library
 add_library(softposit STATIC ${SOFTPOSIT_SOURCES})
+set_target_properties(softposit PROPERTIES OUTPUT_NAME softposit)
 target_link_libraries(softposit ${EXTRA_LIBS})
-
-# Create shared library
-add_library(softposit_shared SHARED ${SOFTPOSIT_SOURCES})
-set_target_properties(softposit_shared PROPERTIES OUTPUT_NAME softposit)
-target_link_libraries(softposit_shared ${EXTRA_LIBS})
-
-# Install targets
-install(TARGETS softposit softposit_shared
+install(TARGETS softposit
+  EXPORT SoftPositTargets
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
+  INCLUDES DESTINATION include
 )
+
+# Install headers
 install(DIRECTORY include/ DESTINATION include)
+
+# Create and install package configuration
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/SoftPositConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SoftPositConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/SoftPositConfig.cmake"
+  INSTALL_DESTINATION lib/cmake/SoftPosit
+)
+
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/SoftPositConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/SoftPositConfigVersion.cmake"
+  DESTINATION lib/cmake/SoftPosit
+)
+
+# Export targets
+install(EXPORT SoftPositTargets
+  FILE SoftPositTargets.cmake
+  NAMESPACE SoftPosit::
+  DESTINATION lib/cmake/SoftPosit
+)
 
 # Python wrapper
 if(BUILD_PYTHON_WRAPPER OR BUILD_PYTHON3_WRAPPER)
