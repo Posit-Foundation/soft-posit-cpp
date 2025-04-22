@@ -75,6 +75,25 @@ The program generates heatmap images that visualize where precision differences 
 
 See [matrix_precision/README.md](matrix_precision/README.md) for more details.
 
+### Control Theory Stabilization: Inverted Pendulum
+
+This example demonstrates the precision advantages of POSIT arithmetic in control theory applications, specifically in the stabilization of an inverted pendulum system.
+
+To run:
+```bash
+cd build/control_theory_stabilization
+./control_stabilization_dynamic
+```
+
+The example simulates an inverted pendulum stabilization using three different number formats:
+- Standard floating-point (float)
+- POSIT arithmetic (posit32)
+- POSIT with quire accumulation (maximum precision)
+
+The visualization shows how numerical precision affects the stability and control of the system over time, with heat maps highlighting where traditional floating-point struggles with precision, while POSIT maintains accuracy.
+
+See [control_theory_stabilization/README.md](control_theory_stabilization/README.md) for more details.
+
 ## Viewing PPM Images
 
 All examples produce PPM image files. You can view these with:
