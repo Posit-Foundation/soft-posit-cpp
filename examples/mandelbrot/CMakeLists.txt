@@ -5,16 +5,14 @@ project(mandelbrot CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find the SoftPosit package
-find_package(SoftPosit REQUIRED)
-
 # Print library paths for debugging
+message(STATUS "Building mandelbrot example")
 message(STATUS "SOFTPOSIT_INCLUDE_DIRS: ${SOFTPOSIT_INCLUDE_DIRS}")
-message(STATUS "SOFTPOSIT_LIBRARIES: ${SOFTPOSIT_LIBRARIES}")
-message(STATUS "SOFTPOSIT_SHARED_LIBRARIES: ${SOFTPOSIT_SHARED_LIBRARIES}")
 
-# Add library search path
-link_directories(${CMAKE_INSTALL_PREFIX}/lib)
+# Add library search path if needed
+if(CMAKE_PREFIX_PATH)
+  link_directories(${CMAKE_PREFIX_PATH}/lib)
+endif()
 
 # Dynamic linking version
 add_executable(mandelbrot_dynamic mandelbrot.cpp)

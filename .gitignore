@@ -4,3 +4,4 @@ examples/mandelbrot/build/*
 **.DS_Store
 examples/mandelbrot/build/*
 install/
+examples/build/*

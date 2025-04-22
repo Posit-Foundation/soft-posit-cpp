@@ -298,3 +298,29 @@ file(REMOVE_RECURSE
 )
 "
 )
+
+# Package configuration
+set(CPACK_PACKAGE_NAME "SoftPosit")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_DESCRIPTION "SoftPosit - A C++ implementation of the Posit number system")
+set(CPACK_PACKAGE_VENDOR "SoftPosit Team")
+set(CPACK_PACKAGE_CONTACT "softposit@example.com")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
+# Platform-specific settings
+if(WIN32)
+    set(CPACK_GENERATOR "ZIP;NSIS")
+    set(CPACK_NSIS_MODIFY_PATH ON)
+elseif(APPLE)
+    set(CPACK_GENERATOR "TGZ;DragNDrop")
+    set(CPACK_DMG_VOLUME_NAME "SoftPosit")
+else()
+    set(CPACK_GENERATOR "TGZ;DEB;RPM")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "SoftPosit Team")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.14)")
+    set(CPACK_RPM_PACKAGE_REQUIRES "glibc >= 2.14")
+endif()
+
+# Include CPack
+include(CPack)
