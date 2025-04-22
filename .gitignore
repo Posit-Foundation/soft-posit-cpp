@@ -1,2 +1,4 @@
 /Debug/
 build/*
+examples/mandelbrot/build/*
+**.DS_Store
