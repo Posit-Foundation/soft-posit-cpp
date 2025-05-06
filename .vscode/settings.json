@@ -11,6 +11,8 @@
         "atomic": "cpp",
         "cstdint": "cpp",
         "cmath": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "chrono": "cpp",
+        "string": "cpp"
     }
 }

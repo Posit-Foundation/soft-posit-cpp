@@ -5,3 +5,4 @@ examples/mandelbrot/build/*
 examples/mandelbrot/build/*
 install/
 examples/build/*
+scratch.cpp
