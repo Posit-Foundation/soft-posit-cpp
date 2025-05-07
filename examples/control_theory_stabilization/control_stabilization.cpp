@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <numeric>
 #include <softposit.h>
+#include <filesystem>
+#include <sys/stat.h>
 
 // Image dimensions
 const int IMAGE_WIDTH = 800;
@@ -276,6 +278,38 @@ void savePPM(const std::string& filename, const std::vector<RGB>& pixels, int wi
     std::cout << "Saved image to " << filename << std::endl;
 }
 
+// Function to save simulation data to CSV
+void saveSimulationData(const std::vector<double>& floatPositions,
+                       const std::vector<double>& floatAngles,
+                       const std::vector<double>& positPositions,
+                       const std::vector<double>& positAngles,
+                       const std::vector<double>& quirePositions,
+                       const std::vector<double>& quireAngles) {
+    // Create data directory if it doesn't exist
+    mkdir("data", 0777);
+    mkdir("data/control_theory", 0777);
+    
+    // Open CSV file
+    std::ofstream csvFile("data/control_theory/simulation_data.csv");
+    
+    // Write header
+    csvFile << "Time,Float_Position,Float_Angle,Posit_Position,Posit_Angle,Quire_Position,Quire_Angle\n";
+    
+    // Write data
+    for (int t = 0; t < TIME_STEPS; ++t) {
+        csvFile << t * TIME_STEP << ","
+                << floatPositions[t] << ","
+                << floatAngles[t] << ","
+                << positPositions[t] << ","
+                << positAngles[t] << ","
+                << quirePositions[t] << ","
+                << quireAngles[t] << "\n";
+    }
+    
+    csvFile.close();
+    std::cout << "Simulation data saved to data/control_theory/simulation_data.csv" << std::endl;
+}
+
 // Define the inverted pendulum system
 template<typename T>
 class InvertedPendulumSystem {
@@ -445,6 +479,11 @@ void runSimulation() {
         positSystem.step();
         quireSystem.stepWithQuire();
     }
+    
+    // Save simulation data to CSV
+    saveSimulationData(floatPositions, floatAngles,
+                      positPositions, positAngles,
+                      quirePositions, quireAngles);
     
     // Find min/max values for normalization
     double minPos = std::min({
