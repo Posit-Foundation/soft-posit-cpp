@@ -1,0 +1,44 @@
+name: Benchmarks
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  pull_request:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+
+jobs:
+  setup:
+    uses: ./.github/workflows/shared-setup.yml
+    with:
+      build_type: Release
+      build_benchmarks: true
+  
+  benchmark:
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build benchmarks
+      run: |
+        cd ${{ needs.setup.outputs.build_dir }}
+        make -j$(nproc)
+
+    - name: Run benchmarks
+      run: |
+        cd ${{ needs.setup.outputs.build_dir }}
+        make bench
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'googlecpp'
+        output-file-path: ${{ needs.setup.outputs.build_dir }}/benchmarks/results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        # Comment out the following lines for the first run
+        # alert-threshold: '150%'
+        # comment-on-alert: true
+        # fail-on-alert: true 

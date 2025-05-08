@@ -1,0 +1,140 @@
+name: Shared Setup
+
+on:
+  workflow_call:
+    inputs:
+      build_type:
+        required: false
+        type: string
+        default: 'Release'
+      build_tests:
+        required: false
+        type: boolean
+        default: true
+      build_benchmarks:
+        required: false
+        type: boolean
+        default: false
+      platform:
+        required: false
+        type: string
+        default: 'ubuntu-latest'
+      coverage:
+        required: false
+        type: boolean
+        default: false
+      clang_tools:
+        required: false
+        type: boolean
+        default: false
+      cmake_extra_args:
+        required: false
+        type: string
+        default: ''
+      cache_key:
+        required: false
+        type: string
+        default: ''
+    outputs:
+      build_dir:
+        description: "The build directory path"
+        value: ${{ jobs.setup.outputs.build_dir }}
+
+jobs:
+  setup:
+    runs-on: ${{ inputs.platform }}
+    outputs:
+      build_dir: ${{ steps.setup.outputs.build_dir }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Create unique cache key based on OS, build type, and latest commit
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        if [ -n "${{ inputs.cache_key }}" ]; then
+          echo "key=${{ inputs.cache_key }}" >> $GITHUB_OUTPUT
+        else
+          echo "key=${{ inputs.platform }}-${{ inputs.build_type }}-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
+    # Try to restore cache
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: build-${{ steps.cache-key.outputs.key }}
+        restore-keys: |
+          build-${{ inputs.platform }}-${{ inputs.build_type }}-
+
+    - name: Set up dependencies (Ubuntu)
+      if: inputs.platform == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake make g++ ninja-build
+        if ${{ inputs.coverage }}; then
+          sudo apt-get install -y lcov gcovr
+        fi
+        if ${{ inputs.clang_tools }}; then
+          sudo apt-get install -y clang-tidy-14 clang-format-14 clang-14
+        fi
+
+    - name: Set up dependencies (macOS)
+      if: inputs.platform == 'macos-latest'
+      run: |
+        brew install cmake ninja
+        if ${{ inputs.clang_tools }}; then
+          brew install llvm@14
+        fi
+
+    - name: Set up dependencies (Windows)
+      if: inputs.platform == 'windows-latest'
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Configure CMake
+      id: setup
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build
+        cd build
+        
+        CMAKE_ARGS="-DCMAKE_BUILD_TYPE=${{ inputs.build_type }}"
+        
+        if ${{ inputs.build_tests }}; then
+          CMAKE_ARGS+=" -DBUILD_TESTS=ON"
+        fi
+        
+        if ${{ inputs.build_benchmarks }}; then
+          CMAKE_ARGS+=" -DBUILD_BENCHMARKS=ON"
+        fi
+        
+        if ${{ inputs.coverage }}; then
+          CMAKE_ARGS+=" -DCMAKE_CXX_FLAGS='--coverage -g -O0' -DCMAKE_C_FLAGS='--coverage -g -O0'"
+        fi
+        
+        if ${{ inputs.clang_tools }}; then
+          CMAKE_ARGS+=" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        fi
+        
+        # Add any extra args
+        CMAKE_ARGS+=" ${{ inputs.cmake_extra_args }}"
+        
+        # Platform-specific generator
+        if [[ "${{ inputs.platform }}" == "windows-latest" ]]; then
+          CMAKE_ARGS+=" -G \"Visual Studio 17 2022\""
+        fi
+        
+        echo "Running cmake with args: ${CMAKE_ARGS}"
+        cmake .. ${CMAKE_ARGS}
+        
+        echo "build_dir=build" >> $GITHUB_OUTPUT
+      shell: bash
+      
+    - name: Set output when cache hit
+      if: steps.cache-build.outputs.cache-hit == 'true'
+      run: echo "build_dir=build" >> $GITHUB_OUTPUT
+      shell: bash 

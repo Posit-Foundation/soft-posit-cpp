@@ -1,0 +1,37 @@
+name: Multi-Platform Build
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  pull_request:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+
+jobs:
+  matrix-setup:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+        build_type: [Release]
+    
+    uses: ./.github/workflows/shared-setup.yml
+    with:
+      platform: ${{ matrix.platform }}
+      build_type: ${{ matrix.build_type }}
+      build_tests: true
+      cmake_extra_args: ${{ matrix.platform == 'windows-latest' && '-G \"Visual Studio 17 2022\"' || '' }}
+  
+  matrix-build:
+    needs: matrix-setup
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+        build_type: [Release]
+    
+    uses: ./.github/workflows/shared-build.yml
+    with:
+      platform: ${{ matrix.platform }}
+      build_type: ${{ matrix.build_type }}
+      build_dir: ${{ needs.matrix-setup.outputs.build_dir }}
+      run_tests: true 

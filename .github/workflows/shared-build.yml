@@ -1,0 +1,87 @@
+name: Shared Build
+
+on:
+  workflow_call:
+    inputs:
+      build_type:
+        required: false
+        type: string
+        default: 'Release'
+      build_dir:
+        required: true
+        type: string
+      platform:
+        required: false
+        type: string
+        default: 'ubuntu-latest'
+      run_tests:
+        required: false
+        type: boolean
+        default: false
+      run_benchmarks:
+        required: false
+        type: boolean
+        default: false
+      cache_key:
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  build:
+    runs-on: ${{ inputs.platform }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # Create unique cache key based on OS, build type, and latest commit
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        if [ -n "${{ inputs.cache_key }}" ]; then
+          echo "key=${{ inputs.cache_key }}" >> $GITHUB_OUTPUT
+        else
+          echo "key=${{ inputs.platform }}-${{ inputs.build_type }}-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
+    # Try to restore build cache
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: build-${{ steps.cache-key.outputs.key }}
+        restore-keys: |
+          build-${{ inputs.platform }}-${{ inputs.build_type }}-
+
+    - name: Build (Unix-like)
+      if: (inputs.platform == 'ubuntu-latest' || inputs.platform == 'macos-latest') && steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        cd ${{ inputs.build_dir }}
+        make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+
+    - name: Build (Windows)
+      if: inputs.platform == 'windows-latest' && steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        cd ${{ inputs.build_dir }}
+        msbuild SoftPosit.sln -p:Configuration=${{ inputs.build_type }}
+
+    - name: Run tests (Unix-like)
+      if: (inputs.platform == 'ubuntu-latest' || inputs.platform == 'macos-latest') && inputs.run_tests
+      run: |
+        cd ${{ inputs.build_dir }}
+        ctest --verbose
+
+    - name: Run tests (Windows)
+      if: inputs.platform == 'windows-latest' && inputs.run_tests
+      run: |
+        cd ${{ inputs.build_dir }}
+        ctest --verbose -C ${{ inputs.build_type }}
+
+    - name: Run benchmarks
+      if: inputs.run_benchmarks
+      run: |
+        cd ${{ inputs.build_dir }}
+        make bench 

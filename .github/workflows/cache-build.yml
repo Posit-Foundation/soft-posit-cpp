@@ -1,0 +1,48 @@
+name: Cache Builder
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+    paths:
+      - '**/*.cpp'
+      - '**/*.c'
+      - '**/*.h'
+      - '**/*.hpp'
+      - '**/CMakeLists.txt'
+      - 'cmake/**'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  cache-debug:
+    uses: ./.github/workflows/shared-setup.yml
+    with:
+      build_type: Debug
+      build_tests: true
+      build_benchmarks: true
+      cache_key: 'global-debug-${{ github.sha }}'
+  
+  cache-debug-build:
+    needs: cache-debug
+    uses: ./.github/workflows/shared-build.yml
+    with:
+      build_type: Debug
+      build_dir: build
+      run_tests: false
+      cache_key: 'global-debug-${{ github.sha }}'
+  
+  cache-release:
+    uses: ./.github/workflows/shared-setup.yml
+    with:
+      build_type: Release
+      build_tests: true
+      build_benchmarks: true
+      cache_key: 'global-release-${{ github.sha }}'
+  
+  cache-release-build:
+    needs: cache-release
+    uses: ./.github/workflows/shared-build.yml
+    with:
+      build_type: Release
+      build_dir: build
+      run_tests: false
+      cache_key: 'global-release-${{ github.sha }}' 
