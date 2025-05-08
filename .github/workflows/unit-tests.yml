@@ -1,0 +1,30 @@
+name: C++ Unit Tests
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  pull_request:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+
+jobs:
+  matrix_test:
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+    
+    uses: ./.github/workflows/shared-setup.yml
+    with:
+      build_type: ${{ matrix.build_type }}
+      build_tests: true
+  
+  build_test:
+    needs: matrix_test
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+    
+    uses: ./.github/workflows/shared-build.yml
+    with:
+      build_type: ${{ matrix.build_type }}
+      build_dir: ${{ needs.matrix_test.outputs.build_dir }}
+      run_tests: true 

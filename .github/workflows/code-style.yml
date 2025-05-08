@@ -1,0 +1,53 @@
+name: Code Style
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  pull_request:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+
+jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format-14
+
+    - name: Create or copy .clang-format if it doesn't exist
+      run: |
+        if [ ! -f .clang-format ]; then
+          cat > .clang-format << 'EOL'
+          ---
+          Language: Cpp
+          BasedOnStyle: Google
+          IndentWidth: 2
+          ColumnLimit: 100
+          AlignConsecutiveAssignments: true
+          AlignConsecutiveDeclarations: true
+          AlignTrailingComments: true
+          AllowShortFunctionsOnASingleLine: All
+          AllowShortIfStatementsOnASingleLine: true
+          BreakBeforeBraces: Attach
+          PointerAlignment: Left
+          EOL
+        fi
+
+    - name: Run clang-format-check action
+      uses: jidicula/clang-format-action@v4.11.0
+      with:
+        clang-format-version: '14'
+        check-path: 'src include tests examples'
+
+    - name: Check for code style changes
+      run: |
+        if [ -n "$(git diff)" ]; then
+          echo "Code style issues found:"
+          git diff
+          exit 1
+        fi 
