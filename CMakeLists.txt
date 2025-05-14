@@ -17,7 +17,6 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
 
-
 # Architecture specialization
 set(SPECIALIZE_TYPE "8086-SSE" CACHE STRING "Specialization type for SoftPosit")
 
@@ -80,9 +79,13 @@ install(TARGETS softposit
 )
 
 # Install headers
-install(DIRECTORY include/ DESTINATION include)
+install(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h"
+)
 
-# Create and install package configuration
+# Create and install package configuration for CMake consumers
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/SoftPositConfigVersion.cmake"
@@ -111,7 +114,6 @@ install(EXPORT SoftPositTargets
 
 # Python wrapper
 if(BUILD_PYTHON_WRAPPER OR BUILD_PYTHON3_WRAPPER)
-  # Find Python
   if(BUILD_PYTHON_WRAPPER)
     find_package(Python2 COMPONENTS Interpreter Development)
     set(PYTHON_INCLUDE_DIRS ${Python2_INCLUDE_DIRS})
@@ -122,7 +124,6 @@ if(BUILD_PYTHON_WRAPPER OR BUILD_PYTHON3_WRAPPER)
     set(PYTHON_LIBRARIES ${Python3_LIBRARIES})
   endif()
 
-  # Add Python wrapper
   add_library(softposit_python MODULE python/softposit_python_wrap.c)
   target_include_directories(softposit_python PRIVATE ${PYTHON_INCLUDE_DIRS})
   target_link_libraries(softposit_python softposit ${PYTHON_LIBRARIES})
@@ -135,46 +136,30 @@ endif()
 
 # Tests setup
 if(BUILD_TESTS)
-  # Download and configure Google Test
   include(FetchContent)
   FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG release-1.12.1
   )
-  # For Windows: Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   FetchContent_MakeAvailable(googletest)
 
-  # Enable testing
   enable_testing()
 
-  # Ensure tests directory exists
   set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
   if(NOT EXISTS "${TESTS_DIR}")
     file(MAKE_DIRECTORY "${TESTS_DIR}")
     message(STATUS "Created tests directory: ${TESTS_DIR}")
   endif()
 
-  # Common test utilities
   set(COMMON_TEST_SOURCES
     "${TESTS_DIR}/common_tests/test_utils.cpp"
   )
-
-  # Add header files
-  set(COMMON_TEST_HEADERS
-    "${TESTS_DIR}/common_tests/test_utils.h"
-  )
-
-  # Include the tests directory in the include path
   include_directories(${TESTS_DIR})
 
-  # Function to add test executable with auto-discovered test files
   function(add_posit_test_executable NAME SIZE)
-    # Auto-discover test files in the directory
     file(GLOB TEST_SOURCES "${TESTS_DIR}/${NAME}_tests/*.cpp")
-    
-    # Add the test executable with all discovered files
     add_executable(${NAME}_tests 
       ${TEST_SOURCES}
       "${TESTS_DIR}/main.cpp"
@@ -184,7 +169,6 @@ if(BUILD_TESTS)
     add_test(NAME ${NAME}_tests COMMAND ${NAME}_tests)
   endfunction()
 
-  # Add all posit and quire tests
   add_posit_test_executable(p8 8)
   add_posit_test_executable(p16 16)
   add_posit_test_executable(p32 32)
@@ -192,7 +176,6 @@ if(BUILD_TESTS)
   add_posit_test_executable(q16 16)
   add_posit_test_executable(q32 32)
 
-  # Add a custom target to run all tests
   add_custom_target(check
     COMMAND ${CMAKE_CTEST_COMMAND} --verbose
     DEPENDS p8_tests p16_tests p32_tests q8_tests q16_tests q32_tests
@@ -201,18 +184,15 @@ endif()
 
 # Benchmarks setup
 if(BUILD_BENCHMARKS)
-  # Download and configure Google Benchmark
   include(FetchContent)
   FetchContent_Declare(
     benchmark
     GIT_REPOSITORY https://github.com/google/benchmark.git
     GIT_TAG v1.8.3
   )
-  # Disable benchmark tests
   set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable benchmark testing" FORCE)
   FetchContent_MakeAvailable(benchmark)
 
-  # Ensure benchmark directory exists
   set(BENCHMARKS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks")
   if(NOT EXISTS "${BENCHMARKS_DIR}")
     file(MAKE_DIRECTORY "${BENCHMARKS_DIR}")
@@ -220,15 +200,11 @@ if(BUILD_BENCHMARKS)
     message(STATUS "Created benchmarks directory: ${BENCHMARKS_DIR}")
   endif()
 
-  # Common benchmark utilities
   set(COMMON_BENCH_SOURCES
-    "${TESTS_DIR}/common_tests/test_utils.cpp"  # Reuse test utilities for benchmarks
+    "${TESTS_DIR}/common_tests/test_utils.cpp"
   )
-
-  # Ensure benchmarks can find Google Test headers
   include_directories(${gtest_SOURCE_DIR}/include)
 
-  # Function to add benchmark executable if the file exists
   function(add_benchmark_if_exists NAME)
     set(BENCH_FILE "${BENCHMARKS_DIR}/performance/${NAME}_bench.cpp")
     if(EXISTS "${BENCH_FILE}")
@@ -237,8 +213,6 @@ if(BUILD_BENCHMARKS)
         ${COMMON_BENCH_SOURCES}
       )
       target_link_libraries(${NAME}_bench benchmark::benchmark softposit pthread)
-      
-      # Add individual benchmark run target
       add_custom_target(run-${NAME}-bench
         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_bench
         DEPENDS ${NAME}_bench
@@ -247,7 +221,6 @@ if(BUILD_BENCHMARKS)
     endif()
   endfunction()
 
-  # Add benchmarks for all posit sizes
   add_benchmark_if_exists(p8)
   add_benchmark_if_exists(p16)
   add_benchmark_if_exists(p32)
@@ -255,15 +228,10 @@ if(BUILD_BENCHMARKS)
   add_benchmark_if_exists(q16)
   add_benchmark_if_exists(q32)
 
-  # Get all benchmark targets
   get_property(BENCHMARK_TARGETS GLOBAL PROPERTY BENCHMARK_TARGETS)
-
-  # Add a custom target to run all benchmarks
   add_custom_target(bench
     COMMAND ${CMAKE_COMMAND} -E echo "Running all benchmarks..."
   )
-  
-  # Add dependencies to the bench target
   if(BENCHMARK_TARGETS)
     add_dependencies(bench ${BENCHMARK_TARGETS})
   endif()
@@ -278,7 +246,7 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cmake_clean.cmake
 file(REMOVE_RECURSE
   \${CMAKE_BINARY_DIR}/CMakeFiles
   \${CMAKE_BINARY_DIR}/CMakeCache.txt
-  \${CMAKE_BINARY_DIR}/cmake_install.cmake
+  \${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake
   \${CMAKE_BINARY_DIR}/Makefile
   \${CMAKE_BINARY_DIR}/libsoftposit.a
   \${CMAKE_BINARY_DIR}/libsoftposit.so
@@ -299,28 +267,17 @@ file(REMOVE_RECURSE
 "
 )
 
-# Package configuration
-set(CPACK_PACKAGE_NAME "SoftPosit")
-set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION "SoftPosit - A C++ implementation of the Posit number system")
-set(CPACK_PACKAGE_VENDOR "SoftPosit Team")
-set(CPACK_PACKAGE_CONTACT "softposit@example.com")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+# ─── CPack configuration ───
+set(CPACK_PACKAGE_NAME        "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VERSION     "${PROJECT_VERSION}")
+set(CPACK_DEBIAN_FILE_NAME "softposit_${PROJECT_VERSION}_amd64")
+set(CPACK_DEBIAN_PACKAGE_RELEASE "1")
+set(CPACK_PACKAGE_CONTACT     "Chaitanya Gambali <gschaitanya2003@gmail.com>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+    "SoftPosit: a high-performance posit arithmetic library"
+)
+set(CPACK_GENERATOR           "DEB")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
-# Platform-specific settings
-if(WIN32)
-    set(CPACK_GENERATOR "ZIP;NSIS")
-    set(CPACK_NSIS_MODIFY_PATH ON)
-elseif(APPLE)
-    set(CPACK_GENERATOR "TGZ;DragNDrop")
-    set(CPACK_DMG_VOLUME_NAME "SoftPosit")
-else()
-    set(CPACK_GENERATOR "TGZ;DEB;RPM")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "SoftPosit Team")
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.14)")
-    set(CPACK_RPM_PACKAGE_REQUIRES "glibc >= 2.14")
-endif()
-
-# Include CPack
+include(InstallRequiredSystemLibraries)
 include(CPack)
