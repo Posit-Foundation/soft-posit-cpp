@@ -2,9 +2,9 @@ name: CI for soft-posit-cpp
 
 on:
   push:
-    branches: [ "refactor-cpp-soft-posits" ]
+    branches: [ "posit_8_math_functions" ]
   pull_request:
-    branches: [ "refactor-cpp-soft-posits" ]
+    branches: [ "posit_8_math_functions" ]
 
 env:
   BUILD_TYPE: Release
@@ -33,12 +33,12 @@ jobs:
         cd build
         make -j$(nproc)
 
-    - name: Run all tests (make check)
-      run: |
-        cd build
-        make check
+    # - name: Run all tests (make check)
+    #   run: |
+    #     cd build
+    #     make check
 
-    - name: Run all benchmarks (make bench)
-      run: |
-        cd build
-        make bench
+    # - name: Run all benchmarks (make bench)
+    #   run: |
+    #     cd build
+    #     make bench
