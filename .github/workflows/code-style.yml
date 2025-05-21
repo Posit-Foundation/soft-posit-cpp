@@ -22,20 +22,19 @@ jobs:
     - name: Create or copy .clang-format if it doesn't exist
       run: |
         if [ ! -f .clang-format ]; then
-          cat > .clang-format << 'EOL'
-          ---
-          Language: Cpp
-          BasedOnStyle: Google
-          IndentWidth: 2
-          ColumnLimit: 100
-          AlignConsecutiveAssignments: true
-          AlignConsecutiveDeclarations: true
-          AlignTrailingComments: true
-          AllowShortFunctionsOnASingleLine: All
-          AllowShortIfStatementsOnASingleLine: true
-          BreakBeforeBraces: Attach
-          PointerAlignment: Left
-          EOL
+          printf '%s\n' \
+            "---" \
+            "Language: Cpp" \
+            "BasedOnStyle: Google" \
+            "IndentWidth: 2" \
+            "ColumnLimit: 100" \
+            "AlignConsecutiveAssignments: true" \
+            "AlignConsecutiveDeclarations: true" \
+            "AlignTrailingComments: true" \
+            "AllowShortFunctionsOnASingleLine: All" \
+            "AllowShortIfStatementsOnASingleLine: true" \
+            "BreakBeforeBraces: Attach" \
+            "PointerAlignment: Left" > .clang-format
         fi
 
     - name: Run clang-format-check action
