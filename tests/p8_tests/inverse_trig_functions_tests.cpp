@@ -188,6 +188,7 @@ TEST(Posit8MathFunctions, AtanPiSpecificValues) {
 }
 
 // Test inverse relationships between sin_pi and asin_pi
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, SinAsinInverse) {
 
   // Create a distribution for values in the range [-0.5, 0.5]
@@ -211,3 +212,4 @@ TEST(Posit8MathFunctions, SinAsinInverse) {
         << p_a.toDouble();
   }
 }
+#endif

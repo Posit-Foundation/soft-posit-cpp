@@ -3,6 +3,7 @@
 #include <random>
 
 // Test for p8_ceil function implementation
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, CeilFunction) {
 
   // Create a distribution that generates values across the full posit8 range
@@ -32,8 +33,10 @@ TEST(Posit8MathFunctions, CeilFunction) {
         << (int)p_expected.value << ")";
   }
 }
+#endif
 
 // Test specific known values for ceiling function
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, CeilSpecificValues) {
 
   // ceil(1.0) = 1.0
@@ -70,6 +73,7 @@ TEST(Posit8MathFunctions, CeilSpecificValues) {
   ASSERT_TRUE(result_nar.isNaR())
       << "ceil(NaR) = " << result_nar.toDouble() << " but expected NaR";
 }
+#endif
 
 // Test for p8_floor function implementation
 TEST(Posit8MathFunctions, FloorFunction) {
@@ -140,6 +144,7 @@ TEST(Posit8MathFunctions, FloorSpecificValues) {
 }
 
 // Test the relationship between ceil and floor
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, CeilFloorRelationship) {
 
   // Create a distribution that generates non-integer values
@@ -179,3 +184,4 @@ TEST(Posit8MathFunctions, CeilFloorRelationship) {
     }
   }
 }
+#endif

@@ -21,6 +21,21 @@ make check
 make bench
 ```
 
+Some experimental math functions are still under development and their tests are disabled by default. To enable these tests, use the `ENABLE_EXPERIMENTAL_TESTS` flag when running CMake:
+
+```bash
+mkdir build && cd build
+cmake -DENABLE_EXPERIMENTAL_TESTS=ON ..
+make check
+```
+
+This will run additional tests for functions that are still being implemented, including:
+
+- Trigonometric functions (sin_pi, cos_pi, tan_pi)
+- Logarithmic functions (log2)
+- Rounding functions (ceil)
+- Inverse trigonometric functions (asin_pi/sin_pi relationship)
+
 For more build options, see the [CMakeLists.txt](CMakeLists.txt) file.
 
 This version (0.4.1) supports:
@@ -43,9 +58,9 @@ This version (0.4.1) supports:
 
 This code is tested on
 
-* GNU gcc (SUSE Linux) 4.8.5
-* Apple LLVM version 9.1.0 (clang-902.0.39.2)
-* Windows 10 (Mingw-w64)
+- GNU gcc (SUSE Linux) 4.8.5
+- Apple LLVM version 9.1.0 (clang-902.0.39.2)
+- Windows 10 (Mingw-w64)
 
 Please note that the same Makefile in build/Linux-x86_64-GCC is used for all 3 operating systems.
 
@@ -55,11 +70,11 @@ Please note that the same Makefile in build/Linux-x86_64-GCC is used for all 3 o
 
  Versions are offered
 
-* [Fast C version](#cversion) : The main source code where all other versions are based on.
-* [User friendly C++ version](#cppversion)  : Documentation can be found below.
-* [User friendly Python version](https://gitlab.com/cerlane/SoftPosit-Python/) : <https://gitlab.com/cerlane/SoftPosit-Python/>
-* [Julia](#jversion)  : Currently only simple .so support. Documentation can be found below.
-* [Others](#known)
+- [Fast C version](#cversion) : The main source code where all other versions are based on.
+- [User friendly C++ version](#cppversion)  : Documentation can be found below.
+- [User friendly Python version](https://gitlab.com/cerlane/SoftPosit-Python/) : <https://gitlab.com/cerlane/SoftPosit-Python/>
+- [Julia](#jversion)  : Currently only simple .so support. Documentation can be found below.
+- [Others](#known)
 
 ## <a name="cversion"/>Fast C version
 
@@ -441,76 +456,76 @@ int main(int argc, char *argv[]){
 
 #### Main functionalities
 
-* Posit types: posit16, posit8
-* Fused-multiply-add:
-  * posit16 fma(posit16, posit16, posit16)
-  * posit18 fma(posit18, posit18, posit8)
-* Square root:
-  * posit16 sqrt(posit16)
-  * posit8 sqrt(posit8)
-* roundToInt:
-  * posit16 rint(posit16)
-  * posit8 rint(posit8)
-* Supported operators
-  * \+
-  * +=
-  * \-
-  * \-=
-  * &ast;
-  * &ast;=
-  * /
-  * /=
-  * <<
-  * <<=
-  * &#62;&#62;
-  * &#62;&#62;=
-  * &
-  * &=
-  * |
-  * |=
-  * ^
-  * ^=
-  * &&
-  * ||
-  * ++
-  * --
-  * ==
-  * ~
-  * !
-  * !=
-  * &ast;
-  * <
-  * &ast;=
-  * <=
-* Posit to Double:
-  * double (instance of posit).toDouble()
-* Double to Posit:
-  * posit16 p16(double)
-  * posit8 p8(double)
-* Posit to NaR:
-  * posit16 (instance of posit16).toNaR()
-  * posit8 (instance of posit8).toNaR()
+- Posit types: posit16, posit8
+- Fused-multiply-add:
+  - posit16 fma(posit16, posit16, posit16)
+  - posit18 fma(posit18, posit18, posit8)
+- Square root:
+  - posit16 sqrt(posit16)
+  - posit8 sqrt(posit8)
+- roundToInt:
+  - posit16 rint(posit16)
+  - posit8 rint(posit8)
+- Supported operators
+  - \+
+  - +=
+  - \-
+  - \-=
+  - &ast;
+  - &ast;=
+  - /
+  - /=
+  - <<
+  - <<=
+  - &#62;&#62;
+  - &#62;&#62;=
+  - &
+  - &=
+  - |
+  - |=
+  - ^
+  - ^=
+  - &&
+  - ||
+  - ++
+  - --
+  - ==
+  - ~
+  - !
+  - !=
+  - &ast;
+  - <
+  - &ast;=
+  - <=
+- Posit to Double:
+  - double (instance of posit).toDouble()
+- Double to Posit:
+  - posit16 p16(double)
+  - posit8 p8(double)
+- Posit to NaR:
+  - posit16 (instance of posit16).toNaR()
+  - posit8 (instance of posit8).toNaR()
 
 #### Quire functionalities (particularly for deep learning)
 
-* Quire types: quire16, quire8 (when declared, quire is initiated to zero)
-* Clear quire to zero:
-  * (instance of quire16).clr()
-* Quire multiply add (fused)
-  * (instance of quire16).fma(quire16)
-  * (instance of quire8).fma(quire8)
-* Quire multiply subtract (fused)
-  * (instance of quire16).fms(quire16)
-  * (instance of quire8).fms(quire8)
-* Convert quire to Posit
-  * posit16 (instance of quire16).toPosit()
-  * posit8 (instance of quire8).toPosit()
-* Check if quire is NaR
-  * bool (instance of quire).isNaR()
+- Quire types: quire16, quire8 (when declared, quire is initiated to zero)
+- Clear quire to zero:
+  - (instance of quire16).clr()
+- Quire multiply add (fused)
+  - (instance of quire16).fma(quire16)
+  - (instance of quire8).fma(quire8)
+- Quire multiply subtract (fused)
+  - (instance of quire16).fms(quire16)
+  - (instance of quire8).fms(quire8)
+- Convert quire to Posit
+  - posit16 (instance of quire16).toPosit()
+  - posit8 (instance of quire8).toPosit()
+- Check if quire is NaR
+  - bool (instance of quire).isNaR()
 
 ## <a name="jversion"/>Julia
 
-* [Julia implementation] (<https://github.com/milankl/SoftPosit.jl>) on top of SoftPosit
+- [Julia implementation] (<https://github.com/milankl/SoftPosit.jl>) on top of SoftPosit
 
 ### Install via Julia package manager
 
@@ -543,10 +558,10 @@ julia> t = ccall((:convertDoubleToP16, "/path/to/SoftPosit/build/Linux-x86_64-GC
 
 ## <a href="known"/>Known implementations on top of SoftPosit
 
-* [Andrey Zgarbul's Rust implementation](https://crates.io/crates/softposit)
-* [Milan Klöwer's Julia implementation](https://github.com/milankl/SoftPosit.jl)
-* [SpeedGo Computing's TensorFlow](https://github.com/xman/tensorflow/tree/posit)
-* [SpeedGo Computing's Numpy](https://github.com/xman/numpy-posit)
-* [Cerlane Leong's SoftPosit-Python](https://gitlab.com/cerlane/SoftPosit-Python)
-* [David Thien's SoftPosit bindings Racket](https://github.com/DavidThien/softposit-rkt)
-* [Bill Zorn's SoftPosit and SoftFloat Python](https://pypi.org/project/sfpy/)
+- [Andrey Zgarbul's Rust implementation](https://crates.io/crates/softposit)
+- [Milan Klöwer's Julia implementation](https://github.com/milankl/SoftPosit.jl)
+- [SpeedGo Computing's TensorFlow](https://github.com/xman/tensorflow/tree/posit)
+- [SpeedGo Computing's Numpy](https://github.com/xman/numpy-posit)
+- [Cerlane Leong's SoftPosit-Python](https://gitlab.com/cerlane/SoftPosit-Python)
+- [David Thien's SoftPosit bindings Racket](https://github.com/DavidThien/softposit-rkt)
+- [Bill Zorn's SoftPosit and SoftFloat Python](https://pypi.org/project/sfpy/)

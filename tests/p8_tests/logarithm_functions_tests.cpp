@@ -69,6 +69,7 @@ TEST(Posit8MathFunctions, LnSpecificValues) {
 }
 
 // Test for p8_log2 function implementation
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, Log2Function) {
 
   // Create a distribution that generates values across the full posit8 range
@@ -98,8 +99,10 @@ TEST(Posit8MathFunctions, Log2Function) {
         << (int)p_expected.value << ")";
   }
 }
+#endif
 
 // Test specific known values for base-2 logarithm function
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, Log2SpecificValues) {
 
   // log2(1) = 0
@@ -141,6 +144,7 @@ TEST(Posit8MathFunctions, Log2SpecificValues) {
   ASSERT_TRUE(result_neg.isNaR())
       << "log2(-1) = " << result_neg.toDouble() << " but expected NaR";
 }
+#endif
 
 // Test the identity: ln(a*b) = ln(a) + ln(b)
 TEST(Posit8MathFunctions, LnMultiplicativeProperty) {

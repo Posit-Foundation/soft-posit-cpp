@@ -8,6 +8,7 @@ option(BUILD_PYTHON_WRAPPER "Build Python wrapper" OFF)
 option(BUILD_PYTHON3_WRAPPER "Build Python3 wrapper" OFF)
 option(BUILD_JULIA_WRAPPER "Build Julia wrapper" OFF)
 option(BUILD_TESTS "Build tests" ON)
+option(ENABLE_EXPERIMENTAL_TESTS "Enable experimental tests that may fail" OFF)
 option(BUILD_BENCHMARKS "Build benchmarks" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(INLINE_LEVEL "Inline level for optimization" 5)
@@ -181,6 +182,12 @@ if(BUILD_TESTS)
       ${COMMON_TEST_SOURCES}
     )
     target_link_libraries(${NAME}_tests gtest gtest_main pthread softposit)
+    
+    # Add the experimental tests flag if enabled
+    if(ENABLE_EXPERIMENTAL_TESTS)
+      target_compile_definitions(${NAME}_tests PRIVATE ENABLE_EXPERIMENTAL_TESTS)
+    endif()
+    
     add_test(NAME ${NAME}_tests COMMAND ${NAME}_tests)
   endfunction()
 

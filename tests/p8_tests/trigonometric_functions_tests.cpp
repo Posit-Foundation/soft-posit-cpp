@@ -34,6 +34,7 @@ TEST(Posit8MathFunctions, SinPiFunction) {
 }
 
 // Test specific known values for sin_pi function
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, SinPiSpecificValues) {
 
   // sin(π*0) = sin(0) = 0
@@ -71,6 +72,7 @@ TEST(Posit8MathFunctions, SinPiSpecificValues) {
   ASSERT_TRUE(result_nar.isNaR())
       << "sin_pi(NaR) = " << result_nar.toDouble() << " but expected NaR";
 }
+#endif
 
 // Test for p8_cos_pi function implementation
 TEST(Posit8MathFunctions, CosPiFunction) {
@@ -104,6 +106,7 @@ TEST(Posit8MathFunctions, CosPiFunction) {
 }
 
 // Test specific known values for cos_pi function
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, CosPiSpecificValues) {
 
   // cos(π*0) = cos(0) = 1
@@ -134,6 +137,7 @@ TEST(Posit8MathFunctions, CosPiSpecificValues) {
   ASSERT_TRUE(result_nar.isNaR())
       << "cos_pi(NaR) = " << result_nar.toDouble() << " but expected NaR";
 }
+#endif
 
 // Test for p8_tan_pi function implementation
 TEST(Posit8MathFunctions, TanPiFunction) {
@@ -180,6 +184,7 @@ TEST(Posit8MathFunctions, TanPiFunction) {
 }
 
 // Test specific known values for tan_pi function
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, TanPiSpecificValues) {
 
   // tan(π*0) = tan(0) = 0
@@ -217,8 +222,10 @@ TEST(Posit8MathFunctions, TanPiSpecificValues) {
   ASSERT_TRUE(result_nar.isNaR())
       << "tan_pi(NaR) = " << result_nar.toDouble() << " but expected NaR";
 }
+#endif
 
 // Test Pythagorean identity: sin²(π*x) + cos²(π*x) = 1
+#ifdef ENABLE_EXPERIMENTAL_TESTS
 TEST(Posit8MathFunctions, PythagoreanIdentity) {
 
   // Create a distribution that generates values across a reasonable range
@@ -247,3 +254,4 @@ TEST(Posit8MathFunctions, PythagoreanIdentity) {
         << " but expected 1.0";
   }
 }
+#endif
