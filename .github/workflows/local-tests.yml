@@ -31,8 +31,9 @@ jobs:
     with:
       cache_key: ${{ needs.setup.outputs.cache_key }}
       build_targets: >-
-        ${{ needs.setup.outputs.cache_hit == 'true' && 
-            (github.event.inputs.test_type == 'build' || github.event.inputs.test_type == 'all') && 
+        ${{ (needs.setup.outputs.cache_hit != 'true' || 
+            github.event.inputs.test_type == 'build' || 
+            github.event.inputs.test_type == 'all') && 
             'all' || '' }}
 
   test:
@@ -41,9 +42,10 @@ jobs:
     uses: ./.github/workflows/shared-build.yml
     with:
       cache_key: ${{ needs.setup.outputs.cache_key }}
+      # build_targets is intentionally omitted here to rely on the build job's artifact/cache
       test_targets: >-
         ${{ github.event.inputs.test_type == 'p8' && 'p8_tests' || 
             github.event.inputs.test_type == 'p16' && 'p16_tests' || 
             github.event.inputs.test_type == 'p32' && 'p32_tests' || 
-            github.event.inputs.test_type == 'quire' && 'quire_tests' || 
-            github.event.inputs.test_type == 'all' && 'all' || '' }} 
+            github.event.inputs.test_type == 'quire' && 'q8_tests q16_tests q32_tests' || 
+            github.event.inputs.test_type == 'all' && 'p8_tests p16_tests p32_tests q8_tests q16_tests q32_tests' || '' }} 

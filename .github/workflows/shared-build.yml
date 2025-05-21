@@ -90,31 +90,46 @@ jobs:
       if: inputs.test_targets != ''
       run: |
         cd build
+        echo "Listing contents of build directory before chmod:"
         ls -la
-        find . -name "*_tests" -type f -executable || true
+
+        echo "Making test executables runnable..."
+        # Attempt to make all potential test files executable
+        # This is important if execute permissions were lost during artifact packaging/extraction
+        find . -name "*_tests" -type f -exec chmod +x {} \;
+        find . -name "*_tests.exe" -type f -exec chmod +x {} \;
+
+        echo "Listing contents of build directory after chmod:"
+        ls -la
+        echo "Finding executable test files after chmod:"
+        find . -name "*_tests" -type f -executable -print -o -name "*_tests.exe" -type f -executable -print || true
         
-        TEST_TARGET="${{ inputs.test_targets }}"
-        echo "Running test target: $TEST_TARGET"
+        echo "Attempting to run test targets: ${{ inputs.test_targets }}"
         
-        # Build the test target if it doesn't exist
-        if [ ! -f "./$TEST_TARGET" ] && [ ! -f "./bin/$TEST_TARGET" ]; then
-          echo "Building test target: $TEST_TARGET"
-          make $TEST_TARGET -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
-        fi
+        for target_name in ${{ inputs.test_targets }}; do
+          echo "Looking for test: $target_name"
+          EXECUTABLE_PATH=""
+          if [ -f "./$target_name" ]; then
+            EXECUTABLE_PATH="./$target_name"
+          elif [ -f "./bin/$target_name" ]; then
+            EXECUTABLE_PATH="./bin/$target_name"
+          # CMake sometimes adds .exe on Windows even if not specified
+          elif [ -f "./${target_name}.exe" ]; then
+            EXECUTABLE_PATH="./${target_name}.exe"
+          elif [ -f "./bin/${target_name}.exe" ]; then
+            EXECUTABLE_PATH="./bin/${target_name}.exe"
+          fi
+
+          if [ -n "$EXECUTABLE_PATH" ]; then
+            echo "Running test: $EXECUTABLE_PATH"
+            $EXECUTABLE_PATH
+          else
+            echo "Error: Test executable '$target_name' not found in build/ or build/bin/."
+            # List files again for debugging if a test is not found
+            echo "Current files in build/:"
+            ls -R .
+            exit 1
+          fi
+        done
         
-        # Now run the test
-        if [[ "$TEST_TARGET" == "p8_tests" ]]; then
-          # Run p8_tests directly
-          ./p8_tests
-        elif [[ "$TEST_TARGET" == "p16_tests" ]]; then
-          # Run p16_tests directly
-          ./p16_tests
-        elif [[ "$TEST_TARGET" == "p32_tests" ]]; then
-          # Run p32_tests directly
-          ./p32_tests
-        elif [[ "$TEST_TARGET" == "quire_tests" ]]; then
-          # Run quire_tests directly
-          ./quire_tests
-        elif [[ "$TEST_TARGET" == "all" ]]; then
-          ctest -V
-        fi 
+    # Removed the commented out old script for cleanliness 
