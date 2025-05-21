@@ -1,13 +1,18 @@
-name: Run Benchmarks
+name: Build Ubuntu
 
 on:
   push:
-    branches: [ "main" ]  # Only run on main branch to avoid too many benchmark runs
+    branches: [ "main", "**" ]
+  pull_request:
+    branches: [ "main", "**" ]
   workflow_dispatch:
 
 jobs:
-  benchmarks:
+  build:
     runs-on: ubuntu-latest
+    outputs:
+      cache_key: ${{ steps.cache-key.outputs.key }}
+      cache_hit: ${{ steps.cache-build.outputs.cache-hit }}
     
     steps:
     - name: Checkout code
@@ -17,6 +22,7 @@ jobs:
       id: cache-key
       run: |
         echo "key=build-ubuntu-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      shell: bash
       
     - name: Restore build cache
       id: cache-build
@@ -31,28 +37,22 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y cmake make g++ ninja-build
 
-    - name: Configure and Build
+    - name: Configure CMake
       if: steps.cache-build.outputs.cache-hit != 'true'
       run: |
         mkdir -p build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
-    
-    - name: Run benchmarks
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=ON
+      
+    - name: Build
+      if: steps.cache-build.outputs.cache-hit != 'true'
       run: |
         cd build
-        chmod +x benchmark/*
-        make bench
+        make -j$(nproc)
         
-    - name: Store benchmark results
-      uses: benchmark-action/github-action-benchmark@v1
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
       with:
-        tool: 'googlecpp'
-        output-file-path: build/benchmarks/results.json
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        auto-push: true
-        # Comment out the following lines for the first run
-        # alert-threshold: '150%'
-        # comment-on-alert: true
-        # fail-on-alert: true
+        name: build-artifact-ubuntu
+        path: build/
+        retention-days: 1 

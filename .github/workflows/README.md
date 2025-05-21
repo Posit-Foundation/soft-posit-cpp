@@ -1,81 +1,71 @@
-# Running GitHub Actions Workflows Locally
+# GitHub Actions Workflows
 
-This guide explains how to run the GitHub Actions workflows locally using the `act` tool.
+This guide explains the GitHub Actions workflows for the soft-posit-cpp project.
 
-## Prerequisites
+## Workflow Structure
 
-1. Install Docker for your platform: <https://docs.docker.com/get-docker/>
-2. Install `act`:
+We've organized our workflows for better clarity and efficiency:
 
-   ```bash
-   brew install act
-   ```
+1. **Build Workflows**:
+   - `build-ubuntu.yml`: Builds the project on Ubuntu
+   - `build-macos.yml`: Builds the project on macOS
 
-## Streamlined Workflow Structure
+2. **Testing & Benchmarking**:
+   - `tests.yml`: Runs tests on cached builds (supports both platforms)
+   - `benchmarks.yml`: Runs benchmarks on Ubuntu with cached builds
 
-We've simplified the workflow structure to reduce redundancy and improve maintainability:
+3. **Code Quality**:
+   - `code-quality.yml`: Runs clang-format and clang-tidy checks
 
-1. **Reusable Workflow Components**:
-   - `shared-setup.yml`: Sets up the build environment and handles caching
-   - `shared-build.yml`: Builds the project and runs tests as needed
+4. **Release**:
+   - `release.yml`: Creates packages and releases for tagged versions
 
-2. **Main Workflow Files**:
-   - `ci.yml`: Main CI workflow for GitHub
-   - `local-tests.yml`: Consolidated local test workflow with input parameters
+5. **Development**:
+   - `local-dev.yml`: Simplified workflow for local development and testing
 
-## Running Local Tests
+## Using the Local Development Workflow
 
-The new `local-tests.yml` workflow replaces all previous individual test workflows with a single interactive workflow:
-
-```bash
-# Just build the project
-act -W .github/workflows/local-tests.yml -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest --container-architecture linux/amd64 -i
-
-# Then choose the option:
-# - build: Just build without running tests
-# - p8: Run Posit8 tests
-# - p16: Run Posit16 tests
-# - p32: Run Posit32 tests
-# - quire: Run all Quire tests
-# - all: Run all tests
-```
-
-Alternatively, you can specify the test type directly:
+The `local-dev.yml` workflow allows you to easily test changes locally. You can run it using the GitHub UI or with the `act` tool:
 
 ```bash
-# Example: Run only Posit8 tests
-act -W .github/workflows/local-tests.yml -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest --container-architecture linux/amd64 --input test_type=p8
+# Install act
+brew install act
+
+# Run the local-dev workflow with the 'act' tool
+act -W .github/workflows/local-dev.yml -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest --container-architecture linux/amd64 --input action=all
 ```
 
-## Caching System
+### Available Actions
 
-The workflows use an efficient caching system:
+The local-dev workflow supports the following actions:
 
-1. Each workflow generates a unique cache key based on the code contents (hashing source files)
-2. If a matching cache is found, the build step is skipped
-3. For local development, all workflows share the same cache prefix ("local-")
-4. For CI, a separate cache prefix is used ("ci-")
+- `build`: Just build without running tests
+- `test`: Run all tests
+- `benchmark`: Run benchmarks
+- `all`: Run all of the above
 
-This ensures that you only rebuild when necessary, and test runs are much faster.
+## Build and Test Flow
 
-## Running the Full CI Workflow
+Our workflows are designed with an efficient flow:
 
-To run the complete CI workflow:
+1. **Build jobs** create artifacts and cache the build
+2. **Test jobs** use the cached builds to run tests
+3. **Benchmark jobs** use the cached builds to run benchmarks
 
-```bash
-act -W .github/workflows/ci.yml -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest --container-architecture linux/amd64
-```
+This separation allows for:
+- Better workflow organization and maintenance
+- Independent test and benchmark runs
+- More efficient resource usage
 
-## Troubleshooting
+## Caching Strategy
 
-- If you see errors about Docker not running, make sure the Docker desktop app is open and running
-- For Apple Silicon (M1/M2) Macs, the `--container-architecture linux/amd64` flag is required
-- If a test is taking too long, you can press Ctrl+C to cancel it
-- If you want to bypass the cache and force a rebuild, use the `--no-cache` flag with `act`
+- Incremental builds are efficiently cached based on source file hashes
+- Different workflows reuse the same cache keys to avoid redundant builds
+- Build artifacts are shared between jobs when needed
 
 ## Manual Build and Test
 
-Alternatively, you can build and test the project directly without using GitHub Actions:
+Alternatively, you can build and test the project directly:
 
 ```bash
 mkdir -p build

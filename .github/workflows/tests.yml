@@ -1,0 +1,108 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ "main", "**" ]
+  pull_request:
+    branches: [ "main", "**" ]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to run tests on'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - ubuntu
+          - macos
+          - both
+
+jobs:
+  ubuntu-tests:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.platform == 'ubuntu' || github.event.inputs.platform == 'both' || github.event_name != 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-ubuntu-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up dependencies
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake make g++ ninja-build
+
+    - name: Configure and Build
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        make -j$(nproc)
+    
+    - name: Run tests
+      run: |
+        cd build
+        chmod +x *_tests
+        ./p8_tests
+        ./p16_tests
+        ./p32_tests
+        ./q8_tests
+        ./q16_tests
+        ./q32_tests
+        
+  macos-tests:
+    runs-on: macos-latest
+    if: github.event.inputs.platform == 'macos' || github.event.inputs.platform == 'both' || github.event_name != 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-macos-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up dependencies
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        brew install cmake ninja
+
+    - name: Configure and Build
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        make -j$(sysctl -n hw.ncpu)
+    
+    - name: Run tests
+      run: |
+        cd build
+        chmod +x *_tests
+        ./p8_tests
+        ./p16_tests
+        ./p32_tests
+        ./q8_tests
+        ./q16_tests
+        ./q32_tests 
