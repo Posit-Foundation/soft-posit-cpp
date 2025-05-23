@@ -4,7 +4,7 @@ project(SoftPosit VERSION 1.0.0 LANGUAGES C CXX)
 # Options
 option(SOFTPOSIT_QUAD "Enable quad-precision support" OFF)
 option(SOFTPOSIT_FAST_INT64 "Enable fast int64 operations" ON)
-option(BUILD_PYTHON_WRAPPER "Build Python wrapper" OFF)
+option(BUILD_PYTHON_WRAPPER "Build Python wrapper" ON)
 option(BUILD_PYTHON3_WRAPPER "Build Python3 wrapper" OFF)
 option(BUILD_JULIA_WRAPPER "Build Julia wrapper" OFF)
 option(BUILD_TESTS "Build tests" ON)
@@ -112,26 +112,106 @@ install(EXPORT SoftPositTargets
 
 # Python wrapper
 if(BUILD_PYTHON_WRAPPER OR BUILD_PYTHON3_WRAPPER)
+  # Fix CMP0078 and CMP0086 policy warnings
+  if(POLICY CMP0078)
+    cmake_policy(SET CMP0078 NEW)
+  endif()
+  
+  if(POLICY CMP0086)
+    cmake_policy(SET CMP0086 NEW)
+  endif()
+
+  # Find SWIG
+  find_package(SWIG 3.0 REQUIRED)
+  include(${SWIG_USE_FILE})
+  
   # Find Python
   if(BUILD_PYTHON_WRAPPER)
     find_package(Python2 COMPONENTS Interpreter Development)
-    set(PYTHON_INCLUDE_DIRS ${Python2_INCLUDE_DIRS})
-    set(PYTHON_LIBRARIES ${Python2_LIBRARIES})
+    if(Python2_FOUND)
+      set(PYTHON_INCLUDE_DIRS ${Python2_INCLUDE_DIRS})
+      set(PYTHON_LIBRARIES ${Python2_LIBRARIES})
+      set(PYTHON_EXECUTABLE ${Python2_EXECUTABLE})
+    else()
+      message(FATAL_ERROR "Python2 not found. Please install Python2 or set BUILD_PYTHON_WRAPPER=OFF.")
+    endif()
   else()
     find_package(Python3 COMPONENTS Interpreter Development)
-    set(PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
-    set(PYTHON_LIBRARIES ${Python3_LIBRARIES})
+    if(Python3_FOUND)
+      set(PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
+      set(PYTHON_LIBRARIES ${Python3_LIBRARIES})
+      set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+    else()
+      find_package(PythonInterp 3)
+      find_package(PythonLibs 3)
+      if(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND)
+        set(PYTHON_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS})
+        set(PYTHON_LIBRARIES ${PYTHON_LIBRARIES})
+        set(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE})
+      else()
+        message(FATAL_ERROR "Python3 not found. Please install Python3 or set BUILD_PYTHON3_WRAPPER=OFF.")
+      endif()
+    endif()
   endif()
 
-  # Add Python wrapper
-  add_library(softposit_python MODULE python/softposit_python_wrap.c)
+  # Find numpy (optional)
+  execute_process(
+    COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print(numpy.get_include())"
+    RESULT_VARIABLE NUMPY_RESULT
+    OUTPUT_VARIABLE NUMPY_INCLUDE_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  if(NUMPY_RESULT EQUAL 0)
+    set(NUMPY_FOUND TRUE)
+    include_directories(${NUMPY_INCLUDE_DIR})
+  endif()
+
+  # Set SWIG options
+  set(CMAKE_SWIG_FLAGS "")
+  include_directories(${PYTHON_INCLUDE_DIRS})
+
+  # Set the source file for SWIG
+  set_source_files_properties(python/softposit_python.i PROPERTIES CPLUSPLUS OFF)
+  set_source_files_properties(python/softposit_python.i PROPERTIES SWIG_FLAGS "-includeall")
+
+  # Create the SWIG Python module
+  # Use a direct method to compile the wrapper file
+  execute_process(
+    COMMAND ${SWIG_EXECUTABLE} -python -o ${CMAKE_CURRENT_SOURCE_DIR}/python/softposit_python_wrap.c ${CMAKE_CURRENT_SOURCE_DIR}/python/softposit_python.i
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+
+  # Now build the Python extension module
+  add_library(softposit_python MODULE
+    ${CMAKE_CURRENT_SOURCE_DIR}/python/softposit_python_wrap.c
+  )
   target_include_directories(softposit_python PRIVATE ${PYTHON_INCLUDE_DIRS})
   target_link_libraries(softposit_python softposit ${PYTHON_LIBRARIES})
+
+  # Rename the output file and set the output directory
   set_target_properties(softposit_python PROPERTIES 
     PREFIX ""
     OUTPUT_NAME "_softposit"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/python"
   )
+
+  # Install Python module
+  execute_process(
+    COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(plat_specific=True))"
+    OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  
+  if(PYTHON_SITE_PACKAGES)
+    install(FILES 
+      "${CMAKE_CURRENT_SOURCE_DIR}/python/softposit.py" 
+      DESTINATION ${PYTHON_SITE_PACKAGES}
+    )
+    
+    install(TARGETS softposit_python
+      LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}
+    )
+  endif()
 endif()
 
 # Tests setup

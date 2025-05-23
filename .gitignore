@@ -2,7 +2,6 @@
 build/*
 examples/mandelbrot/build/*
 **.DS_Store
-examples/mandelbrot/build/*
-install/
+install/*
 examples/build/*
 scratch.cpp

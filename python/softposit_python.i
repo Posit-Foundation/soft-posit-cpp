@@ -25,12 +25,38 @@ SOFTWARE.
 
 %module softposit
 %{
-#include "softposit.h"
+#include "../include/softposit.h"
+#include "../include/softposit_types.h"
 %}
 
+// Rename and ignore functions that use posit_1_t to avoid missing symbol errors
+%rename("$ignore") "i64_to_pX1";
+%rename("$ignore") "ui64_to_pX1";
+%rename("$ignore") "p8_to_pX1";
+%rename("$ignore") "p16_to_pX1";
+%rename("$ignore") "p32_to_pX1";
+%rename("$ignore") "pX2_to_pX1";
+%rename("$ignore") "pX1_to_p8";
+%rename("$ignore") "pX1_to_p16";
+%rename("$ignore") "pX1_to_p32";
+%rename("$ignore") "pX1_to_pX2";
+%rename("$ignore") "pX1_to_i64";
+%rename("$ignore") "pX1_to_ui64";
+%rename("$ignore") "pX1_int";
+%rename("$ignore") "pX1_sqrt";
+%rename("$ignore") "pX1_add";
+%rename("$ignore") "pX1_sub";
+%rename("$ignore") "pX1_mul";
+%rename("$ignore") "pX1_div";
+%rename("$ignore") "pX1_mulAdd";
+%rename("$ignore") "pX1_eq";
+%rename("$ignore") "pX1_le";
+%rename("$ignore") "pX1_lt";
+%rename("$ignore") "convertDoubleToPX1";
+%rename("$ignore") "convertPX1ToDouble";
 
-%include "softposit_types.h"
-%include "softposit.h"
+%include "../include/softposit_types.h"
+%include "../include/softposit.h"
 %include <stdint.i>
 
 %pythonbegin %{

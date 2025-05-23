@@ -398,8 +398,6 @@ Cast binary expressed in unsigned integer to posit :
     
     posit8_t castP8(uint8_t)
     
-Cast posit into binary expressed in unsigned integer
-
     uint16_t castUI(posit16_t)
     
     uint8_t castUI(posit8_t)
@@ -558,10 +556,154 @@ julia> t = ccall((:convertDoubleToP16, "/path/to/SoftPosit/build/Linux-x86_64-GC
 
 ## <a href="known"/>Known implementations on top of SoftPosit
 
-- [Andrey Zgarbul's Rust implementation](https://crates.io/crates/softposit)
-- [Milan Klöwer's Julia implementation](https://github.com/milankl/SoftPosit.jl)
-- [SpeedGo Computing's TensorFlow](https://github.com/xman/tensorflow/tree/posit)
-- [SpeedGo Computing's Numpy](https://github.com/xman/numpy-posit)
-- [Cerlane Leong's SoftPosit-Python](https://gitlab.com/cerlane/SoftPosit-Python)
-- [David Thien's SoftPosit bindings Racket](https://github.com/DavidThien/softposit-rkt)
-- [Bill Zorn's SoftPosit and SoftFloat Python](https://pypi.org/project/sfpy/)
+* [Andrey Zgarbul's Rust implementation](https://crates.io/crates/softposit)
+* [Milan Klöwer's Julia implementation](https://github.com/milankl/SoftPosit.jl)
+* [SpeedGo Computing's TensorFlow](https://github.com/xman/tensorflow/tree/posit)
+* [SpeedGo Computing's Numpy](https://github.com/xman/numpy-posit)
+* [Cerlane Leong's SoftPosit-Python](https://gitlab.com/cerlane/SoftPosit-Python)
+* [David Thien's SoftPosit bindings Racket](https://github.com/DavidThien/softposit-rkt)
+* [Bill Zorn's SoftPosit and SoftFloat Python](https://pypi.org/project/sfpy/)
+
+# SoftPosit Python Wrapper
+
+This package provides Python bindings for the [SoftPosit](https://github.com/cjdelisle/SoftPosit) library, which implements the posit number format.
+
+## What are Posits?
+
+Posits are a new number format proposed by John L. Gustafson as an alternative to IEEE 754 floating-point numbers. They offer several advantages:
+
+* Higher accuracy with fewer bits
+* Graceful underflow to zero
+* No separate handling for infinities, NaN, or subnormals
+* Consistent behavior across all bit widths
+* Faster and simpler hardware implementation
+
+## Installation
+
+### Prerequisites
+
+* CMake (version 3.1 or higher)
+* C++ compiler (GCC, Clang, MSVC)
+* Python 3.6+
+
+### Installation from Source
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/cjdelisle/SoftPosit.git
+   cd SoftPosit/python
+   ```
+
+2. Install the package:
+
+   ```bash
+   # Option 1: Development installation
+   pip install -e .
+   
+   # Option 2: Regular installation
+   pip install .
+   ```
+
+3. Verify the installation:
+
+   ```python
+   import softposit
+   p8 = softposit.posit8(3.5)
+   print(p8)  # Should print 3.5
+   ```
+
+## Usage
+
+The wrapper provides three main posit types:
+* `posit8`: 8-bit posit numbers
+* `posit16`: 16-bit posit numbers
+* `posit32`: 32-bit posit numbers
+
+### Basic Operations
+
+```python
+import softposit
+
+# Create posit numbers
+p8 = softposit.posit8(3.14)
+p16 = softposit.posit16(2.718)
+p32 = softposit.posit32(1.414)
+
+# Arithmetic operations
+sum_p8 = p8 + 1.5        # Adding float
+diff_p16 = p16 - p16/2   # Subtraction
+prod_p32 = p32 * 2       # Multiplication
+div_p8 = p8 / 2          # Division
+
+# Conversion between types
+p16_from_p8 = softposit.posit16(p8)
+p32_from_p16 = softposit.posit32(p16)
+
+# Conversion to Python types
+float_val = float(p8)
+int_val = int(p32)
+
+# Print values
+print(f"p8 = {p8}")
+print(f"p16 = {p16}")
+print(f"p32 = {p32}")
+print(f"p8 + 1.5 = {sum_p8}")
+print(f"p16 - p16/2 = {diff_p16}")
+print(f"p32 * 2 = {prod_p32}")
+print(f"p8 / 2 = {div_p8}")
+```
+
+### Numerical Properties
+
+Posit numbers have different precision characteristics than floats. Here's an example showing
+the precision differences:
+
+```python
+import softposit
+
+# Original value (exact in decimal)
+value = 1/3  # 0.3333...
+
+# Create posit representations
+p8 = softposit.posit8(value)
+p16 = softposit.posit16(value)
+p32 = softposit.posit32(value)
+
+# Print values and errors
+print(f"Original value: {value}")
+print(f"posit8:  {p8}  (error: {abs(float(p8) - value)})")
+print(f"posit16: {p16} (error: {abs(float(p16) - value)})")
+print(f"posit32: {p32} (error: {abs(float(p32) - value)})")
+```
+
+## Examples
+
+The package includes several example files:
+* `basic_test.py`: Basic functionality test
+* `softposit_example.py`: Comprehensive usage examples
+* `test_softposit.py`: More extensive tests
+
+Run these examples to explore the capabilities of the posit number format:
+
+```bash
+python softposit_example.py
+```
+
+## Troubleshooting
+
+### ImportError: No module named '_softposit'
+
+If you see this error, it means the C extension module was not properly installed. Try:
+
+1. Reinstalling the package with `pip install -e .`
+2. Check that your Python version matches the one used during compilation
+3. Make sure the shared library `libsoftposit.so` (or `libsoftposit.dylib` on macOS) is in your library path
+
+### Performance Considerations
+
+Posit operations in this Python wrapper are implemented in C/C++ for performance, but there's still overhead from Python bindings. For maximum performance in numerical code, consider using arrays of posits and native C++ code.
+
+## License
+
+This package is released under the same license as the original SoftPosit library.
