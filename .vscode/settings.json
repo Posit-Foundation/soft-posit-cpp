@@ -13,6 +13,9 @@
         "cmath": "cpp",
         "complex": "cpp",
         "chrono": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "stdint.h": "c",
+        "internals.h": "c",
+        "p8_ln_lut.h": "c"
     }
 }

@@ -7,3 +7,4 @@ install/
 examples/build/*
 scratch.cpp
 package_tests
+.vscode

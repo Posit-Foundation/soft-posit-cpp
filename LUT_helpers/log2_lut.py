@@ -1,7 +1,13 @@
 import softposit as sp
 import numpy as np
+import lut_parameters
 
-log2_lut = []
+
+FUNC_NAME = "p8_log2"
+LUT_NAME = "p8log2"
+HEADER_FILENAME = rf"../include/p8_LUTs/{{FUNC_NAME}}_LUT.h"
+
+LUT = []
 
 for i in range(128):  # Only valid region
     p8 = sp.posit8()
@@ -9,7 +15,7 @@ for i in range(128):  # Only valid region
 
     val = float(p8)
     if val <= 0 or not np.isfinite(val):
-        log2_lut.append(128)
+        LUT.append(128)
         continue
 
     logval = np.log2(val)
@@ -18,8 +24,27 @@ for i in range(128):  # Only valid region
     if abs(logval) < 1e-8: logval = 0.0
 
     out = sp.posit8(logval)
-    log2_lut.append(out.v.v)
+    LUT.append(out.v.v)
     
 # Print C-style
-for i in range(0, 128, 16):
-    print("    " + ", ".join(f"{v:3d}" for v in log2_lut[i:i+16]) + ",")
+def format_lut_line(values):
+    return "    " + "".join(f"{{v}},".ljust(6) for v in values) + "\n"
+
+
+with open(HEADER_FILENAME, "w") as f:
+    f.write(f"#ifndef P8_P8_TAN_LUT_H\n")
+    f.write(f"#define P8_P8_TAN_LUT_H\n\n")
+    f.write("#include <stdint.h>\n\n")
+    f.write("#ifdef __cplusplus\n")
+    f.write('extern "C" {{\n')
+    f.write("#endif\n\n")
+    f.write(f"static const uint8_t {{LUT_NAME}}[256] = {{\n")
+
+    for i in range(0, 256, 16):
+        f.write(format_lut_line(LUT[i:i+16]))
+
+    f.write("};\n\n")
+    f.write("#ifdef __cplusplus\n")
+    f.write("}\n")
+    f.write("#endif\n\n")
+    f.write("#endif\n")

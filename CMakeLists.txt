@@ -31,6 +31,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra")
 # Define include directories
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/softposit/p8_LUTs
   ${CMAKE_CURRENT_SOURCE_DIR}/include/${SPECIALIZE_TYPE}
 )
 

@@ -3,8 +3,8 @@ import numpy as np
 import lut_parameters
 
 
-FUNC_NAME = "p8_tan"
-LUT_NAME = "p8tan"
+FUNC_NAME = "p8_sin"
+LUT_NAME = "p8sin"
 HEADER_FILENAME = rf"../include/p8_LUTs/{{FUNC_NAME}}_LUT.h"
 LUT = []
 
@@ -21,13 +21,17 @@ for i in range(256):
         LUT.append(128)
         continue
 
-    val = np.tan(num)
+    val = np.sin(num)
 
-    if not np.isfinite(val) or abs(val) > lut_parameters.clamps.inf_clamp:
+    if not np.isfinite(val):
         LUT.append(128)
         continue
 
-    if abs(val) < lut_parameters.clamps.zero_clamp:
+    if abs(val - 1.0) < lut_parameters.clamps.zero_clamp:
+        val = 1.0
+    elif abs(val + 1.0) < lut_parameters.clamps.zero_clamp:
+        val = -1.0
+    elif abs(val) < lut_parameters.clamps.zero_clamp:
         val = 0.0
 
     p8_result = sp.posit8(val)
@@ -37,8 +41,8 @@ def format_lut_line(values):
     return "    " + "".join(f"{{v}},".ljust(6) for v in values) + "\n"
 
 with open(HEADER_FILENAME, "w") as f:
-    f.write(f"#ifndef P8_P8_TAN_LUT_H\n")
-    f.write(f"#define P8_P8_TAN_LUT_H\n\n")
+    f.write(f"#ifndef P8_P8_SIN_LUT_H\n")
+    f.write(f"#define P8_P8_SIN_LUT_H\n\n")
     f.write("#include <stdint.h>\n\n")
     f.write("#ifdef __cplusplus\n")
     f.write('extern "C" {{\n')
