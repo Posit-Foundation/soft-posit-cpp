@@ -102,40 +102,67 @@ TEST(Posit16MathFunctions, ExpAdditiveProperty) {
   }
 }
 
-// // Test the identity: (e^a)^b = e^(a*b)
-// TEST(Posit16MathFunctions, ExpPowerProperty) {
+// Test for p16_acos_pi function implementation
+TEST(Posit16MathFunctions, AcosPiFunction) {
 
-//   // Create a distribution that generates values in a safe range to avoid
-//   // overflow
-//   std::uniform_real_distribution<double> safe_dist(-3.0, 3.0);
-//   std::uniform_real_distribution<double> small_dist(-2.0, 2.0);
+  // Create a distribution that generates values in the valid range for acos
+  // [-1, 1]
+  std::uniform_real_distribution<double> valid_dist(-0.99, 0.99);
 
-//   for (int i = 0; i < NTESTS16 / 10; i++) {
-//     double f_a = safe_dist(gen);
-//     double f_b = small_dist(gen); // Use smaller range for exponent
+  for (int i = 0; i < NTESTS16; i++) {
+    double f_a = valid_dist(gen);
+    posit16 p_a = posit16(f_a);
 
-//     posit16 p_a = posit16(f_a);
-//     posit16 p_b = posit16(f_b);
+    // Calculate acos(x)/π using both methods
+    posit16 p_result = p_a.acos_pi();
+    double f_result = std::acos(f_a) / M_PI;
+    posit16 p_expected = posit16(f_result);
 
-//     // Skip cases that might lead to overflow or NaR
-//     if (f_a * f_b > 20.0 || f_a * f_b < -20.0) {
-//       continue;
-//     }
+    // Allow small differences due to rounding
+    ASSERT_TRUE(double_eq(p_result.toDouble(), p_expected.toDouble(), 1e-1))
+        << "Failed acos_pi: acos(" << p_a.toDouble()
+        << ")/π = " << p_result.toDouble() << " but expected "
+        << p_expected.toDouble() << " (hex: 0x" << std::hex << p_a.value
+        << " -> 0x" << p_result.value << ", expected 0x" << p_expected.value
+        << ")";
+  }
+}
 
-//     // Left side: (e^a)^b
-//     posit16 exp_a = p_a.exp();
-//     posit16 left_side = exp_a.pow(p_b);
+// Test specific known values for acos_pi function
+TEST(Posit16MathFunctions, AcosPiSpecificValues) {
 
-//     // Right side: e^(a*b)
-//     posit16 product = p_a * p_b;
-//     posit16 right_side = product.exp();
+  // acos(1)/π = 0
+  posit16 one = posit16(1.0);
+  posit16 zero = posit16(0.0);
+  posit16 result_one = one.acos_pi();
+  ASSERT_EQ(result_one.value, zero.value)
+      << "acos(1)/π = " << result_one.toDouble() << " but expected 0.0";
 
-//     // Allow higher tolerance for pow operations
-//     ASSERT_TRUE(
-//         double_eq(left_side.toDouble(), right_side.toDouble(), 1e-1))
-//         << "Failed: (exp(" << p_a.toDouble() << "))^" << p_b.toDouble() << "
-//         = "
-//         << left_side.toDouble() << " but exp(" << p_a.toDouble() << " * "
-//         << p_b.toDouble() << ") = " << right_side.toDouble();
-//   }
-// }
+  // acos(0)/π = 0.5
+  posit16 p_zero = posit16(0.0);
+  posit16 half = posit16(0.5);
+  posit16 result_zero = p_zero.acos_pi();
+  ASSERT_EQ(result_zero.value, half.value)
+      << "acos(0)/π = " << result_zero.toDouble() << " but expected 0.5";
+
+  // acos(-1)/π = 1
+  posit16 neg_one = posit16(-1.0);
+  posit16 p_one = posit16(1.0);
+  posit16 result_neg_one = neg_one.acos_pi();
+  ASSERT_EQ(result_neg_one.value, p_one.value)
+      << "acos(-1)/π = " << result_neg_one.toDouble() << " but expected 1.0";
+
+  // Input outside [-1, 1] should result in NaR
+  posit16 outside_range = posit16(2.0);
+  posit16 result_outside = outside_range.acos_pi();
+  ASSERT_TRUE(result_outside.isNaR())
+      << "acos(2)/π = " << result_outside.toDouble() << " but expected NaR";
+
+  // NaR input should result in NaR
+  posit16 p_nar;
+  p_nar.toNaR();
+  posit16 result_nar = p_nar.acos_pi();
+  ASSERT_TRUE(result_nar.isNaR())
+      << "acos_pi(NaR) = " << result_nar.toDouble() << " but expected NaR";
+}
+
