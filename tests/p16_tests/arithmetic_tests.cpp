@@ -147,8 +147,8 @@ TEST(Posit16Arithmetic, MulAdd)
         double f_c = p_c.toDouble();
 
         // Skip NaN/NaR values
-        if (p_a.isNaR() || p_b.isNaR() || p_c.isNaR() || 
-            std::isnan(f_a) || std::isnan(f_b) || std::isnan(f_c))
+        if (p_a.isNaR() || p_b.isNaR() || p_c.isNaR() || std::isnan(f_a) || std::isnan(f_b) ||
+            std::isnan(f_c))
         {
             continue;
         }
@@ -190,8 +190,8 @@ TEST(Posit16Arithmetic, MulSub)
         double f_c = p_c.toDouble();
 
         // Skip NaN/NaR values
-        if (p_a.isNaR() || p_b.isNaR() || p_c.isNaR() || 
-            std::isnan(f_a) || std::isnan(f_b) || std::isnan(f_c))
+        if (p_a.isNaR() || p_b.isNaR() || p_c.isNaR() || std::isnan(f_a) || std::isnan(f_b) ||
+            std::isnan(f_c))
         {
             continue;
         }
@@ -233,8 +233,8 @@ TEST(Posit16Arithmetic, SubMul)
         double f_c = p_c.toDouble();
 
         // Skip NaN/NaR values
-        if (p_a.isNaR() || p_b.isNaR() || p_c.isNaR() || 
-            std::isnan(f_a) || std::isnan(f_b) || std::isnan(f_c))
+        if (p_a.isNaR() || p_b.isNaR() || p_c.isNaR() || std::isnan(f_a) || std::isnan(f_b) ||
+            std::isnan(f_c))
         {
             continue;
         }
