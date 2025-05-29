@@ -41,32 +41,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit16_t ui32_to_p16( uint32_t a ){
-    int_fast8_t k, log2 = 25;
+posit16_t ui32_to_p16(uint32_t a)
+{
+    int_fast8_t    k, log2 = 25;
     union ui16_p16 uZ;
-    uint_fast16_t uiA;
-    uint_fast32_t expA, mask = 0x02000000, fracA;
+    uint_fast16_t  uiA;
+    uint_fast32_t  expA, mask = 0x02000000, fracA;
 
-    if ( a > 0x08000000 ) uiA = 0x7FFF; //134217729 to MAX_INT round to maxpos
-    else if ( a > 0x02FFFFFF ) uiA = 0x7FFE;
-    else if ( a < 2 )  uiA = (a << 14);
-    else {
+    if (a > 0x08000000)
+        uiA = 0x7FFF;  // 134217729 to MAX_INT round to maxpos
+    else if (a > 0x02FFFFFF)
+        uiA = 0x7FFE;
+    else if (a < 2)
+        uiA = (a << 14);
+    else
+    {
         fracA = a;
-        while ( !(fracA & mask) ) {
+        while (!(fracA & mask))
+        {
             log2--;
             fracA <<= 1;
         }
-        k = log2 >> 1;
-        expA = (log2 & 0x1) << (12 - k);
-		fracA = (fracA ^ mask);
+        k     = log2 >> 1;
+        expA  = (log2 & 0x1) << (12 - k);
+        fracA = (fracA ^ mask);
 
-        uiA = (0x7FFF ^ (0x3FFF >> k)) | expA | ( fracA >> (k + 13));
-        mask = 0x1000 << k; //bitNPlusOne
-        if (mask & fracA) {
-            if (((mask - 1) & fracA) | ((mask << 1) & fracA)) uiA++;
+        uiA  = (0x7FFF ^ (0x3FFF >> k)) | expA | (fracA >> (k + 13));
+        mask = 0x1000 << k;  // bitNPlusOne
+        if (mask & fracA)
+        {
+            if (((mask - 1) & fracA) | ((mask << 1) & fracA))
+                uiA++;
         }
     }
     uZ.ui = uiA;

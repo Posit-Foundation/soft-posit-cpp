@@ -32,21 +32,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-bool p8_eq( posit8_t pA, posit8_t pB ){
-
+bool p8_eq(posit8_t pA, posit8_t pB)
+{
     union ui8_p8 uA, uB;
-    int8_t uiA, uiB;
+    int8_t       uiA, uiB;
 
     uA.p = pA;
-    uiA = (int8_t) uA.ui;
+    uiA  = (int8_t) uA.ui;
     uB.p = pB;
-    uiB = (int8_t)uB.ui;
+    uiB  = (int8_t) uB.ui;
 
-    if (uiA==uiB)
-    	return true;
+    if (uiA == uiB)
+        return true;
     else
-    	return false;
+        return false;
 }

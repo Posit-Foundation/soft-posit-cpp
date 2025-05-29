@@ -39,57 +39,65 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit8_t p8_roundToInt( posit8_t pA ) {
+posit8_t p8_roundToInt(posit8_t pA)
+{
+    union ui8_p8 uA;
+    uint_fast8_t mask = 0x20, scale = 0, tmp = 0, uiA;
+    bool         bitLast, bitNPlusOne, sign;
 
-	union ui8_p8 uA;
-	uint_fast8_t mask = 0x20, scale=0, tmp=0, uiA;
-	bool bitLast, bitNPlusOne, sign;
+    uA.p = pA;
+    uiA  = uA.ui;
+    sign = (uiA > 0x80);
 
-	uA.p = pA;
-	uiA = uA.ui;
-	sign = (uiA > 0x80);
+    // sign is True if pA > NaR.
+    if (sign)
+        uiA = -uiA & 0xFF;
+    if (uiA <= 0x20)
+    {  // 0 <= |pA| <= 1/2 rounds to zero.
+        uA.ui = 0;
+        return uA.p;
+    }
+    else if (uiA < 0x50)
+    {  // 1/2 < x < 3/2 rounds to 1.
+        uA.ui = 0x40;
+    }
+    else if (uiA <= 0x64)
+    {  // 3/2 <= x <= 5/2 rounds to 2.
+        uA.ui = 0x60;
+    }
+    else if (uiA >= 0x78)
+    {                 // If |A| is 8 or greater, leave it unchanged.
+        return uA.p;  // This also takes care of the NaR case, 0x80.
+    }
+    else
+    {
+        while (mask & uiA)
+        {
+            scale += 1;
+            mask >>= 1;
+        }
 
-	// sign is True if pA > NaR.
-	if (sign) uiA = -uiA & 0xFF;
-	if (uiA <= 0x20) {                     // 0 <= |pA| <= 1/2 rounds to zero.
-		uA.ui = 0;
-		return uA.p;
-	}
-	else if (uiA < 0x50) {                 // 1/2 < x < 3/2 rounds to 1.
-		uA.ui = 0x40;
-	}
-	else if (uiA <= 0x64) {                // 3/2 <= x <= 5/2 rounds to 2.
-		uA.ui = 0x60;
-	}
-	else if (uiA >= 0x78) {                 // If |A| is 8 or greater, leave it unchanged.
-		return uA.p;                           // This also takes care of the NaR case, 0x80.
-	}
-	else {
-		while (mask & uiA) {
-			scale += 1;
-			mask >>= 1;
-		}
+        mask >>= scale;
+        bitLast = (uiA & mask);
 
-		mask >>= scale;
-		bitLast = (uiA & mask);
+        mask >>= 1;
+        tmp         = (uiA & mask);
+        bitNPlusOne = tmp;
+        uiA ^= tmp;
+        tmp = uiA & (mask - 1);  // bitsMore
+        uiA ^= tmp;
 
-		mask >>= 1;
-		tmp = (uiA & mask);
-		bitNPlusOne = tmp;
-		uiA ^= tmp;
-		tmp = uiA & (mask - 1);     //bitsMore
-		uiA ^= tmp;
-
-		if (bitNPlusOne) {
-			if (bitLast | tmp) uiA += (mask << 1);
-		}
-		uA.ui = uiA;
-	}
-	if (sign) uA.ui = -uA.ui & 0xFF;
-	return uA.p;
-
+        if (bitNPlusOne)
+        {
+            if (bitLast | tmp)
+                uiA += (mask << 1);
+        }
+        uA.ui = uiA;
+    }
+    if (sign)
+        uA.ui = -uA.ui & 0xFF;
+    return uA.p;
 }
-

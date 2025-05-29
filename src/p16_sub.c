@@ -39,55 +39,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-
-posit16_t p16_sub( posit16_t a, posit16_t b ){
-
+posit16_t p16_sub(posit16_t a, posit16_t b)
+{
     union ui16_p16 uA, uB;
-    uint_fast16_t uiA, uiB;
+    uint_fast16_t  uiA, uiB;
     union ui16_p16 uZ;
 
     uA.p = a;
-	uiA = uA.ui;
-	uB.p = b;
-	uiB = uB.ui;
+    uiA  = uA.ui;
+    uB.p = b;
+    uiB  = uB.ui;
 
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.exact = (uiA.ui.exact & uiB.ui.exact);
+    uZ.ui.exact = (uiA.ui.exact & uiB.ui.exact);
 #endif
 
-    //infinity
-	if ( uiA==0x8000 || uiB==0x8000 ){
+    // infinity
+    if (uiA == 0x8000 || uiB == 0x8000)
+    {
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.v = 0x8000;
-		uZ.ui.exact = 0;
+        uZ.ui.v     = 0x8000;
+        uZ.ui.exact = 0;
 #else
-		uZ.ui = 0x8000;
+        uZ.ui = 0x8000;
 #endif
-		return uZ.p;
-	}
-    //Zero
-	else if ( uiA==0 || uiB==0 ){
+        return uZ.p;
+    }
+    // Zero
+    else if (uiA == 0 || uiB == 0)
+    {
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.v = (uiA | -uiB);
-		uZ.ui.exact = 0;
+        uZ.ui.v     = (uiA | -uiB);
+        uZ.ui.exact = 0;
 #else
-		uZ.ui = (uiA | -uiB);
+        uZ.ui = (uiA | -uiB);
 #endif
-		return uZ.p;
-	}
+        return uZ.p;
+    }
 
-	//different signs
-	if ((uiA^uiB)>>15)
-		return softposit_addMagsP16(uiA, (-uiB & 0xFFFF));
-	else
-		return softposit_subMagsP16(uiA, (-uiB & 0xFFFF));
-
-
-
-
+    // different signs
+    if ((uiA ^ uiB) >> 15)
+        return softposit_addMagsP16(uiA, (-uiB & 0xFFFF));
+    else
+        return softposit_subMagsP16(uiA, (-uiB & 0xFFFF));
 }
-

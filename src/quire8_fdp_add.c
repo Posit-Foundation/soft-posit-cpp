@@ -32,106 +32,114 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-
 #include <inttypes.h>
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-quire8_t q8_fdp_add( quire8_t q, posit8_t pA, posit8_t pB ){
-	union ui8_p8 uA, uB;
-	union ui32_q8 uqZ, uqZ1, uqZ2;
-	uint_fast8_t uiA, uiB;
-	uint_fast8_t fracA, tmp;
-	bool signA, signB, signZ2, regSA, regSB, rcarry;
-	int_fast8_t kA=0, shiftRight=0;
-	uint_fast32_t frac32Z;
+quire8_t q8_fdp_add(quire8_t q, posit8_t pA, posit8_t pB)
+{
+    union ui8_p8  uA, uB;
+    union ui32_q8 uqZ, uqZ1, uqZ2;
+    uint_fast8_t  uiA, uiB;
+    uint_fast8_t  fracA, tmp;
+    bool          signA, signB, signZ2, regSA, regSB, rcarry;
+    int_fast8_t   kA = 0, shiftRight = 0;
+    uint_fast32_t frac32Z;
 
+    uqZ1.q = q;
 
-	uqZ1.q = q;
+    uA.p = pA;
+    uiA  = uA.ui;
+    uB.p = pB;
+    uiB  = uB.ui;
 
-	uA.p = pA;
-	uiA = uA.ui;
-	uB.p = pB;
-	uiB = uB.ui;
+    // NaR
+    if (isNaRQ8(q) || isNaRP8UI(uA.ui) || isNaRP8UI(uB.ui))
+    {
+        uqZ2.ui = 0x80000000;
+        return uqZ2.q;
+    }
+    else if (uiA == 0 || uiB == 0)
+        return q;
 
-	//NaR
-	if (isNaRQ8(q) || isNaRP8UI(uA.ui) || isNaRP8UI(uB.ui)){
-		uqZ2.ui=0x80000000;
-		return uqZ2.q;
-	}
-	else if (uiA==0 || uiB==0)
-		return q;
+    // max pos (sign plus and minus)
+    signA  = signP8UI(uiA);
+    signB  = signP8UI(uiB);
+    signZ2 = signA ^ signB;
 
+    if (signA)
+        uiA = (-uiA & 0xFF);
+    if (signB)
+        uiB = (-uiB & 0xFF);
 
-	//max pos (sign plus and minus)
-	signA = signP8UI( uiA );
-	signB = signP8UI( uiB );
-	signZ2 = signA ^ signB;
+    regSA = signregP8UI(uiA);
+    regSB = signregP8UI(uiB);
 
-	if(signA) uiA = (-uiA & 0xFF);
-	if(signB) uiB = (-uiB & 0xFF);
+    tmp = (uiA << 2) & 0xFF;
+    if (regSA)
+    {
+        while (tmp >> 7)
+        {
+            kA++;
+            tmp = (tmp << 1) & 0xFF;
+        }
+    }
+    else
+    {
+        kA = -1;
+        while (!(tmp >> 7))
+        {
+            kA--;
+            tmp = (tmp << 1) & 0xFF;
+        }
+        tmp &= 0x7F;
+    }
+    fracA = (0x80 | tmp);
 
-	regSA = signregP8UI(uiA);
-	regSB = signregP8UI(uiB);
+    tmp = (uiB << 2) & 0xFF;
+    if (regSB)
+    {
+        while (tmp >> 7)
+        {
+            kA++;
+            tmp = (tmp << 1) & 0xFF;
+        }
+    }
+    else
+    {
+        kA--;
+        while (!(tmp >> 7))
+        {
+            kA--;
+            tmp = (tmp << 1) & 0xFF;
+        }
+        tmp &= 0x7F;
+    }
+    frac32Z = (uint_fast32_t) (fracA * (0x80 | tmp)) << 16;
 
-	tmp = (uiA<<2) & 0xFF;
-	if (regSA){
-		while (tmp>>7){
-			kA++;
-			tmp= (tmp<<1) & 0xFF;
-		}
-	}
-	else{
-		kA=-1;
-		while (!(tmp>>7)){
-			kA--;
-			tmp= (tmp<<1) & 0xFF;
-		}
-		tmp&=0x7F;
-	}
-	fracA = (0x80 | tmp);
+    rcarry = frac32Z >> 31;  // 1st bit (position 2) of frac32Z, hidden bit is 4th bit (position 3)
+    if (rcarry)
+    {
+        kA++;
+        frac32Z >>= 1;
+    }
 
-	tmp = (uiB<<2) & 0xFF;
-	if (regSB){
-		while (tmp>>7){
-			kA++;
-			tmp= (tmp<<1) & 0xFF;
-		}
-	}
-	else{
-		kA--;
-		while (!(tmp>>7)){
-			kA--;
-			tmp= (tmp<<1) & 0xFF;
-		}
-		tmp&=0x7F;
-	}
-	frac32Z = (uint_fast32_t)( fracA * (0x80 | tmp) ) <<16;
+    // default dot is between bit 19 and 20, extreme left bit is bit 0. Last right bit is bit 31.
+    // Scale = 2^es * k + e  => 2k + e // firstPost = 19-kA, shift = firstPos -1 (because frac32Z
+    // start from 2nd bit) int firstPos = 19 - kA;
+    shiftRight = 18 - kA;
 
-	rcarry = frac32Z>>31;//1st bit (position 2) of frac32Z, hidden bit is 4th bit (position 3)
-	if (rcarry){
-		kA ++;
-		frac32Z>>=1;
-	}
+    uqZ2.ui = frac32Z >> shiftRight;
 
+    if (signZ2)
+        uqZ2.ui = -uqZ2.ui & 0xFFFFFFFF;
 
+    // Addition
+    uqZ.ui = uqZ2.ui + uqZ1.ui;
+    // Exception handling
+    if (isNaRQ8(uqZ.q))
+        uqZ.q.v = 0;
 
-	//default dot is between bit 19 and 20, extreme left bit is bit 0. Last right bit is bit 31.
-	//Scale = 2^es * k + e  => 2k + e // firstPost = 19-kA, shift = firstPos -1 (because frac32Z start from 2nd bit)
-	//int firstPos = 19 - kA;
-	shiftRight = 18-kA;
-
-	uqZ2.ui = frac32Z>> shiftRight;
-
-
-	if (signZ2) uqZ2.ui  = -uqZ2.ui & 0xFFFFFFFF;
-
-
-	//Addition
-	uqZ.ui = uqZ2.ui + uqZ1.ui;
-	//Exception handling
-	if (isNaRQ8(uqZ.q) ) uqZ.q.v = 0;
-
-	return uqZ.q;
+    return uqZ.q;
 }

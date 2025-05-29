@@ -39,146 +39,153 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <quadmath.h>
 #endif
 
-#include "platform.h"
 #include "internals.h"
-
-
+#include "platform.h"
 
 #ifdef SOFTPOSIT_QUAD
 
-__float128 convertPX1ToQuad(posit_1_t a){
+__float128 convertPX1ToQuad(posit_1_t a)
+{
+    union ui32_pX1 uZ;
+    __float128     p32;
+    uZ.p = a;
 
-	union ui32_pX1 uZ;
-	__float128 p32;
-	uZ.p = a;
+    if (uZ.ui == 0)
+    {
+        p32 = 0;
+        return p32;
+    }
+    else if (uZ.ui == 0x7FFFFFFF)
+    {  // maxpos
+        p32 = 1152921504606847000;
+        return p32;
+    }
+    else if (uZ.ui == 0x80000001)
+    {  //-maxpos
+        p32 = -1152921504606847000;
+        return p32;
+    }
+    else if (uZ.ui == 0x80000000)
+    {
+        p32 = NAN;
+        return p32;
+    }
 
-	if (uZ.ui==0){
-		p32 = 0;
-		return p32;
-	}
-	else if(uZ.ui==0x7FFFFFFF){ //maxpos
-		p32 = 1152921504606847000;
-		return p32;
-	}
-	else if (uZ.ui==0x80000001){ //-maxpos
-		p32 = -1152921504606847000;
-		return p32;
-	}
-	else if (uZ.ui == 0x80000000){
-		p32 = NAN;
-		return p32;
-	}
+    bool          regS, sign;
+    uint_fast32_t reg, shift = 2, frac, tmp;
+    int_fast32_t  k = 0;
+    int_fast8_t   exp;
+    __float128    fraction_max;
 
-	bool regS, sign;
-	uint_fast32_t reg, shift=2, frac, tmp;
-	int_fast32_t k=0;
-	int_fast8_t exp;
-	__float128 fraction_max;
+    sign = signP32UI(uZ.ui);
+    if (sign)
+        uZ.ui = -uZ.ui & 0xFFFFFFFF;
+    regS = signregP32UI(uZ.ui);
 
-	sign = signP32UI( uZ.ui );
-	if (sign)
-		uZ.ui = -uZ.ui & 0xFFFFFFFF;
-	regS = signregP32UI( uZ.ui );
+    tmp = tmp = (uZ.ui << 2) & 0xFFFFFFFF;
+    if (regS)
+    {
+        while (tmp >> 31)
+        {
+            k++;
+            shift++;
+            tmp = (tmp << 1) & 0xFFFFFFFF;
+        }
+        reg = k + 1;
+    }
+    else
+    {
+        k = -1;
+        while (!(tmp >> 31))
+        {
+            k--;
+            shift++;
+            tmp = (tmp << 1) & 0xFFFFFFFF;
+        }
+        tmp &= 0x7FFFFFFF;
+        reg = -k;
+    }
+    exp  = tmp >> 30;
+    frac = (tmp & 0x1FFFFFFF) >> shift;
 
-	tmp = tmp = (uZ.ui<<2)&0xFFFFFFFF;
-	if (regS){
-		while (tmp>>31){
-			k++;
-			shift++;
-			tmp= (tmp<<1) & 0xFFFFFFFF;
-		}
-		reg = k+1;
-	}
-	else{
-		k=-1;
-		while (!(tmp>>31)){
-			k--;
-			shift++;
-			tmp= (tmp<<1) & 0xFFFFFFFF;
-		}
-		tmp&=0x7FFFFFFF;
-		reg =-k;
-	}
-	exp = tmp>>30;
-	frac = (tmp & 0x1FFFFFFF) >> shift;
+    (reg > 29) ? (fraction_max = 1) : (fraction_max = pow(2, 29 - reg));
 
-	(reg>29) ? (fraction_max=1) : (fraction_max = pow(2, 29-reg) ) ;
+    p32 = (__float128) (pow(16, k) * pow(2, exp) * (1 + ((__float128) frac / fraction_max)));
 
-	p32 = (__float128)( pow(16, k)* pow(2, exp) * (1+((__float128)frac/fraction_max)) );
+    if (sign)
+        p32 = -p32;
 
-	if (sign)
-		p32 = -p32;
-
-	return p32;
-
+    return p32;
 }
-
 
 #endif
 
+double convertPX1ToDouble(posit_1_t a)
+{
+    union ui32_pX1 uZ;
+    double         d32;
+    uZ.p = a;
 
+    if (uZ.ui == 0)
+    {
+        return 0;
+    }
+    else if (uZ.ui == 0x7FFFFFFF)
+    {  // maxpos
+        return 1152921504606847000;
+    }
+    else if (uZ.ui == 0x80000001)
+    {  //-maxpos
+        return -1152921504606847000;
+    }
+    else if (uZ.ui == 0x80000000)
+    {
+        return NAN;
+    }
 
+    bool          regS, sign;
+    uint_fast32_t reg, shift = 2, frac, tmp;
+    int_fast32_t  k = 0;
+    int_fast8_t   exp;
+    double        fraction_max;
 
-double convertPX1ToDouble(posit_1_t a){
-	union ui32_pX1 uZ;
-	double d32;
-	uZ.p = a;
+    sign = signP32UI(uZ.ui);
+    if (sign)
+        uZ.ui = -uZ.ui & 0xFFFFFFFF;
+    regS = signregP32UI(uZ.ui);
 
-	if (uZ.ui==0){
-		return  0;
-	}
-	else if(uZ.ui==0x7FFFFFFF){ //maxpos
-		return  1152921504606847000;
-	}
-	else if (uZ.ui==0x80000001){ //-maxpos
-		return -1152921504606847000;
-	}
-	else if (uZ.ui == 0x80000000){
-		return NAN;
-	}
+    tmp = (uZ.ui << 2) & 0xFFFFFFFF;
+    if (regS)
+    {
+        while (tmp >> 31)
+        {
+            k++;
+            shift++;
+            tmp = (tmp << 1) & 0xFFFFFFFF;
+        }
+        reg = k + 1;
+    }
+    else
+    {
+        k = -1;
+        while (!(tmp >> 31))
+        {
+            k--;
+            shift++;
+            tmp = (tmp << 1) & 0xFFFFFFFF;
+        }
+        tmp &= 0x7FFFFFFF;
+        reg = -k;
+    }
+    exp = tmp >> 30;
 
-	bool regS, sign;
-	uint_fast32_t reg, shift=2, frac, tmp;
-	int_fast32_t k=0;
-	int_fast8_t exp;
-	double fraction_max;
+    frac = (tmp & 0x3FFFFFFF) >> shift;
 
-	sign = signP32UI( uZ.ui );
-	if (sign)
-		uZ.ui = -uZ.ui & 0xFFFFFFFF;
-	regS = signregP32UI( uZ.ui );
+    (reg > 29) ? (fraction_max = 1) : (fraction_max = pow(2, 29 - reg));
 
-	tmp = (uZ.ui<<2)&0xFFFFFFFF;
-	if (regS){
-		while (tmp>>31){
-			k++;
-			shift++;
-			tmp= (tmp<<1) & 0xFFFFFFFF;
-		}
-		reg = k+1;
-	}
-	else{
-		k=-1;
-		while (!(tmp>>31)){
-			k--;
-			shift++;
-			tmp= (tmp<<1) & 0xFFFFFFFF;
-		}
-		tmp&=0x7FFFFFFF;
-		reg =-k;
-	}
-	exp = tmp>>30;
+    d32 = (double) (pow(4, k) * pow(2, exp) * (1 + ((double) frac / fraction_max)));
+    if (sign)
+        d32 = -d32;
 
-	frac = (tmp & 0x3FFFFFFF) >> shift;
-
-	(reg>29) ? (fraction_max=1) : (fraction_max = pow(2, 29-reg) ) ;
-
-	d32 = (double)( pow(4, k)* pow(2, exp) * (1+((double)frac/fraction_max)) );
-	if (sign)
-		d32 = -d32;
-
-	return d32;
-
+    return d32;
 }
-
-

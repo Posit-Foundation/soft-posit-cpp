@@ -33,56 +33,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit8_t p8_sub( posit8_t a, posit8_t b ){
-
+posit8_t p8_sub(posit8_t a, posit8_t b)
+{
     union ui8_p8 uA, uB;
     uint_fast8_t uiA, uiB;
     union ui8_p8 uZ;
 
     uA.p = a;
-	uiA = uA.ui;
-	uB.p = b;
-	uiB = uB.ui;
-
-
+    uiA  = uA.ui;
+    uB.p = b;
+    uiB  = uB.ui;
 
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.exact = (uiA.ui.exact & uiB.ui.exact);
+    uZ.ui.exact = (uiA.ui.exact & uiB.ui.exact);
 #endif
 
-    //infinity
-	if ( uiA==0x80 || uiB==0x80 ){
+    // infinity
+    if (uiA == 0x80 || uiB == 0x80)
+    {
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.v = 0x80;
-		uZ.ui.exact = 0;
+        uZ.ui.v     = 0x80;
+        uZ.ui.exact = 0;
 #else
-		uZ.ui = 0x80;
+        uZ.ui = 0x80;
 #endif
-		return uZ.p;
-	}
-    //Zero
-	else if ( uiA==0 || uiB==0 ){
+        return uZ.p;
+    }
+    // Zero
+    else if (uiA == 0 || uiB == 0)
+    {
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.v = (uiA | -uiB);
-		uZ.ui.exact = 0;
+        uZ.ui.v     = (uiA | -uiB);
+        uZ.ui.exact = 0;
 #else
-		uZ.ui = (uiA | -uiB);
+        uZ.ui = (uiA | -uiB);
 #endif
-		return uZ.p;
-	}
+        return uZ.p;
+    }
 
-	//different signs
-	if (signP8UI(uiA^uiB))
-		return softposit_addMagsP8(uiA, (-uiB & 0xFF));
-	else
-		return softposit_subMagsP8(uiA, (-uiB & 0xFF));
-
-
-
-
+    // different signs
+    if (signP8UI(uiA ^ uiB))
+        return softposit_addMagsP8(uiA, (-uiB & 0xFF));
+    else
+        return softposit_subMagsP8(uiA, (-uiB & 0xFF));
 }
-

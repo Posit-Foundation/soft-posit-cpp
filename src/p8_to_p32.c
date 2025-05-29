@@ -37,75 +37,84 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit32_t p8_to_p32( posit8_t pA ) {
+posit32_t p8_to_p32(posit8_t pA)
+{
+    union ui8_p8   uA;
+    union ui32_p32 uZ;
+    uint_fast8_t   uiA, tmp;
+    uint_fast32_t  exp_frac32A = 0, regime;
+    bool           sign, regSA;
+    int_fast8_t    kA = 0, regA;
 
+    uA.p = pA;
+    uiA  = uA.ui;
 
-	union ui8_p8 uA;
-	union ui32_p32 uZ;
-	uint_fast8_t uiA, tmp;
-	uint_fast32_t exp_frac32A=0, regime;
-	bool sign, regSA;
-	int_fast8_t kA=0, regA;
+    if (uiA == 0x80 || uiA == 0)
+    {
+        uZ.ui = (uint32_t) uiA << 24;
+        return uZ.p;
+    }
 
+    sign = signP8UI(uiA);
 
-	uA.p = pA;
-	uiA = uA.ui;
+    if (sign)
+        uiA = -uiA & 0xFF;
+    regSA = signregP8UI(uiA);
 
-	if (uiA==0x80 || uiA==0 ){
-		uZ.ui = (uint32_t)uiA<<24;
-		return uZ.p;
-	}
+    tmp = (uiA << 2) & 0xFF;
+    if (regSA)
+    {
+        while (tmp >> 7)
+        {
+            kA++;
+            tmp = (tmp << 1) & 0xFF;
+        }
+    }
+    else
+    {
+        kA = -1;
+        while (!(tmp >> 7))
+        {
+            kA--;
+            tmp = (tmp << 1) & 0xFF;
+        }
+        tmp &= 0x7F;
+    }
+    exp_frac32A = tmp << 22;
 
-	sign = signP8UI( uiA );
+    if (kA < 0)
+    {
+        regA = -kA;
+        // Place exponent bits
+        exp_frac32A |= (((regA & 0x1) | ((regA + 1) & 0x2)) << 29);
 
-	if (sign) uiA = -uiA & 0xFF;
-	regSA = signregP8UI(uiA);
+        regA = (regA + 3) >> 2;
+        if (regA == 0)
+            regA = 1;
+        regSA  = 0;
+        regime = 0x40000000 >> regA;
+    }
+    else
+    {
+        exp_frac32A |= ((kA & 0x3) << 29);
 
-	tmp = (uiA<<2) & 0xFF;
-	if (regSA){
-		while (tmp>>7){
-			kA++;
-			tmp= (tmp<<1) & 0xFF;
-		}
-	}
-	else{
-		kA=-1;
-		while (!(tmp>>7)){
-			kA--;
-			tmp= (tmp<<1) & 0xFF;
-		}
-		tmp&=0x7F;
-	}
-	exp_frac32A = tmp<<22;
+        regA = (kA + 4) >> 2;
+        if (regA == 0)
+            regA = 1;
+        regSA  = 1;
+        regime = 0x7FFFFFFF - (0x7FFFFFFF >> regA);
+    }
 
-	if(kA<0){
-		regA = -kA;
-		// Place exponent bits
-		exp_frac32A |= ( ((regA&0x1)| ((regA+1)&0x2))<<29 );
+    exp_frac32A = ((uint_fast32_t) exp_frac32A) >>
+                  (regA + 1);  // 2 because of sign and regime terminating bit
 
-		regA = (regA+3)>>2;
-		if (regA==0) regA=1;
-		regSA = 0;
-		regime = 0x40000000>>regA;
-	}
-	else{
-		exp_frac32A |= ( (kA&0x3) << 29 );
+    uZ.ui = regime + exp_frac32A;
 
-		regA = (kA+4)>>2;
-		if (regA==0) regA=1;
-		regSA=1;
-		regime = 0x7FFFFFFF - (0x7FFFFFFF>>regA);
-	}
+    if (sign)
+        uZ.ui = -uZ.ui & 0xFFFFFFFF;
 
-	exp_frac32A =((uint_fast32_t)exp_frac32A) >> (regA+1); //2 because of sign and regime terminating bit
-
-	uZ.ui = regime + exp_frac32A;
-
-	if (sign) uZ.ui = -uZ.ui & 0xFFFFFFFF;
-
-	return uZ.p;
+    return uZ.p;
 }
-

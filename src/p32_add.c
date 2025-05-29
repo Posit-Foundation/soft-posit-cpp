@@ -39,48 +39,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit32_t p32_add( posit32_t a, posit32_t b ){
+posit32_t p32_add(posit32_t a, posit32_t b)
+{
     union ui32_p32 uA, uB, uZ;
-    uint_fast32_t uiA, uiB;
+    uint_fast32_t  uiA, uiB;
 
     uA.p = a;
-	uiA = uA.ui;
-	uB.p = b;
-	uiB = uB.ui;
+    uiA  = uA.ui;
+    uB.p = b;
+    uiB  = uB.ui;
 
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.exact = (uiA.ui.exact & uiB.ui.exact);
+    uZ.ui.exact = (uiA.ui.exact & uiB.ui.exact);
 #endif
 
-    //Zero or infinity
-	if (uiA==0 || uiB==0){ // Not required but put here for speed
+    // Zero or infinity
+    if (uiA == 0 || uiB == 0)
+    {  // Not required but put here for speed
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.v = uiA | uiB;
-		uZ.ui.exact = (uiA.ui.exact & uiB.ui.exact);
+        uZ.ui.v     = uiA | uiB;
+        uZ.ui.exact = (uiA.ui.exact & uiB.ui.exact);
 #else
-		uZ.ui = uiA | uiB;
+        uZ.ui = uiA | uiB;
 #endif
-		return uZ.p;
-	}
-	else if ( uiA==0x80000000 || uiB==0x80000000 ){
-		//printf("in infinity\n");
+        return uZ.p;
+    }
+    else if (uiA == 0x80000000 || uiB == 0x80000000)
+    {
+        // printf("in infinity\n");
 #ifdef SOFTPOSIT_EXACT
-		uZ.ui.v = 0x80000000;
-		uZ.ui.exact = 0;
+        uZ.ui.v     = 0x80000000;
+        uZ.ui.exact = 0;
 #else
-		uZ.ui = 0x80000000;
+        uZ.ui = 0x80000000;
 #endif
-		return uZ.p;
-	}
+        return uZ.p;
+    }
 
-	//different signs
-	if ((uiA^uiB)>>31)
-		return softposit_subMagsP32(uiA, uiB);
-	else
-		return softposit_addMagsP32(uiA, uiB);
-
+    // different signs
+    if ((uiA ^ uiB) >> 31)
+        return softposit_subMagsP32(uiA, uiB);
+    else
+        return softposit_addMagsP32(uiA, uiB);
 }
-

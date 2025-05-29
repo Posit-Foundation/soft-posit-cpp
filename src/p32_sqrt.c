@@ -34,45 +34,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
 extern const uint_fast16_t softposit_approxRecipSqrt0[];
 extern const uint_fast16_t softposit_approxRecipSqrt1[];
 
-
-
-posit32_t p32_sqrt( posit32_t pA ) {
-
+posit32_t p32_sqrt(posit32_t pA)
+{
     union ui32_p32 uA;
-    uint_fast32_t index, r0, shift, fracA, expZ, expA;
-    uint_fast32_t mask, uiA, uiZ;
-    uint_fast64_t eSqrR0, fracZ, negRem, recipSqrt, shiftedFracZ, sigma0, sqrSigma0;
-    int_fast32_t eps, shiftZ;
+    uint_fast32_t  index, r0, shift, fracA, expZ, expA;
+    uint_fast32_t  mask, uiA, uiZ;
+    uint_fast64_t  eSqrR0, fracZ, negRem, recipSqrt, shiftedFracZ, sigma0, sqrSigma0;
+    int_fast32_t   eps, shiftZ;
 
     uA.p = pA;
-    uiA = uA.ui;
+    uiA  = uA.ui;
 
     // If NaR or a negative number, return NaR.
-    if (uiA & 0x80000000) {
+    if (uiA & 0x80000000)
+    {
         uA.ui = 0x80000000;
         return uA.p;
     }
     // If the argument is zero, return zero.
-    else if (!uiA) {
+    else if (!uiA)
+    {
         return uA.p;
     }
     // Compute the square root; shiftZ is the power-of-2 scaling of the result.
     // Decode regime and exponent; scale the input to be in the range 1 to 4:
-    if (uiA & 0x40000000) {
+    if (uiA & 0x40000000)
+    {
         shiftZ = -2;
-        while (uiA & 0x40000000) {
+        while (uiA & 0x40000000)
+        {
             shiftZ += 2;
             uiA = (uiA << 1) & 0xFFFFFFFF;
         }
-    } else {
+    }
+    else
+    {
         shiftZ = 0;
-        while (!(uiA & 0x40000000)) {
+        while (!(uiA & 0x40000000))
+        {
             shiftZ -= 2;
             uiA = (uiA << 1) & 0xFFFFFFFF;
         }
@@ -87,49 +92,60 @@ posit32_t p32_sqrt( posit32_t pA ) {
 
     // Use table look-up of first 4 bits for piecewise linear approx. of 1/sqrt:
     index = ((fracA >> 24) & 0xE) + expA;
-    eps = ((fracA >> 9) & 0xFFFF);
-    r0 = softposit_approxRecipSqrt0[index]
-         - (((uint_fast32_t) softposit_approxRecipSqrt1[index] * eps) >> 20);
+    eps   = ((fracA >> 9) & 0xFFFF);
+    r0    = softposit_approxRecipSqrt0[index] -
+         (((uint_fast32_t) softposit_approxRecipSqrt1[index] * eps) >> 20);
 
     // Use Newton-Raphson refinement to get 33 bits of accuracy for 1/sqrt:
     eSqrR0 = (uint_fast64_t) r0 * r0;
-    if (!expA) eSqrR0 <<= 1;
-    sigma0 = 0xFFFFFFFF & (0xFFFFFFFF ^ ((eSqrR0 * (uint64_t)fracA) >> 20));
+    if (!expA)
+        eSqrR0 <<= 1;
+    sigma0    = 0xFFFFFFFF & (0xFFFFFFFF ^ ((eSqrR0 * (uint64_t) fracA) >> 20));
     recipSqrt = ((uint_fast64_t) r0 << 20) + (((uint_fast64_t) r0 * sigma0) >> 21);
 
     sqrSigma0 = ((sigma0 * sigma0) >> 35);
-    recipSqrt += ( ((  recipSqrt + (recipSqrt >> 2) - ((uint_fast64_t)r0 << 19)  ) * sqrSigma0) >> 46 );
-
+    recipSqrt += (((recipSqrt + (recipSqrt >> 2) - ((uint_fast64_t) r0 << 19)) * sqrSigma0) >> 46);
 
     fracZ = (((uint_fast64_t) fracA) * recipSqrt) >> 31;
-    if (expA) fracZ = (fracZ >> 1);
+    if (expA)
+        fracZ = (fracZ >> 1);
 
     // Find the exponent of Z and encode the regime bits.
     expZ = shiftZ & 0x3;
-    if (shiftZ < 0) {
+    if (shiftZ < 0)
+    {
         shift = (-1 - shiftZ) >> 2;
-        uiZ = 0x20000000 >> shift;
-    } else {
+        uiZ   = 0x20000000 >> shift;
+    }
+    else
+    {
         shift = shiftZ >> 2;
-        uiZ = 0x7FFFFFFF - (0x3FFFFFFF >> shift);
+        uiZ   = 0x7FFFFFFF - (0x3FFFFFFF >> shift);
     }
 
     // Trick for eliminating off-by-one cases that only uses one multiply:
     fracZ++;
-    if (!(fracZ & 0xF)) {
+    if (!(fracZ & 0xF))
+    {
         shiftedFracZ = fracZ >> 1;
-        negRem = (shiftedFracZ * shiftedFracZ) & 0x1FFFFFFFF;
-        if (negRem & 0x100000000) {
+        negRem       = (shiftedFracZ * shiftedFracZ) & 0x1FFFFFFFF;
+        if (negRem & 0x100000000)
+        {
             fracZ |= 1;
-        } else {
-            if (negRem) fracZ--;
+        }
+        else
+        {
+            if (negRem)
+                fracZ--;
         }
     }
     // Strip off the hidden bit and round-to-nearest using last shift+5 bits.
     fracZ &= 0xFFFFFFFF;
     mask = (1 << (4 + shift));
-    if (mask & fracZ) {
-        if ( ((mask - 1) & fracZ) | ((mask << 1) & fracZ) ) fracZ += (mask << 1);
+    if (mask & fracZ)
+    {
+        if (((mask - 1) & fracZ) | ((mask << 1) & fracZ))
+            fracZ += (mask << 1);
     }
     // Assemble the result and return it.
     uA.ui = uiZ | (expZ << (27 - shift)) | (fracZ >> (5 + shift));

@@ -39,37 +39,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit16_t p16_add( posit16_t a, posit16_t b ){
+posit16_t p16_add(posit16_t a, posit16_t b)
+{
     union ui16_p16 uA, uB;
-    uint_fast16_t uiA, uiB;
+    uint_fast16_t  uiA, uiB;
     union ui16_p16 uZ;
 
     uA.p = a;
-	uiA = uA.ui;
-	uB.p = b;
-	uiB = uB.ui;
+    uiA  = uA.ui;
+    uB.p = b;
+    uiB  = uB.ui;
 
+    // Zero or infinity
+    if (uiA == 0 || uiB == 0)
+    {  // Not required but put here for speed
+        uZ.ui = uiA | uiB;
+        return uZ.p;
+    }
+    else if (uiA == 0x8000 || uiB == 0x8000)
+    {
+        uZ.ui = 0x8000;
+        return uZ.p;
+    }
 
-    //Zero or infinity
-	if (uiA==0 || uiB==0){ // Not required but put here for speed
-		uZ.ui = uiA | uiB;
-		return uZ.p;
-	}
-	else if ( uiA==0x8000 || uiB==0x8000 ){
-		uZ.ui = 0x8000;
-		return uZ.p;
-	}
-
-	//different signs
-	if ((uiA^uiB)>>15)
-		return softposit_subMagsP16(uiA, uiB);
-	else
-		 return softposit_addMagsP16(uiA, uiB);
-
-
-
+    // different signs
+    if ((uiA ^ uiB) >> 15)
+        return softposit_subMagsP16(uiA, uiB);
+    else
+        return softposit_addMagsP16(uiA, uiB);
 }
-
