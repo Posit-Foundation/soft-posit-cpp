@@ -2,7 +2,7 @@ name: Run Benchmarks
 
 on:
   push:
-    branches: [ "main" ]  # Only run on main branch to avoid too many benchmark runs
+    branches: [ "main", "refactor-cpp-soft-posits" ]
   workflow_dispatch:
 
 jobs:

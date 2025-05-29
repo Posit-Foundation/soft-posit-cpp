@@ -2,9 +2,9 @@ name: Build Ubuntu
 
 on:
   push:
-    branches: [ "main", "**" ]
+    branches: [ "main", "refactor-cpp-soft-posits" ]
   pull_request:
-    branches: [ "main", "**" ]
+    branches: [ "main", "refactor-cpp-soft-posits" ]
   workflow_dispatch:
 
 jobs:
