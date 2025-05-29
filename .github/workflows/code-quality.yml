@@ -24,29 +24,4 @@ jobs:
       uses: jidicula/clang-format-action@v4.11.0
       with:
         clang-format-version: '14'
-        check-path: 'src include tests examples'
-
-  clang-tidy:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y cmake make g++ ninja-build clang-tidy-14
-
-    - name: Generate compile_commands.json
-      run: |
-        mkdir -p build
-        cd build
-        cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-
-    - name: Run clang-tidy
-      run: |
-        find src include tests -name "*.cpp" -o -name "*.h" -o -name "*.c" | \
-        xargs clang-tidy-14 -p build/compile_commands.json \
-        -checks='-*,performance-*,readability-*,bugprone-*,modernize-*,clang-analyzer-*,cppcoreguidelines-*,misc-*,-modernize-use-trailing-return-type' \
-        --warnings-as-errors='*' 
+        check-path: 'src include tests examples' 

@@ -140,7 +140,6 @@ Our automated workflows include:
 - **Comprehensive Testing**: All posit operations and edge cases
 - **Code Quality Checks**:
   - clang-format style enforcement
-  - clang-tidy static analysis
 - **Performance Benchmarks**: Automated performance regression detection
 
 ### Contributing
@@ -156,7 +155,6 @@ All pull requests must pass:
 - ✅ Build validation on Ubuntu and macOS
 - ✅ Complete test suite
 - ✅ Code formatting checks (clang-format-14)
-- ✅ Static analysis (clang-tidy-14)
 
 ## Advanced Build Options
 
