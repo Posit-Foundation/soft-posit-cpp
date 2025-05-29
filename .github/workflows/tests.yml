@@ -10,18 +10,19 @@ on:
       platform:
         description: 'Platform to run tests on'
         required: true
-        default: 'both'
+        default: 'all'
         type: choice
         options:
           - ubuntu
           - macos
-          - both
+          - riscv
+          - all
 
 jobs:
   ubuntu-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    if: github.event.inputs.platform == 'ubuntu' || github.event.inputs.platform == 'both' || github.event_name != 'workflow_dispatch'
+    if: github.event.inputs.platform == 'ubuntu' || github.event.inputs.platform == 'all' || github.event_name != 'workflow_dispatch'
     
     steps:
     - name: Checkout code
@@ -67,7 +68,7 @@ jobs:
   macos-tests:
     runs-on: macos-latest
     timeout-minutes: 25
-    if: github.event.inputs.platform == 'macos' || github.event.inputs.platform == 'both' || github.event_name != 'workflow_dispatch'
+    if: github.event.inputs.platform == 'macos' || github.event.inputs.platform == 'all' || github.event_name != 'workflow_dispatch'
     
     steps:
     - name: Checkout code
@@ -107,4 +108,63 @@ jobs:
         ./p32_tests
         ./q8_tests
         ./q16_tests
-        ./q32_tests 
+        ./q32_tests
+
+  riscv-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event.inputs.platform == 'riscv' || github.event.inputs.platform == 'all' || github.event_name != 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-riscv-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build-riscv
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up RISC-V toolchain and dependencies
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake make ninja-build qemu-user-static
+        sudo apt-get install -y gcc-riscv64-linux-gnu g++-riscv64-linux-gnu
+
+    - name: Configure and Build for RISC-V
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build-riscv
+        cd build-riscv
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTS=ON \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+          -DCMAKE_C_COMPILER=riscv64-linux-gnu-gcc \
+          -DCMAKE_CXX_COMPILER=riscv64-linux-gnu-g++ \
+          -DCMAKE_FIND_ROOT_PATH=/usr/riscv64-linux-gnu \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
+          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY \
+          -DREDUCE_P16_TESTS_ON_UBUNTU=ON
+        make -j$(nproc)
+    
+    - name: Run RISC-V tests
+      run: |
+        cd build-riscv
+        chmod +x *_tests
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p8_tests
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p16_tests
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p32_tests
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q8_tests
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q16_tests
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q32_tests 

@@ -4,10 +4,21 @@ on:
   push:
     branches: [ "main", "refactor-cpp-soft-posits" ]
   workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to run benchmarks on'
+        required: true
+        default: 'ubuntu'
+        type: choice
+        options:
+          - ubuntu
+          - riscv
+          - both
 
 jobs:
-  benchmarks:
+  ubuntu-benchmarks:
     runs-on: ubuntu-latest
+    if: github.event.inputs.platform == 'ubuntu' || github.event.inputs.platform == 'both' || github.event_name != 'workflow_dispatch'
     
     steps:
     - name: Checkout code
@@ -56,3 +67,67 @@ jobs:
         # alert-threshold: '150%'
         # comment-on-alert: true
         # fail-on-alert: true
+
+  riscv-benchmarks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: github.event.inputs.platform == 'riscv' || github.event.inputs.platform == 'both'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-riscv-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build-riscv
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up RISC-V toolchain and dependencies
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake make ninja-build qemu-user-static
+        sudo apt-get install -y gcc-riscv64-linux-gnu g++-riscv64-linux-gnu
+
+    - name: Configure and Build for RISC-V
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build-riscv
+        cd build-riscv
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_BENCHMARKS=ON \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+          -DCMAKE_C_COMPILER=riscv64-linux-gnu-gcc \
+          -DCMAKE_CXX_COMPILER=riscv64-linux-gnu-g++ \
+          -DCMAKE_FIND_ROOT_PATH=/usr/riscv64-linux-gnu \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
+          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
+        make -j$(nproc)
+    
+    - name: Run RISC-V benchmarks with QEMU
+      run: |
+        cd build-riscv
+        echo "Note: Running benchmarks under QEMU emulation - results will not reflect real hardware performance"
+        # Run benchmarks if they exist and are executable
+        if ls *_bench 1> /dev/null 2>&1; then
+          for bench in *_bench; do
+            if [ -x "$bench" ]; then
+              echo "Running $bench..."
+              qemu-riscv64-static -L /usr/riscv64-linux-gnu ./$bench --benchmark_format=json > ${bench}_results.json || echo "Benchmark $bench failed or completed with warnings"
+            fi
+          done
+        else
+          echo "No benchmark executables found - checking if benchmarks were built"
+          ls -la
+        fi

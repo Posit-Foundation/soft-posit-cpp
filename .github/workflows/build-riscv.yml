@@ -1,0 +1,101 @@
+name: Build and Test RISC-V
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  pull_request:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test-riscv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      cache_key: ${{ steps.cache-key.outputs.key }}
+      cache_hit: ${{ steps.cache-build.outputs.cache-hit }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-riscv-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      shell: bash
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build-riscv
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up RISC-V toolchain and dependencies
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake make ninja-build qemu-user-static
+        sudo apt-get install -y gcc-riscv64-linux-gnu g++-riscv64-linux-gnu
+        # Verify toolchain installation
+        riscv64-linux-gnu-gcc --version
+        riscv64-linux-gnu-g++ --version
+        qemu-riscv64-static --version
+
+    - name: Configure CMake for RISC-V
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build-riscv
+        cd build-riscv
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=ON \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+          -DCMAKE_C_COMPILER=riscv64-linux-gnu-gcc \
+          -DCMAKE_CXX_COMPILER=riscv64-linux-gnu-g++ \
+          -DCMAKE_FIND_ROOT_PATH=/usr/riscv64-linux-gnu \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
+          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY \
+          -DREDUCE_P16_TESTS_ON_UBUNTU=ON
+      
+    - name: Build for RISC-V
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        cd build-riscv
+        make -j$(nproc)
+        
+    - name: Verify RISC-V binaries
+      run: |
+        cd build-riscv
+        file *_tests | head -10
+        echo "Checking if binaries are RISC-V architecture..."
+        file p8_tests | grep -q "RISC-V" || (echo "ERROR: Binary is not RISC-V" && exit 1)
+        
+    - name: Run RISC-V tests with QEMU
+      run: |
+        cd build-riscv
+        chmod +x *_tests
+        echo "Running p8_tests..."
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p8_tests
+        echo "Running p16_tests..."
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p16_tests
+        echo "Running p32_tests..."
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p32_tests
+        echo "Running q8_tests..."
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q8_tests
+        echo "Running q16_tests..."
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q16_tests
+        echo "Running q32_tests..."
+        qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q32_tests
+        
+    - name: Upload RISC-V build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifact-riscv
+        path: build-riscv/
+        retention-days: 1 
