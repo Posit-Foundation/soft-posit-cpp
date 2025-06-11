@@ -1,3 +1,11 @@
+// This example demonstrates a control system simulation of an inverted pendulum using different number systems:
+// float, posit, and posit with quire. It simulates the dynamics of the system, applies control inputs, and visualizes the results.
+
+// Formulas and values for the inverted pendulum system are copied from: https://ctms.engin.umich.edu/CTMS/index.php?example=InvertedPendulum&section=ControlStateSpace
+
+// Next steps: 
+// Theoretically, stepWithQuire() can perform even more operations before rounding. Need to double-check check softposit.h for supported operations.
+
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -15,15 +23,19 @@
 // Image dimensions
 const int IMAGE_WIDTH = 800;
 const int IMAGE_HEIGHT = 600;
-const int TIME_STEPS = 500;
 const int SYSTEM_COUNT = 3; // float, posit, posit+quire
 
 // System parameters for inverted pendulum
-const double GRAVITY = 9.81;  // Gravity acceleration (m/s^2)
-const double CART_MASS = 1.0; // Mass of the cart (kg)
-const double POLE_MASS = 0.1; // Mass of the pendulum (kg)
-const double POLE_LENGTH = 0.5; // Half length of the pendulum (m)
+const double GRAVITY = 9.8;  // Gravity acceleration (m/s^2) --> "g"
+const double CART_MASS = 0.5; // Mass of the cart (kg) --> "M"
+const double POLE_MASS = 0.2; // Mass of the pendulum (kg) --> "m"
+const double POLE_LENGTH = 0.3; // Length to pendulum center of mass (m) --> "l"
+const double CART_FRICTION = 0.1; // Friction coefficient for the cart (N/m/sec) --> "b"
+const double MOMENT_OF_INERTIA = (POLE_MASS * POLE_LENGTH * POLE_LENGTH) / 3.0; // Moment of inertia of the pendulum (kg*m^2) --> "I"
+
+// Simulation parameters
 const double TIME_STEP = 0.02; // Simulation time step (s)
+const int TIME_STEPS = 500; // Number of simulation steps
 
 // Define colors for visualization
 struct RGB {
@@ -320,6 +332,9 @@ private:
     Matrix<T> K; // Control gain matrix
     Matrix<T> x; // State vector [position, velocity, angle, angular velocity]
 
+    // Time step for simulation
+    T dt = convertFromDouble(TIME_STEP);
+
     // Convert double to the template type
     T convertFromDouble(double value) {
         if constexpr (std::is_same_v<T, posit32_t>) {
@@ -348,15 +363,17 @@ public:
         // Initialize A matrix
         // x' = Ax + Bu
         // State: [position, velocity, angle, angular velocity]
-        T m = convertFromDouble(CART_MASS);
-        T M = convertFromDouble(POLE_MASS);
+        T M = convertFromDouble(CART_MASS);
+        T m = convertFromDouble(POLE_MASS);
         T l = convertFromDouble(POLE_LENGTH);
         T g = convertFromDouble(GRAVITY);
-        T dt = convertFromDouble(TIME_STEP);
+        T b = convertFromDouble(CART_FRICTION);
+        T I = convertFromDouble(MOMENT_OF_INERTIA);
         
         // Simplified continuous-time model
         T one = convertFromDouble(1.0);
-        T denom = one / (m + M);
+        T negOne = convertFromDouble(-1.0);
+        T denom = one / (I * (m+M) + M * m * l*l);
         
         // A matrix for continuous system
         A(0, 0) = convertFromDouble(0);
@@ -365,8 +382,8 @@ public:
         A(0, 3) = convertFromDouble(0);
         
         A(1, 0) = convertFromDouble(0);
-        A(1, 1) = convertFromDouble(0);
-        A(1, 2) = M * (g * denom);
+        A(1, 1) = negOne * (I + m * l*l) * b * denom;
+        A(1, 2) = m*m * g * l*l * denom;
         A(1, 3) = convertFromDouble(0);
         
         A(2, 0) = convertFromDouble(0);
@@ -375,24 +392,15 @@ public:
         A(2, 3) = convertFromDouble(1);
         
         A(3, 0) = convertFromDouble(0);
-        A(3, 1) = convertFromDouble(0);
-        A(3, 2) = g * ((m + M) * denom) / l;
+        A(3, 1) = negOne * m*l*b * denom;
+        A(3, 2) = m * g * l * (M+m) * denom;
         A(3, 3) = convertFromDouble(0);
         
         // B matrix for control input
         B(0, 0) = convertFromDouble(0);
-        B(1, 0) = denom;
+        B(1, 0) = I + m*l*l * denom;
         B(2, 0) = convertFromDouble(0);
-        B(3, 0) = denom / l;
-        
-        // Discretize the system using Euler method: A_d = I + dt*A, B_d = dt*B
-        Matrix<T> I(4, 4);
-        for (int i = 0; i < 4; i++) {
-            I(i, i) = convertFromDouble(1);
-        }
-        
-        A = I + (A * dt);
-        B = B * dt;
+        B(3, 0) = m*l * denom;
 
         // Initialize state 
         // Small initial angle perturbation
@@ -402,35 +410,39 @@ public:
         x(3, 0) = convertFromDouble(0.0);    // Initial angular velocity
         
         // Initialize K with LQR-like gains (simplified)
-        K(0, 0) = convertFromDouble(-1.0);    // Position gain
-        K(0, 1) = convertFromDouble(-1.5);    // Velocity gain
-        K(0, 2) = convertFromDouble(-20.0);   // Angle gain (high to prioritize angle stabilization)
-        K(0, 3) = convertFromDouble(-3.0);    // Angular velocity gain
+        K(0, 0) = convertFromDouble(-1.00);    // Position gain
+        K(0, 1) = convertFromDouble(-1.66);    // Velocity gain
+        K(0, 2) = convertFromDouble(18.7);   // Angle gain (high to prioritize angle stabilization)
+        K(0, 3) = convertFromDouble(3.46);    // Angular velocity gain
     }
 
     // Step the system forward in time
     void step() {
         // Compute control input u = -Kx
-        Matrix<T> u = K * x;
-        Matrix<T> negU = u * convertFromDouble(-1.0); // Negative feedback
+        Matrix<T> u = K * x * convertFromDouble(-1.0);  // Negative feedback
 
         // Update state: x' = Ax + Bu
-        x = A * x + B * negU;
+        Matrix<T> dxdt = A*x + B*u;
+        Matrix<T> dx = dxdt * dt; // Compute change in state
+        x = x + dx;     // Update state
     }
 
-    // Special step for posit with quire accumulation
+    // Step system forward in time, but use quire fused-dot product when multiplying matrices
     void stepWithQuire() {
         // Only valid for posit32_t
         static_assert(std::is_same_v<T, posit32_t>, "stepWithQuire is only valid for posit32_t");
         
         // Compute control input u = -Kx
         Matrix<T> u = K.multiplyWithQuire(x);
-        Matrix<T> negU = u * convertFromDouble(-1.0); // Negative feedback
+        Matrix<T> negU(1, 1);
+        negU(0, 0) = convertFromDouble(-1.0) * u(0, 0); // Negative feedback
 
         // Update state: x' = Ax + Bu
         Matrix<T> Ax = A.multiplyWithQuire(x);
         Matrix<T> Bu = B.multiplyWithQuire(negU);
-        x = Ax + Bu;
+        Matrix<T> dxdt = Ax + Bu;
+        Matrix<T> dx = dxdt * dt; // Compute change in state
+        x = x + dx; // Update state
     }
 
     // Get cart position
@@ -486,13 +498,13 @@ void runSimulation() {
                       quirePositions, quireAngles);
     
     // Find min/max values for normalization
-    double minPos = std::min({
+    double minPosition = std::min({
         *std::min_element(floatPositions.begin(), floatPositions.end()),
         *std::min_element(positPositions.begin(), positPositions.end()),
         *std::min_element(quirePositions.begin(), quirePositions.end())
     });
     
-    double maxPos = std::max({
+    double maxPosition = std::max({
         *std::max_element(floatPositions.begin(), floatPositions.end()),
         *std::max_element(positPositions.begin(), positPositions.end()),
         *std::max_element(quirePositions.begin(), quirePositions.end())
@@ -566,12 +578,12 @@ void runSimulation() {
         int x2 = static_cast<int>(t * IMAGE_WIDTH / TIME_STEPS);
         
         // Calculate y-coordinates for cart position
-        int floatPosY1 = mapToY(floatPositions[t-1], minPos, maxPos);
-        int floatPosY2 = mapToY(floatPositions[t], minPos, maxPos);
-        int positPosY1 = mapToY(positPositions[t-1], minPos, maxPos);
-        int positPosY2 = mapToY(positPositions[t], minPos, maxPos);
-        int quirePosY1 = mapToY(quirePositions[t-1], minPos, maxPos);
-        int quirePosY2 = mapToY(quirePositions[t], minPos, maxPos);
+        int floatPosY1 = mapToY(floatPositions[t-1], minPosition, maxPosition);
+        int floatPosY2 = mapToY(floatPositions[t], minPosition, maxPosition);
+        int positPosY1 = mapToY(positPositions[t-1], minPosition, maxPosition);
+        int positPosY2 = mapToY(positPositions[t], minPosition, maxPosition);
+        int quirePosY1 = mapToY(quirePositions[t-1], minPosition, maxPosition);
+        int quirePosY2 = mapToY(quirePositions[t], minPosition, maxPosition);
         
         // Draw position line for float (blue)
         drawLine(floatImage, x1, floatPosY1, x2, floatPosY2, RGB(0, 0, 255));
