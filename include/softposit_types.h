@@ -16,15 +16,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-	this list of conditions, and the following disclaimer.
+    this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-	this list of conditions, and the following disclaimer in the documentation
-	and/or other materials provided with the distribution.
+    this list of conditions, and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-	be used to endorse or promote products derived from this software without
-	specific prior written permission.
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -56,94 +56,94 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTPOSIT_EXACT
 typedef struct
 {
-	uint8_t v;
-	bool exact;
+    uint8_t v;
+    bool    exact;
 } posit8_t;
 typedef struct
 {
-	uint_fast16_t v;
-	bool exact;
+    uint_fast16_t v;
+    bool          exact;
 } posit16_t;
 typedef struct
 {
-	uint32_t v;
-	bool exact;
+    uint32_t v;
+    bool     exact;
 } posit32_t;
 typedef struct
 {
-	uint64_t v;
-	bool exact;
+    uint64_t v;
+    bool     exact;
 } posit64_t;
 typedef struct
 {
-	uint64_t v[2];
-	bool exact;
+    uint64_t v[2];
+    bool     exact;
 } posit128_t;
 
 typedef struct
 {
-	uint64_t v[2];
-	bool exact;
+    uint64_t v[2];
+    bool     exact;
 } quire16_t;
 #else
 typedef struct
 {
-	uint8_t v;
+    uint8_t v;
 } posit8_t;
 typedef struct
 {
-	uint16_t v;
+    uint16_t v;
 } posit16_t;
 typedef struct
 {
-	uint32_t v;
+    uint32_t v;
 } posit32_t;
 typedef struct
 {
-	uint64_t v;
+    uint64_t v;
 } posit64_t;
 typedef struct
 {
-	uint64_t v[2];
+    uint64_t v[2];
 } posit128_t;
 
 typedef struct
 {
-	uint32_t v;
+    uint32_t v;
 } quire8_t;
 typedef struct
 {
-	uint64_t v[2];
+    uint64_t v[2];
 } quire16_t;
 typedef struct
 {
-	uint64_t v[8];
+    uint64_t v[8];
 } quire32_t;
 
 typedef struct
 {
-	uint32_t v;
+    uint32_t v;
 } posit_2_t;
 typedef struct
 {
-	uint32_t v;
+    uint32_t v;
 } posit_1_t;
 typedef struct
 {
-	uint32_t v;
+    uint32_t v;
 } posit_0_t;
 
 typedef struct
 {
-	uint64_t v[8];
+    uint64_t v[8];
 } quire_2_t;
 typedef struct
 {
-	uint64_t v[8];
+    uint64_t v[8];
 } quire_1_t;
 typedef struct
 {
-	uint64_t v[8];
+    uint64_t v[8];
 } quire_0_t;
 
 #endif
@@ -151,132 +151,132 @@ typedef struct
 #ifdef SOFTPOSIT_EXACT
 typedef struct
 {
-	uint8_t v;
-	bool exact;
+    uint8_t v;
+    bool    exact;
 } uint8e_t;
 typedef struct
 {
-	uint16_t v;
-	bool exact;
+    uint16_t v;
+    bool     exact;
 } uint16e_t;
 typedef struct
 {
-	uint32_t v;
-	bool exact;
+    uint32_t v;
+    bool     exact;
 } uint32e_t;
 typedef struct
 {
-	uint64_t v;
-	bool exact;
+    uint64_t v;
+    bool     exact;
 } uint64e_t;
 typedef struct
 {
-	uint64_t v[2];
-	bool exact;
+    uint64_t v[2];
+    bool     exact;
 } uint128e_t;
 
 union ui8_p8
 {
-	uint8e_t ui;
-	posit8_t p;
+    uint8e_t ui;
+    posit8_t p;
 };
 union ui16_p16
 {
-	uint16e_t ui;
-	posit16_t p;
+    uint16e_t ui;
+    posit16_t p;
 };
 union ui32_p32
 {
-	uint32e_t ui;
-	posit32_t p;
+    uint32e_t ui;
+    posit32_t p;
 };
 union ui64_p64
 {
-	uint64e_t ui;
-	posit64_t p;
+    uint64e_t ui;
+    posit64_t p;
 };
 
 union ui128_q16
 {
-	uint64_t ui[2];
-	quire16_t q;
+    uint64_t  ui[2];
+    quire16_t q;
 };
 #else
 union ui8_p8
 {
-	uint8_t ui;
-	posit8_t p;
+    uint8_t  ui;
+    posit8_t p;
 };
 union ui16_p16
 {
-	uint16_t ui;
-	posit16_t p;
+    uint16_t  ui;
+    posit16_t p;
 };
 union ui32_p32
 {
-	uint32_t ui;
-	posit32_t p;
+    uint32_t  ui;
+    posit32_t p;
 };
 union ui64_p64
 {
-	uint64_t ui;
-	posit64_t p;
+    uint64_t  ui;
+    posit64_t p;
 };
 union ui128_p128c
 {
-	uint64_t ui[2];
-	posit128_t p;
-}; // c to differentiate from original implementation
+    uint64_t   ui[2];
+    posit128_t p;
+};  // c to differentiate from original implementation
 
 union ui32_pX2
 {
-	uint32_t ui;
-	posit_2_t p;
+    uint32_t  ui;
+    posit_2_t p;
 };
 union ui32_pX1
 {
-	uint32_t ui;
-	posit_1_t p;
+    uint32_t  ui;
+    posit_1_t p;
 };
 union ui32_pX0
 {
-	uint32_t ui;
-	posit_1_t p;
+    uint32_t  ui;
+    posit_1_t p;
 };
 
 union ui64_double
 {
-	uint64_t ui;
-	double d;
+    uint64_t ui;
+    double   d;
 };
 
 union ui32_q8
 {
-	uint32_t ui;
-	quire8_t q;
+    uint32_t ui;
+    quire8_t q;
 };
 union ui128_q16
 {
-	uint64_t ui[2];
-	quire16_t q;
+    uint64_t  ui[2];
+    quire16_t q;
 };
 
 union ui512_q32
 {
-	uint64_t ui[8];
-	quire32_t q;
+    uint64_t  ui[8];
+    quire32_t q;
 };
 
 union ui512_qX2
 {
-	uint64_t ui[8];
-	quire_2_t q;
+    uint64_t  ui[8];
+    quire_2_t q;
 };
 
 union ui512_qX1
 {
-	uint64_t ui[8];
-	quire_1_t q;
+    uint64_t  ui[8];
+    quire_1_t q;
 };
 #endif
 

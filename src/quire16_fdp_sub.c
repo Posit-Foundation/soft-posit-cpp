@@ -34,158 +34,175 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <inttypes.h>
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-quire16_t q16_fdp_sub( quire16_t q, posit16_t pA, posit16_t pB ){
+quire16_t q16_fdp_sub(quire16_t q, posit16_t pA, posit16_t pB)
+{
+    union ui16_p16  uA, uB;
+    union ui128_q16 uZ, uZ1, uZ2;
+    uint_fast16_t   uiA, uiB;
+    uint_fast16_t   fracA, tmp;
+    bool            signA, signB, signZ2, regSA, regSB, rcarry;
+    int_fast8_t     expA;
+    int_fast16_t    kA = 0, shiftRight;
+    uint_fast32_t   frac32Z;
+    // For add
+    bool rcarryb, b1, b2, rcarryZ;  //, rcarrySignZ;
 
-	union ui16_p16 uA, uB;
-	union ui128_q16 uZ, uZ1, uZ2;
-	uint_fast16_t uiA, uiB;
-	uint_fast16_t fracA, tmp;
-	bool signA, signB, signZ2, regSA, regSB, rcarry;
-	int_fast8_t expA;
-	int_fast16_t kA=0, shiftRight;
-	uint_fast32_t frac32Z;
-	//For add
-	bool rcarryb, b1, b2, rcarryZ;//, rcarrySignZ;
+    uZ1.q = q;
 
-	uZ1.q = q;
+    uA.p = pA;
+    uiA  = uA.ui;
+    uB.p = pB;
+    uiB  = uB.ui;
 
-	uA.p = pA;
-	uiA = uA.ui;
-	uB.p = pB;
-	uiB = uB.ui;
+    // NaR
+    if (isNaRQ16(q) || isNaRP16UI(uA.ui) || isNaRP16UI(uB.ui))
+    {
+        uZ2.ui[0] = 0x8000000000000000ULL;
+        uZ2.ui[1] = 0;
+        return uZ2.q;
+    }
+    else if (uiA == 0 || uiB == 0)
+        return q;
 
-	//NaR
-	if (isNaRQ16(q) || isNaRP16UI(uA.ui) || isNaRP16UI(uB.ui)){
-		uZ2.ui[0]=0x8000000000000000ULL;
-		uZ2.ui[1] = 0;
-		return uZ2.q;
-	}
-	else if (uiA==0 || uiB==0)
-		return q;
+    // max pos (sign plus and minus)
+    signA  = signP16UI(uiA);
+    signB  = signP16UI(uiB);
+    signZ2 = signA ^ signB;
 
+    if (signA)
+        uiA = (-uiA & 0xFFFF);
+    if (signB)
+        uiB = (-uiB & 0xFFFF);
 
-	//max pos (sign plus and minus)
-	signA = signP16UI( uiA );
-	signB = signP16UI( uiB );
-	signZ2 = signA ^ signB;
+    regSA = signregP16UI(uiA);
+    regSB = signregP16UI(uiB);
 
-	if(signA) uiA = (-uiA & 0xFFFF);
-	if(signB) uiB = (-uiB & 0xFFFF);
+    tmp = (uiA << 2) & 0xFFFF;
+    if (regSA)
+    {
+        while (tmp >> 15)
+        {
+            kA++;
+            tmp = (tmp << 1) & 0xFFFF;
+        }
+    }
+    else
+    {
+        kA = -1;
+        while (!(tmp >> 15))
+        {
+            kA--;
+            tmp = (tmp << 1) & 0xFFFF;
+        }
+        tmp &= 0x7FFF;
+    }
+    expA  = tmp >> 14;
+    fracA = (0x4000 | tmp);
 
-	regSA = signregP16UI(uiA);
-	regSB = signregP16UI(uiB);
+    tmp = (uiB << 2) & 0xFFFF;
+    if (regSB)
+    {
+        while (tmp >> 15)
+        {
+            kA++;
+            tmp = (tmp << 1) & 0xFFFF;
+        }
+    }
+    else
+    {
+        kA--;
+        while (!(tmp >> 15))
+        {
+            kA--;
+            tmp = (tmp << 1) & 0xFFFF;
+        }
+        tmp &= 0x7FFF;
+    }
+    expA += tmp >> 14;
+    frac32Z = (uint_fast32_t) fracA * (0x4000 | tmp);
 
-	tmp = (uiA<<2) & 0xFFFF;
-	if (regSA){
-		while (tmp>>15){
-			kA++;
-			tmp= (tmp<<1) & 0xFFFF;
-		}
-	}
-	else{
-		kA=-1;
-		while (!(tmp>>15)){
-			kA--;
-			tmp= (tmp<<1) & 0xFFFF;
-		}
-		tmp&=0x7FFF;
-	}
-	expA = tmp>>14;
-	fracA = (0x4000 | tmp);
+    if (expA > 1)
+    {
+        kA++;
+        expA ^= 0x2;
+    }
 
-	tmp = (uiB<<2) & 0xFFFF;
-	if (regSB){
-		while (tmp>>15){
-			kA++;
-			tmp= (tmp<<1) & 0xFFFF;
-		}
-	}
-	else{
-		kA--;
-		while (!(tmp>>15)){
-			kA--;
-			tmp= (tmp<<1) & 0xFFFF;
-		}
-		tmp&=0x7FFF;
-	}
-	expA += tmp>>14;
-	frac32Z = (uint_fast32_t) fracA * (0x4000 | tmp);
+    rcarry = frac32Z >> 29;  // 3rd bit (position 2) of frac32Z, hidden bit is 4th bit (position 3)
+    if (rcarry)
+    {
+        if (expA)
+            kA++;
+        expA ^= 1;
+        frac32Z >>= 1;
+    }
 
-	if (expA>1){
-		kA++;
-		expA ^=0x2;
-	}
+    // default dot is between bit 71 and 72, extreme left bit is bit 0. Last right bit is bit 127.
+    // Scale = 2^es * k + e  => 2k + e
+    int firstPos = 71 - (kA << 1) - expA;
 
-	rcarry = frac32Z>>29;//3rd bit (position 2) of frac32Z, hidden bit is 4th bit (position 3)
-	if (rcarry){
-		if (expA) kA ++;
-		expA^=1;
-		frac32Z>>=1;
-	}
+    // No worries about hidden bit moving before position 4 because fraction is right aligned so
+    // there are 16 spare bits
+    if (firstPos > 63)
+    {  // This means entire fraction is in right 64 bits
+        uZ2.ui[0]  = 0;
+        shiftRight = firstPos - 99;  // 99 = 63+ 4+ 32
+        if (shiftRight < 0)          // shiftLeft
+            uZ2.ui[1] = ((uint64_t) frac32Z) << -shiftRight;
+        else
+            uZ2.ui[1] = (uint64_t) frac32Z >> shiftRight;
+    }
+    else
+    {                                // frac32Z can be in both left64 and right64
+        shiftRight = firstPos - 35;  // -35= -3-32
+        if (shiftRight < 0)
+            uZ2.ui[0] = ((uint64_t) frac32Z) << -shiftRight;
+        else
+        {
+            uZ2.ui[0] = (uint64_t) frac32Z >> shiftRight;
+            uZ2.ui[1] = (uint64_t) frac32Z << (64 - shiftRight);
+        }
+    }
 
-	//default dot is between bit 71 and 72, extreme left bit is bit 0. Last right bit is bit 127.
-	//Scale = 2^es * k + e  => 2k + e
-	int firstPos = 71 - (kA<<1) - expA;
+    // This is the only difference from ADD (signZ2) and (!signZ2)
+    if (!signZ2)
+    {
+        if (uZ2.ui[1] > 0)
+        {
+            uZ2.ui[1] = -uZ2.ui[1];
+            uZ2.ui[0] = ~uZ2.ui[0];
+        }
+        else
+        {
+            uZ2.ui[0] = -uZ2.ui[0];
+        }
+    }
 
-	//No worries about hidden bit moving before position 4 because fraction is right aligned so
-	//there are 16 spare bits
-	if (firstPos>63){ //This means entire fraction is in right 64 bits
-		uZ2.ui[0] = 0;
-		shiftRight = firstPos-99;//99 = 63+ 4+ 32
-		if (shiftRight<0)//shiftLeft
-			uZ2.ui[1] =  ((uint64_t)frac32Z) << -shiftRight;
-		else
-			uZ2.ui[1] = (uint64_t) frac32Z >> shiftRight;
-	}
-	else{//frac32Z can be in both left64 and right64
-		shiftRight = firstPos - 35;// -35= -3-32
-		if (shiftRight<0)
-			uZ2.ui[0]  = ((uint64_t)frac32Z) << -shiftRight;
-		else{
-			uZ2.ui[0] = (uint64_t)frac32Z >> shiftRight;
-			uZ2.ui[1] =  (uint64_t) frac32Z <<  (64 - shiftRight);
-		}
+    // Subtraction
+    b1       = uZ1.ui[1] & 0x1;
+    b2       = uZ2.ui[1] & 0x1;
+    rcarryb  = b1 & b2;
+    uZ.ui[1] = (uZ1.ui[1] >> 1) + (uZ2.ui[1] >> 1) + rcarryb;
 
-	}
+    rcarryZ = uZ.ui[1] >> 63;
 
-	//This is the only difference from ADD (signZ2) and (!signZ2)
-	if (!signZ2){
-		if (uZ2.ui[1]>0){
-			uZ2.ui[1] = - uZ2.ui[1];
-			uZ2.ui[0] = ~uZ2.ui[0];
-		}
-		else{
-			uZ2.ui[0] = -uZ2.ui[0];
-		}
-	}
+    uZ.ui[1] = (uZ.ui[1] << 1 | (b1 ^ b2));
 
-	//Subtraction
-	b1 = uZ1.ui[1]&0x1;
-	b2 = uZ2.ui[1]&0x1;
-	rcarryb = b1 & b2;
-	uZ.ui[1] = (uZ1.ui[1]>>1) + (uZ2.ui[1]>>1) + rcarryb;
+    b1                   = uZ1.ui[0] & 0x1;
+    b2                   = uZ2.ui[0] & 0x1;
+    rcarryb              = b1 & b2;
+    int_fast8_t rcarryb3 = b1 + b2 + rcarryZ;
 
-	rcarryZ = uZ.ui[1]>>63;
+    uZ.ui[0] = (uZ1.ui[0] >> 1) + (uZ2.ui[0] >> 1) + ((rcarryb3 >> 1) & 0x1);
+    // rcarrySignZ = uZ.ui[0]>>63;
 
-	uZ.ui[1] = (uZ.ui[1]<<1 | (b1^b2) );
+    uZ.ui[0] = (uZ.ui[0] << 1 | (rcarryb3 & 0x1));
 
+    // Exception handling
+    if (isNaRQ16(uZ.q))
+        uZ.q.v[0] = 0;
 
-	b1 = uZ1.ui[0]&0x1;
-	b2 = uZ2.ui[0]&0x1;
-	rcarryb = b1 & b2 ;
-	int_fast8_t rcarryb3 = b1 + b2 + rcarryZ;
-
-	uZ.ui[0] = (uZ1.ui[0]>>1) + (uZ2.ui[0]>>1) + ((rcarryb3>>1)& 0x1);
-	//rcarrySignZ = uZ.ui[0]>>63;
-
-
-	uZ.ui[0] = (uZ.ui[0]<<1 | (rcarryb3 & 0x1) );
-
-	//Exception handling
-	if (isNaRQ16(uZ.q)) uZ.q.v[0] = 0;
-
-	return uZ.q;
+    return uZ.q;
 }

@@ -39,60 +39,64 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-int_fast64_t p16_to_i64( posit16_t pA ){
-	union ui16_p16 uA;
-	int_fast64_t mask, tmp, iZ;
-	uint_fast16_t scale = 0, uiA;
-	bool sign, bitLast, bitNPlusOne;
+int_fast64_t p16_to_i64(posit16_t pA)
+{
+    union ui16_p16 uA;
+    int_fast64_t   mask, tmp, iZ;
+    uint_fast16_t  scale = 0, uiA;
+    bool           sign, bitLast, bitNPlusOne;
 
-	uA.p = pA;
-	uiA = uA.ui;
+    uA.p = pA;
+    uiA  = uA.ui;
 
-	// NaR
-	if (uiA==0x8000) return 0;
+    // NaR
+    if (uiA == 0x8000)
+        return 0;
 
-	sign = uiA>>15;
-	if (sign) uiA = -uiA & 0xFFFF;
+    sign = uiA >> 15;
+    if (sign)
+        uiA = -uiA & 0xFFFF;
 
-	if (uiA <= 0x3000)
-		return 0;
-	else if (uiA < 0x4800)
-		iZ = 1;
-	else if (uiA <= 0x5400)
-		iZ = 2;
-	else{
+    if (uiA <= 0x3000)
+        return 0;
+    else if (uiA < 0x4800)
+        iZ = 1;
+    else if (uiA <= 0x5400)
+        iZ = 2;
+    else
+    {
+        uiA -= 0x4000;
 
-		uiA -= 0x4000;
+        while (0x2000 & uiA)
+        {
+            scale += 2;
+            uiA = (uiA - 0x2000) << 1;
+        }
+        uiA <<= 1;
+        if (0x2000 & uiA)
+            scale++;
+        iZ = ((uint64_t) uiA | 0x2000) << 49;
 
-		while (0x2000 & uiA) {
-			scale += 2;
-			uiA = (uiA - 0x2000) << 1;
-		}
-		uiA <<= 1;
-		if (0x2000 & uiA) scale++;
-		iZ = ((uint64_t)uiA | 0x2000) << 49;
+        mask = 0x4000000000000000 >> scale;
 
-		mask = 0x4000000000000000 >> scale;
+        bitLast = (iZ & mask);
+        mask >>= 1;
+        tmp         = (iZ & mask);
+        bitNPlusOne = tmp;
+        iZ ^= tmp;
+        tmp = iZ & (mask - 1);  // bitsMore
+        iZ ^= tmp;
 
-		bitLast = (iZ & mask);
-		mask >>= 1;
-		tmp = (iZ & mask);
-		bitNPlusOne = tmp;
-		iZ ^= tmp;
-		tmp = iZ & (mask - 1);  // bitsMore
-		iZ ^= tmp;
+        if (bitNPlusOne)
+            if (bitLast | tmp)
+                iZ += (mask << 1);
 
-		if (bitNPlusOne)
-			if (bitLast | tmp) iZ += (mask << 1);
-
-		iZ = (uint64_t)iZ >> (62 - scale);
-
-	}
-	if (sign) iZ = -iZ;
-	return iZ;
-
+        iZ = (uint64_t) iZ >> (62 - scale);
+    }
+    if (sign)
+        iZ = -iZ;
+    return iZ;
 }
-

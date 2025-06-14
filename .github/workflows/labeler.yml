@@ -1,0 +1,14 @@
+name: PR Labeler (Disabled)
+
+# This workflow has been disabled as requested
+on:
+  # No triggers = workflow will never run
+  workflow_dispatch:
+    # Only manually triggerable, and hidden by default
+
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow disabled
+        run: echo "This workflow has been disabled as requested" 

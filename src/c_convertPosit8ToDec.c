@@ -35,64 +35,72 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
+double convertP8ToDouble(posit8_t a)
+{
+    union ui8_p8 uZ;
+    double       d8;
+    uZ.p = a;
 
-double convertP8ToDouble(posit8_t a){
-	union ui8_p8 uZ;
-	double d8;
-	uZ.p = a;
+    if (uZ.ui == 0)
+    {
+        return 0;
+    }
+    else if (uZ.ui == 0x7F)
+    {  // maxpos
+        return 64;
+    }
+    else if (uZ.ui == 0x81)
+    {  //-maxpos
+        return -64;
+    }
+    else if (uZ.ui == 0x80)
+    {  // NaR
+        return NAN;
+    }
 
-	if (uZ.ui==0){
-		return 0;
-	}
-	else if(uZ.ui==0x7F){ //maxpos
-		return 64;
-	}
-	else if (uZ.ui==0x81){ //-maxpos
-		return -64;
-	}
-	else if (uZ.ui == 0x80){ //NaR
-		return NAN;
-	}
+    bool         regS, sign;
+    uint_fast8_t reg, shift = 2, frac;
+    int_fast8_t  k = 0;
+    double       fraction_max;
 
-	bool regS, sign;
-	uint_fast8_t reg, shift=2, frac;
-	int_fast8_t k=0;
-	double fraction_max;
+    sign = signP8UI(uZ.ui);
+    if (sign)
+        uZ.ui = -uZ.ui & 0xFF;
+    regS = signregP8UI(uZ.ui);
 
-	sign = signP8UI( uZ.ui );
-	if (sign) uZ.ui = -uZ.ui & 0xFF;
-	regS = signregP8UI( uZ.ui );
+    uint_fast8_t tmp = (uZ.ui << 2) & 0xFF;
+    if (regS)
+    {
+        while (tmp >> 7)
+        {
+            k++;
+            shift++;
+            tmp = (tmp << 1) & 0xFF;
+        }
+        reg = k + 1;
+    }
+    else
+    {
+        k = -1;
+        while (!(tmp >> 7))
+        {
+            k--;
+            shift++;
+            tmp = (tmp << 1) & 0xFF;
+        }
+        tmp &= 0x7F;
+        reg = -k;
+    }
+    frac = (tmp & 0x7F) >> shift;
 
-	uint_fast8_t tmp = (uZ.ui<<2) & 0xFF;
-	if (regS){
-		while (tmp>>7){
-			k++;
-			shift++;
-			tmp= (tmp<<1) & 0xFF;
-		}
-		reg = k+1;
-	}
-	else{
-		k=-1;
-		while (!(tmp>>7)){
-			k--;
-			shift++;
-			tmp= (tmp<<1) & 0xFF;
-		}
-		tmp&=0x7F;
-		reg =-k;
-	}
-	frac = (tmp & 0x7F) >> shift;
+    fraction_max = pow(2, 6 - reg);
+    d8           = (double) (pow(2, k) * (1 + ((double) frac / fraction_max)));
 
+    if (sign)
+        d8 = -d8;
 
-	fraction_max = pow(2, 6-reg) ;
-	d8 = (double)( pow(2, k) * (1+((double)frac/fraction_max)) );
-
-	if (sign)
-		d8 = -d8;
-
-	return d8;
+    return d8;
 }

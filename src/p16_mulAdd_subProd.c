@@ -35,21 +35,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "platform.h"
 
-posit16_t p16_subMul(posit16_t a, posit16_t b, posit16_t c) {
-  union ui16_p16 uA;
-  uint_fast16_t uiA;
-  union ui16_p16 uB;
-  uint_fast16_t uiB;
-  union ui16_p16 uC;
-  uint_fast16_t uiC;
+posit16_t p16_subMul(posit16_t a, posit16_t b, posit16_t c)
+{
+    union ui16_p16 uA;
+    uint_fast16_t  uiA;
+    union ui16_p16 uB;
+    uint_fast16_t  uiB;
+    union ui16_p16 uC;
+    uint_fast16_t  uiC;
 
-  uA.p = a;
-  uiA = uA.ui;
-  uB.p = b;
-  uiB = uB.ui;
-  uC.p = c;
-  uiC = uC.ui;
+    uA.p = a;
+    uiA  = uA.ui;
+    uB.p = b;
+    uiB  = uB.ui;
+    uC.p = c;
+    uiC  = uC.ui;
 
-  // Computing c - (a*b)
-  return softposit_mulAddP16(uiA, uiB, uiC, softposit_mulAdd_subProd);
-} 
+    // Computing c - (a*b)
+    return softposit_mulAddP16(uiA, uiB, uiC, softposit_mulAdd_subProd);
+}

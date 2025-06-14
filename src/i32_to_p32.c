@@ -39,49 +39,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
+posit32_t i32_to_p32(int32_t iA)
+{
+    int_fast8_t k, log2 = 31;  // length of bit (e.g. 4294966271) in int (32 but because we have
+                               // only 32 bits, so one bit off to accommodate that fact)
+    union ui32_p32 uZ;
+    uint_fast32_t  uiA;
+    uint_fast32_t  expA, mask = 0x80000000, fracA;
+    bool           sign;
 
-posit32_t i32_to_p32( int32_t iA ) {
-	int_fast8_t k, log2 = 31;//length of bit (e.g. 4294966271) in int (32 but because we have only 32 bits, so one bit off to accommodate that fact)
-	union ui32_p32 uZ;
-	uint_fast32_t uiA;
-	uint_fast32_t expA, mask = 0x80000000, fracA;
-	bool sign;
+    if (iA < -2147483135)
+    {  //-2147483648 to -2147483136 rounds to P32 value -2147483648
+        uZ.ui = 0x80500000;
+        return uZ.p;
+    }
 
-	if (iA < -2147483135){ //-2147483648 to -2147483136 rounds to P32 value -2147483648
-		uZ.ui = 0x80500000;
-		return uZ.p;
-	}
+    sign = iA >> 31;
+    if (sign)
+        iA = -iA & 0xFFFFFFFF;
 
-    sign = iA>>31;
-    if(sign) iA = -iA &0xFFFFFFFF;
+    if (iA > 2147483135)  // 2147483136 to 2147483647 rounds to P32 value (2147483648)=> 0x7FB00000
+        uiA = 0x7FB00000;
+    else if (iA < 0x2)
+        uiA = (iA << 30);
+    else
+    {
+        fracA = iA;
+        while (!(fracA & mask))
+        {
+            log2--;
+            fracA <<= 1;
+        }
+        k     = (log2 >> 2);
+        expA  = (log2 & 0x3) << (27 - k);
+        fracA = (fracA ^ mask);
+        uiA   = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | expA | fracA >> (k + 4);
 
-	if ( iA >2147483135)//2147483136 to 2147483647 rounds to P32 value (2147483648)=> 0x7FB00000
-		uiA = 0x7FB00000;
-	else if ( iA < 0x2 )
-		uiA = (iA << 30);
-	else {
-		fracA = iA;
-		while ( !(fracA & mask) ) {
-			log2--;
-			fracA <<= 1;
-		}
-		k = (log2 >> 2);
-		expA = (log2 & 0x3) << (27 - k);
-		fracA = (fracA ^ mask);
-		uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | expA | fracA>>(k+4);
+        mask = 0x8 << k;  // bitNPlusOne
 
-		mask = 0x8 << k;  //bitNPlusOne
-
-		if (mask & fracA)
-			if (((mask - 1) & fracA) | ((mask << 1) & fracA)) uiA++;
-
-	}
-	(sign) ? (uZ.ui = -uiA &0xFFFFFFFF) : (uZ.ui = uiA);
-	return uZ.p;
+        if (mask & fracA)
+            if (((mask - 1) & fracA) | ((mask << 1) & fracA))
+                uiA++;
+    }
+    (sign) ? (uZ.ui = -uiA & 0xFFFFFFFF) : (uZ.ui = uiA);
+    return uZ.p;
 }
-
-

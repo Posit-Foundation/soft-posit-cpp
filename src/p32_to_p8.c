@@ -36,88 +36,103 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit8_t pX2_to_p8( posit_2_t pA ){
-	posit32_t p32 = {.v = pA.v};
-	return p32_to_p8(p32);
+posit8_t pX2_to_p8(posit_2_t pA)
+{
+    posit32_t p32 = {.v = pA.v};
+    return p32_to_p8(p32);
 }
 
-posit8_t p32_to_p8( posit32_t pA ){
+posit8_t p32_to_p8(posit32_t pA)
+{
+    union ui32_p32 uA;
+    union ui8_p8   uZ;
+    uint_fast32_t  uiA, tmp = 0, regime;
+    uint_fast32_t  exp_frac32A = 0;
+    bool           sign, regSA, bitsMore = 0, bitNPlusOne = 0;
+    int_fast8_t    kA = 0, regA;
 
-	union ui32_p32 uA;
-	union ui8_p8 uZ;
-	uint_fast32_t uiA, tmp=0, regime;
-	uint_fast32_t exp_frac32A=0;
-	bool sign, regSA, bitsMore=0, bitNPlusOne=0;
-	int_fast8_t kA=0, regA;
+    uA.p = pA;
+    uiA  = uA.ui;
 
-	uA.p = pA;
-	uiA = uA.ui;
+    if (uiA == 0x80000000 || uiA == 0)
+    {
+        uZ.ui = (uint8_t) (uiA >> 24) & 0xFF;
+        return uZ.p;
+    }
 
-	if (uiA==0x80000000 || uiA==0 ){
-		uZ.ui = (uint8_t)(uiA>>24) &0xFF;
-		return uZ.p;
-	}
+    sign = signP32UI(uiA);
+    if (sign)
+        uiA = -uiA & 0xFFFFFFFF;
 
+    if (uiA > 0x66000000)
+        uZ.ui = 0x7F;
+    else if (uiA < 0x1A000000)
+        uZ.ui = 0x1;
+    else
+    {
+        regSA = signregP32UI(uiA);
+        // regime
+        tmp = (uiA << 2) & 0xFFFFFFFF;
+        if (regSA)
+        {
+            while (tmp >> 31)
+            {
+                kA++;
+                tmp = (tmp << 1) & 0xFFFFFFFF;
+            }
+        }
+        else
+        {
+            kA = -1;
+            while (!(tmp >> 31))
+            {
+                kA--;
+                tmp = (tmp << 1) & 0xFFFFFFFF;
+            }
+            tmp &= 0x7FFFFFFF;
+        }
 
-	sign = signP32UI( uiA );
-	if (sign) uiA = -uiA & 0xFFFFFFFF;
+        // 2nd and 3rd bit exp
+        exp_frac32A = tmp;
 
-	if (uiA>0x66000000) uZ.ui = 0x7F;
-	else if (uiA<0x1A000000) uZ.ui = 0x1;
-	else{
-		regSA = signregP32UI(uiA);
-		//regime
-		tmp = (uiA<<2)&0xFFFFFFFF;
-		if (regSA){
-			while (tmp>>31){
-				kA++;
-				tmp= (tmp<<1) & 0xFFFFFFFF;
-			}
-		}
-		else{
-			kA=-1;
-			while (!(tmp>>31)){
-				kA--;
-				tmp= (tmp<<1) & 0xFFFFFFFF;
-			}
-			tmp&=0x7FFFFFFF;
-		}
+        if (kA < 0)
+        {
+            regA = ((-kA) << 2) - (exp_frac32A >> 29);
 
-		//2nd and 3rd bit exp
-		exp_frac32A = tmp;
+            if (regA == 0)
+                regA = 1;
+            regSA  = 0;
+            regime = (regA > 6) ? (0x1) : (0x40 >> regA);
+        }
+        else
+        {
+            (kA == 0) ? (regA = 1 + (exp_frac32A >> 29))
+                      : (regA = (kA << 2) + (exp_frac32A >> 29) + 1);
+            regSA  = 1;
+            regime = 0x7F - (0x7F >> regA);
+        }
+        exp_frac32A = (exp_frac32A << 3) & 0xFFFFFFFF;
+        if (regA > 5)
+        {
+            uZ.ui = regime;
+        }
+        else
+        {
+            // exp_frac32A= ((exp_frac32A)&0x3F) >> shift; //first 2 bits already empty (for sign
+            // and regime terminating bit)
+            uZ.ui = regime | (exp_frac32A >> (regA + 26));
+        }
+        if (exp_frac32A & (0x2000000 << regA))
+        {
+            bitsMore = exp_frac32A & (0xFFFFFFFF >> (7 - regA));
+            uZ.ui += (uZ.ui & 1) | bitsMore;
+        }
+    }
 
-		if(kA<0){
-			regA = ((-kA)<<2) - (exp_frac32A>>29);
-
-			if (regA==0) regA=1;
-			regSA = 0;
-			regime = (regA>6) ? (0x1) : (0x40>>regA);
-
-		}
-		else{
-			(kA==0)?(regA=1 + (exp_frac32A>>29)): (regA = (kA<<2) + (exp_frac32A>>29) +1);
-			regSA=1;
-			regime = 0x7F - (0x7F>>regA);
-		}
-		exp_frac32A = (exp_frac32A<<3) &0xFFFFFFFF;
-		if (regA>5){
-			uZ.ui = regime;
-		}
-		else{
-			//exp_frac32A= ((exp_frac32A)&0x3F) >> shift; //first 2 bits already empty (for sign and regime terminating bit)
-			uZ.ui = regime | ( exp_frac32A>>(regA+26) );
-		}
-		if ( exp_frac32A & (0x2000000<<regA) ){
-			bitsMore = exp_frac32A & (0xFFFFFFFF>>(7-regA));
-			uZ.ui += (uZ.ui&1) | bitsMore;
-		}
-	}
-
-
-	if (sign) uZ.ui = -uZ.ui & 0xFF;
-	return uZ.p;
+    if (sign)
+        uZ.ui = -uZ.ui & 0xFF;
+    return uZ.p;
 }
-

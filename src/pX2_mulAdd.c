@@ -32,25 +32,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit_2_t pX2_mulAdd( posit_2_t a, posit_2_t b, posit_2_t c, int x ) {
-	//a*b + c
-	union ui32_pX2 uA;
-    uint_fast32_t uiA;
+posit_2_t pX2_mulAdd(posit_2_t a, posit_2_t b, posit_2_t c, int x)
+{
+    // a*b + c
+    union ui32_pX2 uA;
+    uint_fast32_t  uiA;
     union ui32_pX2 uB;
-    uint_fast32_t uiB;
+    uint_fast32_t  uiB;
     union ui32_pX2 uC;
-    uint_fast32_t uiC;
+    uint_fast32_t  uiC;
 
     uA.p = a;
-    uiA = uA.ui;
+    uiA  = uA.ui;
     uB.p = b;
-    uiB = uB.ui;
+    uiB  = uB.ui;
     uC.p = c;
-    uiC = uC.ui;
-    return softposit_mulAddPX2( uiA, uiB, uiC, 0, x);
-
+    uiC  = uC.ui;
+    return softposit_mulAddPX2(uiA, uiB, uiC, 0, x);
 }
-

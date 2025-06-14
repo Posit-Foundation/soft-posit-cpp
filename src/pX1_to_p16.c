@@ -36,43 +36,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
+posit16_t pX1_to_p16(posit_1_t pA)
+{
+    union ui32_pX1 uA;
+    union ui16_p16 uZ;
+    uint_fast32_t  uiA;
+    bool           sign;
 
-posit16_t pX1_to_p16( posit_1_t pA ){
+    uA.p = pA;
+    uiA  = uA.ui;
 
-	union ui32_pX1 uA;
-	union ui16_p16 uZ;
-	uint_fast32_t uiA;
-	bool sign;
-
-	uA.p = pA;
-	uiA = uA.ui;
-
-	if (uiA==0x80000000 || uiA==0 ){
-		uZ.ui = uiA>>16;
-		return uZ.p;
-	}
-
-	sign = signP32UI( uiA );
-	if (sign) uiA = -uiA & 0xFFFFFFFF;
-
-	if ((uiA&0xFFFF)==0 ){
-    	uZ.ui = uiA>>16;
+    if (uiA == 0x80000000 || uiA == 0)
+    {
+        uZ.ui = uiA >> 16;
+        return uZ.p;
     }
-    else {
-		if( (uiA>>16)!=0x7FFF ){
-			if( (uint32_t)0x8000 & uiA){
-				if ( ( ((uint32_t)0x10000) & uiA) || (((uint32_t)0x7FFF) & uiA) )
-					uiA += 0x10000;
-			}
-		}
-    	uZ.ui = uiA>>16;
-    	if (uZ.ui==0) uZ.ui = 0x1;
 
+    sign = signP32UI(uiA);
+    if (sign)
+        uiA = -uiA & 0xFFFFFFFF;
+
+    if ((uiA & 0xFFFF) == 0)
+    {
+        uZ.ui = uiA >> 16;
     }
-    if (sign) uZ.ui = (-uZ.ui & 0xFFFFFFFF);
-	return uZ.p;
+    else
+    {
+        if ((uiA >> 16) != 0x7FFF)
+        {
+            if ((uint32_t) 0x8000 & uiA)
+            {
+                if ((((uint32_t) 0x10000) & uiA) || (((uint32_t) 0x7FFF) & uiA))
+                    uiA += 0x10000;
+            }
+        }
+        uZ.ui = uiA >> 16;
+        if (uZ.ui == 0)
+            uZ.ui = 0x1;
+    }
+    if (sign)
+        uZ.ui = (-uZ.ui & 0xFFFFFFFF);
+    return uZ.p;
 }
-

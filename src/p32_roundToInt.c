@@ -39,67 +39,75 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit32_t p32_roundToInt( posit32_t pA ){
-	union ui32_p32 uA;
-	uint_fast32_t mask = 0x20000000, scale=0, tmp=0, uiA, uiZ;
-	bool bitLast, bitNPlusOne, sign;
+posit32_t p32_roundToInt(posit32_t pA)
+{
+    union ui32_p32 uA;
+    uint_fast32_t  mask = 0x20000000, scale = 0, tmp = 0, uiA, uiZ;
+    bool           bitLast, bitNPlusOne, sign;
 
-	uA.p = pA;
-	uiA = uA.ui;
-	sign = uiA>>31;
+    uA.p = pA;
+    uiA  = uA.ui;
+    sign = uiA >> 31;
 
-	// sign is True if pA > NaR.
-	if (sign) uiA = -uiA & 0xFFFFFFFF;           // A is now |A|.
-	if (uiA <= 0x38000000) {                     // 0 <= |pA| <= 1/2 rounds to zero.
-		uA.ui = 0;
-		return uA.p;
-	}
-	else if (uiA < 0x44000000) {                 // 1/2 < x < 3/2 rounds to 1.
-		uA.ui = 0x40000000;
-	}
-	else if (uiA <= 0x4A000000) {                // 3/2 <= x <= 5/2 rounds to 2.
-		uA.ui = 0x48000000;
-	}
-	else if (uiA >= 0x7E800000) {                 // If |A| is 0x7E800000 (posit is pure integer value), leave it unchanged.
-		return uA.p;                           // This also takes care of the NaR case, 0x80000000.
-	}
-	else {                                   // 34% of the cases, we have to decode the posit.
+    // sign is True if pA > NaR.
+    if (sign)
+        uiA = -uiA & 0xFFFFFFFF;  // A is now |A|.
+    if (uiA <= 0x38000000)
+    {  // 0 <= |pA| <= 1/2 rounds to zero.
+        uA.ui = 0;
+        return uA.p;
+    }
+    else if (uiA < 0x44000000)
+    {  // 1/2 < x < 3/2 rounds to 1.
+        uA.ui = 0x40000000;
+    }
+    else if (uiA <= 0x4A000000)
+    {  // 3/2 <= x <= 5/2 rounds to 2.
+        uA.ui = 0x48000000;
+    }
+    else if (uiA >= 0x7E800000)
+    {                 // If |A| is 0x7E800000 (posit is pure integer value), leave it unchanged.
+        return uA.p;  // This also takes care of the NaR case, 0x80000000.
+    }
+    else
+    {  // 34% of the cases, we have to decode the posit.
 
-		while (mask & uiA) {
-			scale += 4;
-			mask >>= 1;
-		}
-		mask >>= 1;
+        while (mask & uiA)
+        {
+            scale += 4;
+            mask >>= 1;
+        }
+        mask >>= 1;
 
-		//Exponential (2 bits)
-		if (mask & uiA) scale+=2;
-		mask >>= 1;
-		if (mask & uiA) scale++;
-		mask >>= scale;
+        // Exponential (2 bits)
+        if (mask & uiA)
+            scale += 2;
+        mask >>= 1;
+        if (mask & uiA)
+            scale++;
+        mask >>= scale;
 
-		//the rest of the bits
-		bitLast = (uiA & mask);
-		mask >>= 1;
-		tmp = (uiA & mask);
-		bitNPlusOne = tmp;
-		uiA ^= tmp;                            // Erase the bit, if it was set.
-		tmp = uiA & (mask - 1);                // this is actually bitsMore
+        // the rest of the bits
+        bitLast = (uiA & mask);
+        mask >>= 1;
+        tmp         = (uiA & mask);
+        bitNPlusOne = tmp;
+        uiA ^= tmp;              // Erase the bit, if it was set.
+        tmp = uiA & (mask - 1);  // this is actually bitsMore
 
-		uiA ^= tmp;    
+        uiA ^= tmp;
 
-		if (bitNPlusOne) {
-			if (bitLast | tmp) uiA += (mask << 1);
-		}
-		uA.ui = uiA;
-
-
-	}
-	if (sign) uA.ui = -uA.ui & 0xFFFFFFFF;
-	return uA.p;
-
-
+        if (bitNPlusOne)
+        {
+            if (bitLast | tmp)
+                uiA += (mask << 1);
+        }
+        uA.ui = uiA;
+    }
+    if (sign)
+        uA.ui = -uA.ui & 0xFFFFFFFF;
+    return uA.p;
 }
-

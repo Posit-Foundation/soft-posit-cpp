@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (vX.Y.Z format)'
+        required: true
+        type: string
+
+jobs:
+  build-packages:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            package_type: DEB
+            artifact_name: soft-posit-cpp-deb
+            file_ext: "*.deb"
+          - os: macos-latest
+            package_type: TGZ
+            artifact_name: soft-posit-cpp-macos
+            file_ext: "*.tar.gz"
+          - os: windows-latest
+            package_type: ZIP
+            artifact_name: soft-posit-cpp-windows
+            file_ext: "*.zip"
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up CMake
+      uses: lukka/get-cmake@latest
+    
+    - name: Configure CMake
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_TESTS=ON
+    
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Release -j
+    
+    - name: Test
+      run: |
+        cd build
+        ctest --output-on-failure -C Release
+    
+    - name: Package
+      run: |
+        cd build
+        cpack -G ${{ matrix.package_type }} -C Release
+    
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact_name }}
+        path: build/${{ matrix.file_ext }}
+        retention-days: 7
+
+  create-release:
+    needs: build-packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Determine version
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "push" ]]; then
+          VERSION=${GITHUB_REF#refs/tags/}
+        else
+          VERSION=${{ github.event.inputs.version }}
+        fi
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "Using version: ${VERSION}"
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        
+    - name: Display structure of downloaded files
+      run: ls -R dist
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: Release ${{ steps.version.outputs.version }}
+        draft: false
+        prerelease: false
+        files: |
+          dist/soft-posit-cpp-deb/*.deb
+          dist/soft-posit-cpp-macos/*.tar.gz
+          dist/soft-posit-cpp-windows/*.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

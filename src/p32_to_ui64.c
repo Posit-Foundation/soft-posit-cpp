@@ -39,79 +39,86 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-uint_fast64_t pX2_to_ui64( posit_2_t pA ) {
-	posit32_t p32 = {.v = pA.v};
-	return p32_to_ui64(p32);
-
+uint_fast64_t pX2_to_ui64(posit_2_t pA)
+{
+    posit32_t p32 = {.v = pA.v};
+    return p32_to_ui64(p32);
 }
 
-uint_fast64_t p32_to_ui64( posit32_t pA ) {
-
+uint_fast64_t p32_to_ui64(posit32_t pA)
+{
     union ui32_p32 uA;
-    uint_fast64_t mask, iZ, tmp;
-    uint_fast32_t scale = 0, uiA;
-    bool bitLast, bitNPlusOne, bitsMore;
+    uint_fast64_t  mask, iZ, tmp;
+    uint_fast32_t  scale = 0, uiA;
+    bool           bitLast, bitNPlusOne, bitsMore;
 
     uA.p = pA;
-    uiA = uA.ui;
+    uiA  = uA.ui;
 
-    //NaR
-	//if (uiA==0x80000000) return 0;
-	//negative
-	if (uiA>=0x80000000) return 0;
+    // NaR
+    // if (uiA==0x80000000) return 0;
+    // negative
+    if (uiA >= 0x80000000)
+        return 0;
 
-	if (uiA <= 0x38000000) {                     // 0 <= |pA| <= 1/2 rounds to zero.
-		return 0;
-	}
-	else if (uiA < 0x44000000) {                 // 1/2 < x < 3/2 rounds to 1.
-		return 1;
-	}
-	else if (uiA <= 0x4A000000) {                // 3/2 <= x <= 5/2 rounds to 2.
-		return 2;
-	}
-	else if (uiA>0x7FFFBFFF){
-		return 0xFFFFFFFFFFFFFFFFULL;
-	}
-	else {
+    if (uiA <= 0x38000000)
+    {  // 0 <= |pA| <= 1/2 rounds to zero.
+        return 0;
+    }
+    else if (uiA < 0x44000000)
+    {  // 1/2 < x < 3/2 rounds to 1.
+        return 1;
+    }
+    else if (uiA <= 0x4A000000)
+    {  // 3/2 <= x <= 5/2 rounds to 2.
+        return 2;
+    }
+    else if (uiA > 0x7FFFBFFF)
+    {
+        return 0xFFFFFFFFFFFFFFFFULL;
+    }
+    else
+    {
+        uiA -= 0x40000000;
+        while (0x20000000 & uiA)
+        {
+            scale += 4;
+            uiA = (uiA - 0x20000000) << 1;
+        }
+        uiA <<= 1;  // Skip over termination bit, which is 0.
+        if (0x20000000 & uiA)
+            scale += 2;  // If first exponent bit is 1, increment the scale.
+        if (0x10000000 & uiA)
+            scale++;
+        iZ = (((uint64_t) uiA | 0x10000000ULL) & 0x1FFFFFFFULL)
+             << 34;  // Left-justify fraction in 32-bit result (one left bit padding)
 
-		uiA -= 0x40000000;
-		while (0x20000000 & uiA) {
-			scale += 4;
-			uiA = (uiA - 0x20000000) << 1;
-		}
-		uiA <<= 1;  								// Skip over termination bit, which is 0.
-		if (0x20000000 & uiA) scale+=2;          	// If first exponent bit is 1, increment the scale.
-		if (0x10000000 & uiA) scale++;
-		iZ = (((uint64_t)uiA | 0x10000000ULL)&0x1FFFFFFFULL) << 34;	// Left-justify fraction in 32-bit result (one left bit padding)
+        if (scale < 62)
+        {
+            mask = 0x4000000000000000 >> scale;  // Point to the last bit of the integer part.
 
-		if(scale<62){
+            bitLast = (iZ & mask);  // Extract the bit, without shifting it.
+            mask >>= 1;
+            tmp         = (iZ & mask);
+            bitNPlusOne = tmp;      // "True" if nonzero.
+            iZ ^= tmp;              // Erase the bit, if it was set.
+            tmp = iZ & (mask - 1);  // tmp has any remaining bits. // This is bitsMore
+            iZ ^= tmp;              // Erase those bits, if any were set.
 
-			mask = 0x4000000000000000 >> scale; 	 // Point to the last bit of the integer part.
-
-			bitLast = (iZ & mask);               // Extract the bit, without shifting it.
-			mask >>= 1;
-			tmp = (iZ & mask);
-			bitNPlusOne = tmp;                   // "True" if nonzero.
-			iZ ^= tmp;                           // Erase the bit, if it was set.
-			tmp = iZ & (mask - 1);               // tmp has any remaining bits. // This is bitsMore
-			iZ ^= tmp;                           // Erase those bits, if any were set.
-
-			if (bitNPlusOne) {                   // logic for round to nearest, tie to even
-				if (bitLast | tmp) iZ += (mask << 1);
-			}
-			iZ = (uint64_t)iZ >> (62 - scale);             // Right-justify the integer.
-		}
-		else if (scale>62){
-			iZ = (uint64_t)iZ << (scale-62);
-		}
-
-	}
+            if (bitNPlusOne)
+            {  // logic for round to nearest, tie to even
+                if (bitLast | tmp)
+                    iZ += (mask << 1);
+            }
+            iZ = (uint64_t) iZ >> (62 - scale);  // Right-justify the integer.
+        }
+        else if (scale > 62)
+        {
+            iZ = (uint64_t) iZ << (scale - 62);
+        }
+    }
     return iZ;
 }
-
-
-

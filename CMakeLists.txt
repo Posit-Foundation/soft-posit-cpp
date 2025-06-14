@@ -4,7 +4,7 @@ project(SoftPosit VERSION 1.0.0 LANGUAGES C CXX)
 # Options
 option(SOFTPOSIT_QUAD "Enable quad-precision support" OFF)
 option(SOFTPOSIT_FAST_INT64 "Enable fast int64 operations" ON)
-option(BUILD_PYTHON_WRAPPER "Build Python wrapper" ON)
+option(BUILD_PYTHON_WRAPPER "Build Python wrapper" OFF)
 option(BUILD_PYTHON3_WRAPPER "Build Python3 wrapper" OFF)
 option(BUILD_JULIA_WRAPPER "Build Julia wrapper" OFF)
 option(BUILD_TESTS "Build tests" ON)
@@ -13,7 +13,27 @@ option(BUILD_BENCHMARKS "Build benchmarks" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(INLINE_LEVEL "Inline level for optimization" 5)
 
-# Default build type if not specified
+# Set deployment target explicitly for macOS to avoid missing headers with default version detection
+if(APPLE)
+  # Use current SDK version as deployment target if not specified
+  if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+    execute_process(COMMAND /usr/bin/xcrun --sdk macosx --show-sdk-version OUTPUT_VARIABLE _sdk_ver OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(_sdk_ver)
+      set(CMAKE_OSX_DEPLOYMENT_TARGET "${_sdk_ver}" CACHE STRING "Minimum macOS deployment target" FORCE)
+      execute_process(COMMAND /usr/bin/xcrun --sdk macosx --show-sdk-path OUTPUT_VARIABLE _sdk_path OUTPUT_STRIP_TRAILING_WHITESPACE)
+      if(_sdk_path)
+        set(ENV{SDKROOT} "${_sdk_path}")
+        message(STATUS "Using macOS SDK: ${_sdk_path}")
+        set(CMAKE_OSX_SYSROOT "${_sdk_path}" CACHE STRING "macOS SDK root" FORCE)
+      endif()
+    else()
+      # Fallback to 11.0 which is broadly available
+      set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS deployment target" FORCE)
+    endif()
+  endif()
+endif()
+
+# Original build type setup
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
@@ -253,7 +273,7 @@ if(BUILD_TESTS)
   # Function to add test executable with auto-discovered test files
   function(add_posit_test_executable NAME SIZE)
     # Auto-discover test files in the directory
-    file(GLOB TEST_SOURCES "${TESTS_DIR}/${NAME}_tests/*.cpp")
+    file(GLOB TEST_SOURCES CONFIGURE_DEPENDS "${TESTS_DIR}/${NAME}_tests/*.cpp")
     
     # Add the test executable with all discovered files
     add_executable(${NAME}_tests 

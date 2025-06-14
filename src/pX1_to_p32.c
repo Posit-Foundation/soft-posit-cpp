@@ -36,78 +36,85 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
+posit32_t pX1_to_p32(posit_1_t pA)
+{
+    union ui32_pX1 uA;
+    union ui32_p32 uZ;
+    uint_fast32_t  uiA, tmp, regime;
+    uint_fast32_t  exp_frac32A = 0;
+    bool           sign, regSA, bitNPlusOne = 0, bitsMore = 0;
+    int_fast8_t    kA = 0, regA;
 
-posit32_t pX1_to_p32( posit_1_t pA ){
+    uA.p = pA;
+    uiA  = uA.ui;
 
-	union ui32_pX1 uA;
-	union ui32_p32 uZ;
-	uint_fast32_t uiA, tmp, regime;
-	uint_fast32_t exp_frac32A=0;
-	bool sign, regSA, bitNPlusOne=0, bitsMore=0;
-	int_fast8_t kA=0, regA;
+    if (uiA == 0x80000000 || uiA == 0)
+    {
+        uZ.ui = uiA;
+        return uZ.p;
+    }
 
-	uA.p = pA;
-	uiA = uA.ui;
+    sign = signP32UI(uiA);
+    if (sign)
+        uiA = -uiA & 0xFFFFFFFF;
+    regSA = signregP32UI(uiA);
 
-	if (uiA==0x80000000 || uiA==0 ){
-		uZ.ui = uiA;
-		return uZ.p;
-	}
+    tmp = (uiA << 2) & 0xFFFFFFFF;
+    if (regSA)
+    {
+        while (tmp >> 31)
+        {
+            kA++;
+            tmp = (tmp << 1) & 0xFFFFFFFF;
+        }
+    }
+    else
+    {
+        kA = -1;
+        while (!(tmp >> 31))
+        {
+            kA--;
+            tmp = (tmp << 1) & 0xFFFFFFFF;
+        }
+        tmp &= 0x7FFFFFFF;
+    }
 
+    // 2nd bit exp
+    exp_frac32A = tmp;
 
-	sign = signP32UI( uiA );
-	if (sign) uiA = -uiA & 0xFFFFFFFF;
-	regSA = signregP32UI(uiA);
+    if (kA < 0)
+    {
+        regA = -kA;
+        exp_frac32A |= ((uint32_t) (regA & 0x1) << 31);
+        regA = (regA + 1) >> 1;
+        if (regA == 0)
+            regA = 1;
+        regSA  = 0;
+        regime = 0x40000000 >> regA;
+    }
+    else
+    {
+        exp_frac32A |= ((uint32_t) (kA & 0x1) << 31);
+        (kA == 0) ? (regA = 1) : (regA = (kA + 2) >> 1);
+        regSA  = 1;
+        regime = 0x7FFFFFFF - (0x7FFFFFFF >> regA);
+    }
 
-	tmp = (uiA<<2)&0xFFFFFFFF;
-	if (regSA){
-		while (tmp>>31){
-			kA++;
-			tmp= (tmp<<1) & 0xFFFFFFFF;
-		}
-	}
-	else{
-		kA=-1;
-		while (!(tmp>>31)){
-			kA--;
-			tmp= (tmp<<1) & 0xFFFFFFFF;
-		}
-		tmp&=0x7FFFFFFF;
-	}
+    bitNPlusOne = (exp_frac32A >> (regA + 1)) & 0x1;
+    bitsMore    = exp_frac32A & (0x7FFFFFFF >> (31 - regA));
 
+    exp_frac32A >>= (regA + 2);  // 2 because of sign and regime terminating bit
+    uZ.ui = regime + exp_frac32A;
 
-	//2nd bit exp
-	exp_frac32A = tmp;
+    if (bitNPlusOne)
+    {
+        uZ.ui += (uZ.ui & 1) | bitsMore;
+    }
 
-	if(kA<0){
-		regA = -kA;
-		exp_frac32A |= ((uint32_t)(regA&0x1)<<31);
-		regA = (regA+1)>>1;
-		if (regA==0) regA=1;
-		regSA = 0;
-		regime = 0x40000000>>regA;
-	}
-	else{
-		exp_frac32A |= ((uint32_t)(kA&0x1)<<31);
-		(kA==0) ? (regA=1) : (regA = (kA+2)>>1);
-		regSA=1;
-		regime = 0x7FFFFFFF - (0x7FFFFFFF>>regA);
-	}
-
-	bitNPlusOne = (exp_frac32A >>(regA+1))&0x1;
-	bitsMore = exp_frac32A&(0x7FFFFFFF>>(31-regA));
-
-	exp_frac32A >>=(regA+2); //2 because of sign and regime terminating bit
-	uZ.ui = regime + exp_frac32A;
-
-	if (bitNPlusOne){
-		uZ.ui += (uZ.ui&1) | bitsMore;
-	}
-
-    if (sign) uZ.ui = (-uZ.ui & 0xFFFFFFFF);
-	return uZ.p;
+    if (sign)
+        uZ.ui = (-uZ.ui & 0xFFFFFFFF);
+    return uZ.p;
 }
-

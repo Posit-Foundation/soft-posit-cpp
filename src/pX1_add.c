@@ -39,39 +39,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit_1_t pX1_add( posit_1_t a, posit_1_t b, int x ){
+posit_1_t pX1_add(posit_1_t a, posit_1_t b, int x)
+{
     union ui32_pX1 uA, uB, uZ;
-    uint_fast32_t uiA, uiB;
+    uint_fast32_t  uiA, uiB;
 
-    if (x<2 || x>32){
-    	uZ.ui = 0x80000000;
-    	return uZ.p;
+    if (x < 2 || x > 32)
+    {
+        uZ.ui = 0x80000000;
+        return uZ.p;
     }
 
     uA.p = a;
-	uiA = uA.ui;
-	uB.p = b;
-	uiB = uB.ui;
+    uiA  = uA.ui;
+    uB.p = b;
+    uiB  = uB.ui;
 
-    //Zero or infinity
-	if (uiA==0 || uiB==0){ // Not required but put here for speed
-		uZ.ui = uiA | uiB;
-		return uZ.p;
-	}
-	else if ( uiA==0x80000000 || uiB==0x80000000 ){
-		uZ.ui = 0x80000000;
-		return uZ.p;
-	}
+    // Zero or infinity
+    if (uiA == 0 || uiB == 0)
+    {  // Not required but put here for speed
+        uZ.ui = uiA | uiB;
+        return uZ.p;
+    }
+    else if (uiA == 0x80000000 || uiB == 0x80000000)
+    {
+        uZ.ui = 0x80000000;
+        return uZ.p;
+    }
 
-
-	//different signs
-	if ((uiA^uiB)>>31)
-		return softposit_subMagsPX1(uiA, uiB, x);
-	else
-		return softposit_addMagsPX1(uiA, uiB, x);
-
+    // different signs
+    if ((uiA ^ uiB) >> 31)
+        return softposit_subMagsPX1(uiA, uiB, x);
+    else
+        return softposit_addMagsPX1(uiA, uiB, x);
 }
-
