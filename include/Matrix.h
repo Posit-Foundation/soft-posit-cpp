@@ -163,7 +163,7 @@ public:
                 augmented(i, j) = (*this)(i, j);
             }
             if constexpr (std::is_same_v<T, posit32_t>) {
-                augmented(i, i + cols) = int_to_posit32(1); // Identity matrix on the right
+                augmented(i, i + cols) = double_to_posit32(1); // Identity matrix on the right
             } else {
                 augmented(i, i + cols) = 1; // Identity matrix on the right
             }

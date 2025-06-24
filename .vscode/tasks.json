@@ -9,6 +9,7 @@
                 "-fdiagnostics-color=always",
                 "-I${workspaceFolder}/include",
                 "-I${workspaceFolder}/include/8086-SSE",
+                "-I/opt/homebrew/include/eigen3",
                 "-g",
                 "${workspaceFolder}/src/*.c",
                 "${file}",

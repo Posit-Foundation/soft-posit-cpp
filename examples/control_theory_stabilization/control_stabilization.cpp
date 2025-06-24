@@ -21,7 +21,7 @@ Theoretically, stepWithQuire() can perform even more operations before rounding.
 #include <softposit.h>
 #include <filesystem>
 #include <sys/stat.h>
-#include <Matrix.h>
+#include <matrix.h>
 #include <posit_ops.h>
 
 // Image dimensions
