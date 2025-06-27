@@ -39,57 +39,65 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-uint_fast32_t p16_to_ui32( posit16_t pA ) {
+uint_fast32_t p16_to_ui32(posit16_t pA)
+{
+    union ui16_p16 uA;
+    uint_fast32_t  mask, iZ, tmp;
+    uint_fast16_t  scale = 0, uiA;
+    bool           bitLast, bitNPlusOne;
 
-	union ui16_p16 uA;
-	uint_fast32_t mask, iZ, tmp;
-	uint_fast16_t scale = 0, uiA;
-	bool bitLast, bitNPlusOne;
+    uA.p = pA;
+    uiA  = uA.ui;  // Copy of the input.
+    // NaR
+    // if (uiA==0x8000) return 0;
+    if (uiA >= 0x8000)
+        return 0;  // negative
 
-	uA.p = pA;
-	uiA = uA.ui;                             // Copy of the input.
-	//NaR
-	//if (uiA==0x8000) return 0;
-	if (uiA>=0x8000) return 0; 	//negative
+    if (uiA <= 0x3000)
+    {  // 0 <= |pA| <= 1/2 rounds to zero.
+        return 0;
+    }
+    else if (uiA < 0x4800)
+    {  // 1/2 < x < 3/2 rounds to 1.
+        iZ = 1;
+    }
+    else if (uiA <= 0x5400)
+    {  // 3/2 <= x <= 5/2 rounds to 2.
+        iZ = 2;
+    }
+    else
+    {                   // Decode the posit, left-justifying as we go.
+        uiA -= 0x4000;  // Strip off first regime bit (which is a 1).
+        while (0x2000 & uiA)
+        {                               // Increment scale by 2 for each regime sign bit.
+            scale += 2;                 // Regime sign bit is always 1 in this range.
+            uiA = (uiA - 0x2000) << 1;  // Remove the bit; line up the next regime bit.
+        }
+        uiA <<= 1;  // Skip over termination bit, which is 0.
+        if (0x2000 & uiA)
+            scale++;  // If exponent is 1, increment the scale.
+        iZ = ((uint32_t) uiA | 0x2000)
+             << 17;  // Left-justify fraction in 32-bit result (one left bit padding)
+        mask = 0x40000000 >> scale;  // Point to the last bit of the integer part.
 
-	if (uiA <= 0x3000) {                     // 0 <= |pA| <= 1/2 rounds to zero.
-		return 0;
-	}
-	else if (uiA < 0x4800) {                 // 1/2 < x < 3/2 rounds to 1.
-		iZ = 1;
-	}
-	else if (uiA <= 0x5400) {                // 3/2 <= x <= 5/2 rounds to 2.
-		iZ = 2;
-	}
-	else {                                   // Decode the posit, left-justifying as we go.
-		uiA -= 0x4000;                       // Strip off first regime bit (which is a 1).
-		while (0x2000 & uiA) {               // Increment scale by 2 for each regime sign bit.
-			scale += 2;                      // Regime sign bit is always 1 in this range.
-			uiA = (uiA - 0x2000) << 1;       // Remove the bit; line up the next regime bit.
-		}
-		uiA <<= 1;                           // Skip over termination bit, which is 0.
-		if (0x2000 & uiA) scale++;           // If exponent is 1, increment the scale.
-		iZ = ((uint32_t)uiA | 0x2000) << 17;         // Left-justify fraction in 32-bit result (one left bit padding)
-		mask = 0x40000000 >> scale;          // Point to the last bit of the integer part.
+        bitLast = (iZ & mask);  // Extract the bit, without shifting it.
+        mask >>= 1;
+        tmp         = (iZ & mask);
+        bitNPlusOne = tmp;      // "True" if nonzero.
+        iZ ^= tmp;              // Erase the bit, if it was set.
+        tmp = iZ & (mask - 1);  // tmp has any remaining bits. // This is bitsMore
+        iZ ^= tmp;              // Erase those bits, if any were set.
 
-		bitLast = (iZ & mask);               // Extract the bit, without shifting it.
-		mask >>= 1;
-		tmp = (iZ & mask);
-		bitNPlusOne = tmp;                   // "True" if nonzero.
-		iZ ^= tmp;                           // Erase the bit, if it was set.
-		tmp = iZ & (mask - 1);               // tmp has any remaining bits. // This is bitsMore
-		iZ ^= tmp;                           // Erase those bits, if any were set.
+        if (bitNPlusOne)
+        {  // logic for round to nearest, tie to even
+            if (bitLast | tmp)
+                iZ += (mask << 1);
+        }
+        iZ = (uint32_t) iZ >> (30 - scale);  // Right-justify the integer.
+    }
 
-		if (bitNPlusOne) {                   // logic for round to nearest, tie to even
-			if (bitLast | tmp) iZ += (mask << 1);
-		}
-		iZ = (uint32_t)iZ >> (30 - scale);             // Right-justify the integer.
-	}
-
-	return iZ;
-
+    return iZ;
 }
-

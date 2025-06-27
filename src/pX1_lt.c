@@ -38,22 +38,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-bool pX1_lt( posit_1_t a, posit_1_t b ) {
-	union ui32_pX1 uA, uB;
-	int32_t uiA, uiB;
+bool pX1_lt(posit_1_t a, posit_1_t b)
+{
+    union ui32_pX1 uA, uB;
+    int32_t        uiA, uiB;
 
-	uA.p = a;
-	uiA = (int32_t) uA.ui;
-	uB.p = b;
-	uiB = (int32_t)uB.ui;
+    uA.p = a;
+    uiA  = (int32_t) uA.ui;
+    uB.p = b;
+    uiB  = (int32_t) uB.ui;
 
-	if(uiA<uiB)
-		return true;
-	else
-		return false;
-
+    if (uiA < uiB)
+        return true;
+    else
+        return false;
 }
-

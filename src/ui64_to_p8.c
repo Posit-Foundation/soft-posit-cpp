@@ -41,31 +41,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit8_t ui64_to_p8( uint64_t a ){
-    int_fast8_t k, log2 = 6;//length of bit
-    union ui8_p8 uZ;
-    uint_fast8_t uiA;
+posit8_t ui64_to_p8(uint64_t a)
+{
+    int_fast8_t   k, log2 = 6;  // length of bit
+    union ui8_p8  uZ;
+    uint_fast8_t  uiA;
     uint_fast64_t mask = 0x40, fracA;
 
-    if ( a > 48 ) uiA = 0x7F;
-    else if ( a < 2 ) uiA = (a << 6);
-    else {
+    if (a > 48)
+        uiA = 0x7F;
+    else if (a < 2)
+        uiA = (a << 6);
+    else
+    {
         fracA = a;
-        while ( !(fracA & mask) ) {
+        while (!(fracA & mask))
+        {
             log2--;
             fracA <<= 1;
         }
 
-        k = log2;
-		fracA = (fracA ^ mask);
-        uiA = (0x7F ^ (0x3F >> k)) | ( fracA >> (k+1) ) ;
+        k     = log2;
+        fracA = (fracA ^ mask);
+        uiA   = (0x7F ^ (0x3F >> k)) | (fracA >> (k + 1));
 
-        mask = 0x1 << k; //bitNPlusOne
-        if (mask & fracA) {
-            if (((mask - 1) & fracA) | ((mask << 1) & fracA)) uiA++;
+        mask = 0x1 << k;  // bitNPlusOne
+        if (mask & fracA)
+        {
+            if (((mask - 1) & fracA) | ((mask << 1) & fracA))
+                uiA++;
         }
     }
     uZ.ui = uiA;

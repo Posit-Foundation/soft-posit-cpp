@@ -36,83 +36,94 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
+posit8_t pX1_to_p8(posit_1_t pA)
+{
+    union ui32_pX1 uA;
+    union ui8_p8   uZ;
+    uint_fast32_t  uiA, tmp, regime;
+    uint_fast32_t  exp_frac32A = 0;
+    bool           sign, regSA, bitsMore = 0;
+    int_fast8_t    kA = 0, regA;
 
-posit8_t pX1_to_p8( posit_1_t pA ){
+    uA.p = pA;
+    uiA  = uA.ui;
 
-	union ui32_pX1 uA;
-	union ui8_p8 uZ;
-	uint_fast32_t uiA, tmp, regime;
-	uint_fast32_t exp_frac32A=0;
-	bool sign, regSA, bitsMore=0;
-	int_fast8_t kA=0, regA;
+    if (uiA == 0x80000000 || uiA == 0)
+    {
+        uZ.ui = (uiA >> 24) & 0xFF;
+        return uZ.p;
+    }
 
-	uA.p = pA;
-	uiA = uA.ui;
+    sign = signP32UI(uiA);
+    if (sign)
+        uiA = -uiA & 0xFFFFFFFF;
+    regSA = signregP32UI(uiA);
 
-	if (uiA==0x80000000 || uiA==0 ){
-		uZ.ui = (uiA>>24) & 0xFF;
-		return uZ.p;
-	}
+    tmp = (uiA << 2) & 0xFFFFFFFF;
+    if (regSA)
+    {
+        while (tmp >> 31)
+        {
+            kA++;
+            tmp = (tmp << 1) & 0xFFFFFFFF;
+        }
+    }
+    else
+    {
+        kA = -1;
+        while (!(tmp >> 31))
+        {
+            kA--;
+            tmp = (tmp << 1) & 0xFFFFFFFF;
+        }
+        tmp &= 0x7FFFFFFF;
+    }
 
-	sign = signP32UI( uiA );
-	if (sign) uiA = -uiA & 0xFFFFFFFF;
-	regSA = signregP32UI(uiA);
+    if (kA < -3 || kA >= 3)
+    {
+        (kA < 0) ? (uZ.ui = 0x1) : (uZ.ui = 0x7F);
+    }
+    else
+    {
+        // 2nd bit exp
+        exp_frac32A = tmp;
+        if (kA < 0)
+        {
+            regA = ((-kA) << 1) - (exp_frac32A >> 30);
+            if (regA == 0)
+                regA = 1;
+            regSA  = 0;
+            regime = 0x40 >> regA;
+        }
+        else
+        {
+            (kA == 0) ? (regA = 1 + (exp_frac32A >> 30))
+                      : (regA = ((kA + 1) << 1) + (exp_frac32A >> 30) - 1);
+            regSA  = 1;
+            regime = 0x7F - (0x7F >> regA);
+        }
 
-	tmp = (uiA<<2)&0xFFFFFFFF;
-	if (regSA){
-		while (tmp>>31){
-			kA++;
-			tmp= (tmp<<1) & 0xFFFFFFFF;
-		}
-	}
-	else{
-		kA=-1;
-		while (!(tmp>>31)){
-			kA--;
-			tmp= (tmp<<1) & 0xFFFFFFFF;
-		}
-		tmp&=0x7FFFFFFF;
+        if (regA > 5)
+        {
+            uZ.ui = regime;
+        }
+        else
+        {
+            uZ.ui = regime + (((exp_frac32A) &0x3FFFFFFF) >> (regA + 24));
+        }
+    }
 
-	}
+    if (exp_frac32A & (0x800000 << regA))
+    {
+        bitsMore = exp_frac32A & ((0x800000 << regA) - 1);
+        uZ.ui += (uZ.ui & 1) | bitsMore;
+    }
 
-	if (kA<-3 || kA>=3){
-		(kA<0) ? (uZ.ui=0x1):(uZ.ui= 0x7F);
-	}
-	else{
-		//2nd bit exp
-		exp_frac32A = tmp;
-		if(kA<0){
-			regA = ((-kA)<<1) - (exp_frac32A>>30);
-			if (regA==0) regA=1;
-			regSA = 0;
-			regime = 0x40>>regA;
-		}
-		else{
+    if (sign)
+        uZ.ui = -uZ.ui & 0xFF;
 
-			(kA==0)?(regA=1 + (exp_frac32A>>30)): (regA = ((kA+1)<<1) + (exp_frac32A>>30) -1);
-			regSA=1;
-			regime = 0x7F - (0x7F>>regA);
-		}
-
-		if (regA>5){
-			uZ.ui = regime;
-		}
-		else{
-			uZ.ui = regime + ( ((exp_frac32A)&0x3FFFFFFF)>>(regA+24) );
-		}
-	}
-
-	if ( exp_frac32A & (0x800000<<regA)){
-		bitsMore = exp_frac32A & ((0x800000<<regA)-1);
-		uZ.ui += (uZ.ui&1) | bitsMore;
-
-	}
-
-	if (sign) uZ.ui = -uZ.ui & 0xFF;
-
-	return uZ.p;
+    return uZ.p;
 }
-

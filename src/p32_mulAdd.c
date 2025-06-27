@@ -38,22 +38,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit32_t p32_mulAdd(posit32_t a, posit32_t b, posit32_t c) {
+posit32_t p32_mulAdd(posit32_t a, posit32_t b, posit32_t c)
+{
     union ui32_p32 uA;
-    uint_fast32_t uiA;
+    uint_fast32_t  uiA;
     union ui32_p32 uB;
-    uint_fast32_t uiB;
+    uint_fast32_t  uiB;
     union ui32_p32 uC;
-    uint_fast32_t uiC;
+    uint_fast32_t  uiC;
 
     uA.p = a;
-    uiA = uA.ui;
+    uiA  = uA.ui;
     uB.p = b;
-    uiB = uB.ui;
+    uiB  = uB.ui;
     uC.p = c;
-    uiC = uC.ui;
+    uiC  = uC.ui;
     return softposit_mulAddP32(uiA, uiB, uiC, softposit_mulAdd);
 }

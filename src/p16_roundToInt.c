@@ -39,60 +39,68 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
+posit16_t p16_roundToInt(posit16_t pA)
+{
+    union ui16_p16 uA;
+    uint_fast16_t  mask = 0x2000, scale = 0, tmp = 0, uiA;
+    bool           bitLast, bitNPlusOne, sign;
 
-posit16_t p16_roundToInt( posit16_t pA ) {
+    uA.p = pA;
+    uiA  = uA.ui;  // Copy of the input.
+    sign = (uiA > 0x8000);
 
-	union ui16_p16 uA;
-	uint_fast16_t mask = 0x2000, scale=0, tmp=0, uiA;
-	bool bitLast, bitNPlusOne, sign;
+    // sign is True if pA > NaR.
+    if (sign)
+        uiA = -uiA & 0xFFFF;  // A is now |A|.
+    if (uiA <= 0x3000)
+    {  // 0 <= |pA| <= 1/2 rounds to zero.
+        uA.ui = 0;
+        return uA.p;
+    }
+    else if (uiA < 0x4800)
+    {  // 1/2 < x < 3/2 rounds to 1.
+        uA.ui = 0x4000;
+    }
+    else if (uiA <= 0x5400)
+    {  // 3/2 <= x <= 5/2 rounds to 2.
+        uA.ui = 0x5000;
+    }
+    else if (uiA >= 0x7C00)
+    {                 // If |A| is 256 or greater, leave it unchanged.
+        return uA.p;  // This also takes care of the NaR case, 0x8000.
+    }
+    else
+    {  // 34% of the cases, we have to decode the posit.
+        while (mask & uiA)
+        {                // Increment scale by 2 for each regime sign bit.
+            scale += 2;  // Regime sign bit is always 1 in this range.
+            mask >>= 1;  // Move the mask right, to the next bit.
+        }
+        mask >>= 1;  // Skip over termination bit.
+        if (mask & uiA)
+            scale++;  // If exponent is 1, increment the scale.
 
-	uA.p = pA;
-	uiA = uA.ui;                             // Copy of the input.
-	sign = (uiA > 0x8000);
+        mask >>= scale;          // Point to the last bit of the integer part.
+        bitLast = (uiA & mask);  // Extract the bit, without shifting it.
 
-	// sign is True if pA > NaR.
-	if (sign) uiA = -uiA & 0xFFFF;           // A is now |A|.
-	if (uiA <= 0x3000) {                     // 0 <= |pA| <= 1/2 rounds to zero.
-		uA.ui = 0;
-		return uA.p;
-	}
-	else if (uiA < 0x4800) {                 // 1/2 < x < 3/2 rounds to 1.
-		uA.ui = 0x4000;
-	}
-	else if (uiA <= 0x5400) {                // 3/2 <= x <= 5/2 rounds to 2.
-		uA.ui = 0x5000;
-	}
-	else if (uiA >= 0x7C00) {                 // If |A| is 256 or greater, leave it unchanged.
-		return uA.p;                           // This also takes care of the NaR case, 0x8000.
-	}
-	else {                                   // 34% of the cases, we have to decode the posit.
-		while (mask & uiA) {                   // Increment scale by 2 for each regime sign bit.
-			scale += 2;                          // Regime sign bit is always 1 in this range.
-			mask >>= 1;                          // Move the mask right, to the next bit.
-		}
-		mask >>= 1;                            // Skip over termination bit.
-		if (mask & uiA) scale++;               // If exponent is 1, increment the scale.
+        mask >>= 1;
+        tmp         = (uiA & mask);
+        bitNPlusOne = tmp;       // "True" if nonzero.
+        uiA ^= tmp;              // Erase the bit, if it was set.
+        tmp = uiA & (mask - 1);  // tmp has any remaining bits.
+        uiA ^= tmp;              // Erase those bits, if any were set.
 
-		mask >>= scale;                  	// Point to the last bit of the integer part.
-		bitLast = (uiA & mask);				// Extract the bit, without shifting it.
-
-		mask >>= 1;
-		tmp = (uiA & mask);
-		bitNPlusOne = tmp;                       // "True" if nonzero.
-		uiA ^= tmp;                            // Erase the bit, if it was set.
-		tmp = uiA & (mask - 1);                // tmp has any remaining bits.
-		uiA ^= tmp;                            // Erase those bits, if any were set.
-
-		if (bitNPlusOne) {                       // logic for round to nearest, tie to even
-			if (bitLast | tmp) uiA += (mask << 1);
-		}
-		uA.ui = uiA;
-	}
-	if (sign) uA.ui = -uA.ui & 0xFFFF;       // Apply the sign of Z.
-	return uA.p;
-
+        if (bitNPlusOne)
+        {  // logic for round to nearest, tie to even
+            if (bitLast | tmp)
+                uiA += (mask << 1);
+        }
+        uA.ui = uiA;
+    }
+    if (sign)
+        uA.ui = -uA.ui & 0xFFFF;  // Apply the sign of Z.
+    return uA.p;
 }
-

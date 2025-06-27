@@ -1,0 +1,57 @@
+name: Build macOS
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  pull_request:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    outputs:
+      cache_key: ${{ steps.cache-key.outputs.key }}
+      cache_hit: ${{ steps.cache-build.outputs.cache-hit }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-macos-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      shell: bash
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up dependencies
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        brew install cmake ninja
+
+    - name: Configure CMake
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=ON
+      
+    - name: Build
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        cd build
+        make -j$(sysctl -n hw.ncpu)
+        
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifact-macos
+        path: build/
+        retention-days: 1 

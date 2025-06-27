@@ -1,0 +1,175 @@
+# RISC-V Development Environment with QEMU
+FROM ubuntu:22.04
+
+# Avoid interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set working directory
+WORKDIR /workspace
+
+# Update package list and install dependencies
+RUN apt-get update && apt-get install -y \
+    # Build essentials
+    build-essential \
+    cmake \
+    make \
+    ninja-build \
+    git \
+    wget \
+    curl \
+    # QEMU user-mode emulation
+    qemu-user-static \
+    # RISC-V cross-compilation toolchain
+    gcc-riscv64-linux-gnu \
+    g++-riscv64-linux-gnu \
+    # RISC-V runtime libraries
+    libc6-dev-riscv64-cross \
+    libstdc++6-riscv64-cross \
+    libgcc-s1-riscv64-cross \
+    # Additional utilities
+    file \
+    tree \
+    vim \
+    nano \
+    && rm -rf /var/lib/apt/lists/*
+
+# Verify QEMU installation
+RUN qemu-riscv64-static --version
+
+# Verify cross-compilation toolchain
+RUN riscv64-linux-gnu-gcc --version && \
+    riscv64-linux-gnu-g++ --version
+
+# Set environment variables for cross-compilation
+ENV CC=riscv64-linux-gnu-gcc
+ENV CXX=riscv64-linux-gnu-g++
+ENV AR=riscv64-linux-gnu-ar
+ENV STRIP=riscv64-linux-gnu-strip
+ENV OBJCOPY=riscv64-linux-gnu-objcopy
+ENV OBJDUMP=riscv64-linux-gnu-objdump
+
+# Create scripts directory
+RUN mkdir -p /usr/local/bin
+
+# Create build script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+echo "Building for RISC-V..."\n\
+mkdir -p build-riscv\n\
+cd build-riscv\n\
+\n\
+cmake .. \\\n\
+  -DCMAKE_BUILD_TYPE=Release \\\n\
+  -DBUILD_TESTS=ON \\\n\
+  -DBUILD_BENCHMARKS=ON \\\n\
+  -DCMAKE_SYSTEM_NAME=Linux \\\n\
+  -DCMAKE_SYSTEM_PROCESSOR=riscv64 \\\n\
+  -DCMAKE_C_COMPILER=riscv64-linux-gnu-gcc \\\n\
+  -DCMAKE_CXX_COMPILER=riscv64-linux-gnu-g++ \\\n\
+  -DCMAKE_FIND_ROOT_PATH=/usr/riscv64-linux-gnu \\\n\
+  -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \\\n\
+  -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \\\n\
+  -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \\\n\
+  -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY \\\n\
+  -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" \\\n\
+  -DREDUCE_P16_TESTS_ON_UBUNTU=ON\n\
+\n\
+make -j$(nproc)\n\
+echo "Build completed successfully!"' > /usr/local/bin/build-riscv.sh && \
+    chmod +x /usr/local/bin/build-riscv.sh
+
+# Create test runner script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+if [ ! -d "build-riscv" ]; then\n\
+    echo "Error: build-riscv directory not found. Run build-riscv.sh first."\n\
+    exit 1\n\
+fi\n\
+\n\
+cd build-riscv\n\
+\n\
+echo "Running RISC-V tests using QEMU..."\n\
+chmod +x *_tests\n\
+\n\
+echo "Running p8_tests..."\n\
+qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p8_tests\n\
+\n\
+echo "Running p16_tests..."\n\
+qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p16_tests\n\
+\n\
+echo "Running p32_tests..."\n\
+qemu-riscv64-static -L /usr/riscv64-linux-gnu ./p32_tests\n\
+\n\
+echo "Running q8_tests..."\n\
+qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q8_tests\n\
+\n\
+echo "Running q16_tests..."\n\
+qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q16_tests\n\
+\n\
+echo "Running q32_tests..."\n\
+qemu-riscv64-static -L /usr/riscv64-linux-gnu ./q32_tests\n\
+\n\
+echo "All tests completed successfully!"' > /usr/local/bin/run-riscv-tests.sh && \
+    chmod +x /usr/local/bin/run-riscv-tests.sh
+
+# Create benchmark runner script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+if [ ! -d "build-riscv" ]; then\n\
+    echo "Error: build-riscv directory not found. Run build-riscv.sh first."\n\
+    exit 1\n\
+fi\n\
+\n\
+cd build-riscv\n\
+\n\
+echo "Running RISC-V benchmarks using QEMU..."\n\
+\n\
+if [ -f "./benchmarks/accuracy_benchmarks" ]; then\n\
+    echo "Running accuracy benchmarks..."\n\
+    qemu-riscv64-static -L /usr/riscv64-linux-gnu ./benchmarks/accuracy_benchmarks\n\
+fi\n\
+\n\
+if [ -f "./benchmarks/performance_benchmarks" ]; then\n\
+    echo "Running performance benchmarks..."\n\
+    qemu-riscv64-static -L /usr/riscv64-linux-gnu ./benchmarks/performance_benchmarks\n\
+fi\n\
+\n\
+echo "Benchmarks completed!"' > /usr/local/bin/run-riscv-benchmarks.sh && \
+    chmod +x /usr/local/bin/run-riscv-benchmarks.sh
+
+# Create utility script to run any RISC-V binary
+RUN echo '#!/bin/bash\n\
+if [ $# -eq 0 ]; then\n\
+    echo "Usage: run-riscv.sh <riscv-binary> [args...]"\n\
+    echo "Example: run-riscv.sh ./build-riscv/p8_tests"\n\
+    exit 1\n\
+fi\n\
+\n\
+echo "Running RISC-V binary: $1"\n\
+qemu-riscv64-static -L /usr/riscv64-linux-gnu "$@"' > /usr/local/bin/run-riscv.sh && \
+    chmod +x /usr/local/bin/run-riscv.sh
+
+# Create welcome message
+RUN echo '=====================================\n\
+RISC-V Development Environment\n\
+=====================================\n\
+\n\
+Available commands:\n\
+  build-riscv.sh          - Build project for RISC-V\n\
+  run-riscv-tests.sh      - Run all test suites\n\
+  run-riscv-benchmarks.sh - Run benchmarks\n\
+  run-riscv.sh <binary>   - Run any RISC-V binary\n\
+\n\
+Example workflow:\n\
+  1. build-riscv.sh\n\
+  2. run-riscv-tests.sh\n\
+\n\
+Your source code should be mounted at /workspace\n\
+=====================================' > /etc/motd && \
+    echo 'cat /etc/motd' >> /etc/bash.bashrc
+
+# Set default command
+CMD ["/bin/bash"] 

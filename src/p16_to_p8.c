@@ -37,84 +37,96 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit8_t p16_to_p8( posit16_t pA ) {
+posit8_t p16_to_p8(posit16_t pA)
+{
+    union ui16_p16 uA;
+    union ui8_p8   uZ;
+    uint_fast16_t  uiA, tmp, regime;
+    uint_fast16_t  exp_frac16A = 0;
+    bool           sign, regSA, bitsMore = 0;
+    int_fast8_t    kA = 0, regA;
 
-	union ui16_p16 uA;
-	union ui8_p8 uZ;
-	uint_fast16_t uiA, tmp, regime;
-	uint_fast16_t exp_frac16A=0;
-	bool sign, regSA, bitsMore=0;
-	int_fast8_t kA=0, regA;
+    uA.p = pA;
+    uiA  = uA.ui;
 
-	uA.p = pA;
-	uiA = uA.ui;
+    if (uiA == 0x8000 || uiA == 0)
+    {
+        uZ.ui = (uiA >> 8) & 0xFF;
+        return uZ.p;
+    }
 
-	if (uiA==0x8000 || uiA==0 ){
-		uZ.ui = (uiA>>8) &0xFF;
-		return uZ.p;
-	}
+    sign = signP16UI(uiA);
 
-	sign = signP16UI( uiA );
+    if (sign)
+        uiA = -uiA & 0xFFFF;
+    regSA = signregP16UI(uiA);
 
-	if (sign) uiA = -uiA & 0xFFFF;
-	regSA = signregP16UI(uiA);
+    tmp = (uiA << 2) & 0xFFFF;
+    if (regSA)
+    {
+        while (tmp >> 15)
+        {
+            kA++;
+            tmp = (tmp << 1) & 0xFFFF;
+        }
+    }
+    else
+    {
+        kA = -1;
+        while (!(tmp >> 15))
+        {
+            kA--;
+            tmp = (tmp << 1) & 0xFFFF;
+        }
+        tmp &= 0x7FFF;
+    }
 
-	tmp = (uiA<<2) & 0xFFFF;
-	if (regSA){
-		while (tmp>>15){
-			kA++;
-			tmp= (tmp<<1) & 0xFFFF;
-		}
-	}
-	else{
-		kA=-1;
-		while (!(tmp>>15)){
-			kA--;
-			tmp= (tmp<<1) & 0xFFFF;
-		}
-		tmp&=0x7FFF;
-	}
+    if (kA < -3 || kA >= 3)
+    {
+        (kA < 0) ? (uZ.ui = 0x1) : (uZ.ui = 0x7F);
+    }
+    else
+    {
+        // 2nd bit exp
+        exp_frac16A = tmp;
+        if (kA < 0)
+        {
+            regA = ((-kA) << 1) - (exp_frac16A >> 14);
+            if (regA == 0)
+                regA = 1;
+            regSA  = 0;
+            regime = 0x40 >> regA;
+        }
+        else
+        {
+            (kA == 0) ? (regA = 1 + (exp_frac16A >> 14))
+                      : (regA = ((kA + 1) << 1) + (exp_frac16A >> 14) - 1);
+            regSA  = 1;
+            regime = 0x7F - (0x7F >> regA);
+        }
+        if (regA > 5)
+        {
+            uZ.ui = regime;
+        }
+        else
+        {
+            // int shift = regA+8;
+            // exp_frac16A= ((exp_frac16A)&0x3FFF) >> shift; //first 2 bits already empty (for sign
+            // and regime terminating bit)
+            uZ.ui = regime + (((exp_frac16A) &0x3FFF) >> (regA + 8));
+        }
+    }
 
-	if (kA<-3 || kA>=3){
-		(kA<0) ? (uZ.ui=0x1):(uZ.ui= 0x7F);
-	}
-	else{
-		//2nd bit exp
-		exp_frac16A = tmp;
-		if(kA<0){
-			regA = ((-kA)<<1) - (exp_frac16A>>14);
-			if (regA==0) regA=1;
-			regSA = 0;
-			regime = 0x40>>regA;
-		}
-		else{
+    if (exp_frac16A & (0x80 << regA))
+    {
+        bitsMore = exp_frac16A & (0xFFFF >> (9 - regA));
+        uZ.ui += (uZ.ui & 1) | bitsMore;
+    }
+    if (sign)
+        uZ.ui = -uZ.ui & 0xFF;
 
-			(kA==0)?(regA=1 + (exp_frac16A>>14)): (regA = ((kA+1)<<1) + (exp_frac16A>>14) -1);
-			regSA=1;
-			regime = 0x7F - (0x7F>>regA);
-		}
-		if (regA>5){
-			uZ.ui = regime;
-		}
-		else{
-			//int shift = regA+8;
-			//exp_frac16A= ((exp_frac16A)&0x3FFF) >> shift; //first 2 bits already empty (for sign and regime terminating bit)
-			uZ.ui = regime + ( ((exp_frac16A)&0x3FFF)>>(regA+8) );
-
-		}
-
-	}
-
-	if ( exp_frac16A & (0x80<<regA) ){
-		bitsMore = exp_frac16A & (0xFFFF>>(9-regA));
-		uZ.ui += (uZ.ui&1) | bitsMore;
-
-	}
-	if (sign) uZ.ui = -uZ.ui & 0xFF;
-
-	return uZ.p;
+    return uZ.p;
 }
-

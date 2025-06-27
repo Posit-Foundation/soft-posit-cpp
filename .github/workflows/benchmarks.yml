@@ -1,0 +1,139 @@
+name: Run Benchmarks
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to run benchmarks on'
+        required: true
+        default: 'ubuntu'
+        type: choice
+        options:
+          - ubuntu
+          - riscv
+          - both
+
+jobs:
+  ubuntu-benchmarks:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.platform == 'ubuntu' || github.event.inputs.platform == 'both' || github.event_name != 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-ubuntu-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up dependencies
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake make g++ ninja-build
+
+    - name: Configure and Build
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+    
+    - name: Run benchmarks
+      run: |
+        cd build
+        chmod +x benchmark/*
+        make bench
+        
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'googlecpp'
+        output-file-path: build/benchmarks/results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        # Comment out the following lines for the first run
+        # alert-threshold: '150%'
+        # comment-on-alert: true
+        # fail-on-alert: true
+
+  riscv-benchmarks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: github.event.inputs.platform == 'riscv' || github.event.inputs.platform == 'both'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-riscv-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build-riscv
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up runtime dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-user-static
+        sudo apt-get install -y libc6-dev-riscv64-cross
+        sudo apt-get install -y libstdc++6-riscv64-cross libgcc-s1-riscv64-cross
+        
+    - name: Set up RISC-V build toolchain
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get install -y cmake make ninja-build
+        sudo apt-get install -y gcc-riscv64-linux-gnu g++-riscv64-linux-gnu
+
+    - name: Configure and Build for RISC-V
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build-riscv
+        cd build-riscv
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_BENCHMARKS=ON \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+          -DCMAKE_C_COMPILER=riscv64-linux-gnu-gcc \
+          -DCMAKE_CXX_COMPILER=riscv64-linux-gnu-g++ \
+          -DCMAKE_FIND_ROOT_PATH=/usr/riscv64-linux-gnu \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
+          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY \
+          -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" \
+          -DREDUCE_P16_TESTS_ON_UBUNTU=ON
+        make -j$(nproc)
+    
+    - name: Run RISC-V benchmarks
+      run: |
+        cd build-riscv
+        chmod +x *_bench 2>/dev/null || true
+        echo "Note: Running benchmarks under QEMU emulation - results will not reflect real hardware performance"
+        if ls *_bench 1> /dev/null 2>&1; then
+          for bench in *_bench; do
+            echo "Running $bench..."
+            qemu-riscv64-static -L /usr/riscv64-linux-gnu ./$bench --benchmark_format=json > ${bench}_results.json || echo "Benchmark $bench completed with warnings"
+          done
+        else
+          echo "No benchmark executables found"
+          ls -la
+        fi

@@ -41,37 +41,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit32_t ui32_to_p32( uint32_t a ) {
-	int_fast8_t k, log2 = 31;//length of bit (e.g. 4294966271) in int (32 but because we have only 32 bits, so one bit off to accomdate that fact)
-	union ui32_p32 uZ;
-	uint_fast32_t uiA;
-	uint_fast32_t expA, mask = 0x80000000, fracA;
+posit32_t ui32_to_p32(uint32_t a)
+{
+    int_fast8_t k, log2 = 31;  // length of bit (e.g. 4294966271) in int (32 but because we have
+                               // only 32 bits, so one bit off to accomdate that fact)
+    union ui32_p32 uZ;
+    uint_fast32_t  uiA;
+    uint_fast32_t  expA, mask = 0x80000000, fracA;
 
-	if ( a > 4294966271)
-		uiA = 0x7FC00000; // 4294967296
-	else if ( a < 0x2 )
-		uiA = (a << 30);
-	else {
-		fracA = a;
-		while ( !(fracA & mask) ) {
-			log2--;
-			fracA <<= 1;
-		}
-		k = (log2 >> 2);
-		expA = (log2 & 0x3) << (27 - k);
-		fracA = (fracA ^ mask);
-		uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | expA | fracA>>(k+4);
+    if (a > 4294966271)
+        uiA = 0x7FC00000;  // 4294967296
+    else if (a < 0x2)
+        uiA = (a << 30);
+    else
+    {
+        fracA = a;
+        while (!(fracA & mask))
+        {
+            log2--;
+            fracA <<= 1;
+        }
+        k     = (log2 >> 2);
+        expA  = (log2 & 0x3) << (27 - k);
+        fracA = (fracA ^ mask);
+        uiA   = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | expA | fracA >> (k + 4);
 
-		mask = 0x8 << k;  //bitNPlusOne
+        mask = 0x8 << k;  // bitNPlusOne
 
-		if (mask & fracA)
-			if (((mask - 1) & fracA) | ((mask << 1) & fracA)) uiA++;
-
-	}
-	uZ.ui = uiA;
-	return uZ.p;
+        if (mask & fracA)
+            if (((mask - 1) & fracA) | ((mask << 1) & fracA))
+                uiA++;
+    }
+    uZ.ui = uiA;
+    return uZ.p;
 }
-

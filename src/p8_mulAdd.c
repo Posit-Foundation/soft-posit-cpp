@@ -35,19 +35,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "platform.h"
 
-posit8_t p8_mulAdd(posit8_t a, posit8_t b, posit8_t c) {
-  union ui8_p8 uA;
-  uint_fast8_t uiA;
-  union ui8_p8 uB;
-  uint_fast8_t uiB;
-  union ui8_p8 uC;
-  uint_fast8_t uiC;
+posit8_t p8_mulAdd(posit8_t a, posit8_t b, posit8_t c)
+{
+    union ui8_p8 uA;
+    uint_fast8_t uiA;
+    union ui8_p8 uB;
+    uint_fast8_t uiB;
+    union ui8_p8 uC;
+    uint_fast8_t uiC;
 
-  uA.p = a;
-  uiA = uA.ui;
-  uB.p = b;
-  uiB = uB.ui;
-  uC.p = c;
-  uiC = uC.ui;
-  return softposit_mulAddP8(uiA, uiB, uiC, softposit_mulAdd);
+    uA.p = a;
+    uiA  = uA.ui;
+    uB.p = b;
+    uiB  = uB.ui;
+    uC.p = c;
+    uiC  = uC.ui;
+    return softposit_mulAddP8(uiA, uiB, uiC, softposit_mulAdd);
 }

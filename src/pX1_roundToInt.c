@@ -39,72 +39,82 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit_1_t pX1_roundToInt( posit_1_t pA, int x ){
-	union ui32_pX1 uA;
-	uint_fast32_t mask = 0x20000000, scale=0, tmp=0, uiA, uiZ;
-	bool bitLast, bitNPlusOne, sign;
+posit_1_t pX1_roundToInt(posit_1_t pA, int x)
+{
+    union ui32_pX1 uA;
+    uint_fast32_t  mask = 0x20000000, scale = 0, tmp = 0, uiA, uiZ;
+    bool           bitLast, bitNPlusOne, sign;
 
-	uA.p = pA;
-	uiA = uA.ui;
-	sign = uiA>>31;
+    uA.p = pA;
+    uiA  = uA.ui;
+    sign = uiA >> 31;
 
-	// sign is True if pA > NaR.
-	if (sign) uiA = -uiA & 0xFFFFFFFF;           // A is now |A|.
-	if (uiA <= 0x30000000) {                     // 0 <= |pA| <= 1/2 rounds to zero.
-		uA.ui = 0;
-		return uA.p;
-	}
-	else if (uiA < 0x48000000) {                 // 1/2 < x < 3/2 rounds to 1.
-		uA.ui = 0x40000000;
-	}
-	else if (uiA <= 0x54000000) {                // 3/2 <= x <= 5/2 rounds to 2.
-		uA.ui = 0x50000000;
-	}
-	else if (uiA >= 0x7FE80000) {                 // If |A| is 0x7FE800000 (4194304) (posit is pure integer value), leave it unchanged.
-		if (x>8) return uA.p;                           // This also takes care of the NaR case, 0x80000000.
-		else{
-			bitNPlusOne=((uint32_t)0x80000000>>x) & uiA;
-			tmp = ((uint32_t)0x7FFFFFFF>>x)& uiA; //bitsMore
-			bitLast = ((uint32_t)0x80000000>>(x-1)) & uiA;
-			if (bitNPlusOne)
-				if (bitLast | tmp) uiA += bitLast;
-			uA.ui = uiA;
-		}
-	}
-	else {                                   // 34% of the cases, we have to decode the posit.
+    // sign is True if pA > NaR.
+    if (sign)
+        uiA = -uiA & 0xFFFFFFFF;  // A is now |A|.
+    if (uiA <= 0x30000000)
+    {  // 0 <= |pA| <= 1/2 rounds to zero.
+        uA.ui = 0;
+        return uA.p;
+    }
+    else if (uiA < 0x48000000)
+    {  // 1/2 < x < 3/2 rounds to 1.
+        uA.ui = 0x40000000;
+    }
+    else if (uiA <= 0x54000000)
+    {  // 3/2 <= x <= 5/2 rounds to 2.
+        uA.ui = 0x50000000;
+    }
+    else if (uiA >= 0x7FE80000)
+    {  // If |A| is 0x7FE800000 (4194304) (posit is pure integer value), leave it unchanged.
+        if (x > 8)
+            return uA.p;  // This also takes care of the NaR case, 0x80000000.
+        else
+        {
+            bitNPlusOne = ((uint32_t) 0x80000000 >> x) & uiA;
+            tmp         = ((uint32_t) 0x7FFFFFFF >> x) & uiA;  // bitsMore
+            bitLast     = ((uint32_t) 0x80000000 >> (x - 1)) & uiA;
+            if (bitNPlusOne)
+                if (bitLast | tmp)
+                    uiA += bitLast;
+            uA.ui = uiA;
+        }
+    }
+    else
+    {  // 34% of the cases, we have to decode the posit.
 
-		while (mask & uiA) {
-			scale += 2;
-			mask >>= 1;
-		}
-		mask >>= 1;
-		if (mask & uiA) scale++;
+        while (mask & uiA)
+        {
+            scale += 2;
+            mask >>= 1;
+        }
+        mask >>= 1;
+        if (mask & uiA)
+            scale++;
 
-		mask >>= scale;
+        mask >>= scale;
 
-		//the rest of the bits
-		bitLast = (uiA & mask);
-		mask >>= 1;
-		tmp = (uiA & mask);
-		bitNPlusOne = tmp;
-		uiA ^= tmp;                            // Erase the bit, if it was set.
-		tmp = uiA & (mask - 1);                // this is actually bitsMore
+        // the rest of the bits
+        bitLast = (uiA & mask);
+        mask >>= 1;
+        tmp         = (uiA & mask);
+        bitNPlusOne = tmp;
+        uiA ^= tmp;              // Erase the bit, if it was set.
+        tmp = uiA & (mask - 1);  // this is actually bitsMore
 
-		uiA ^= tmp;    
+        uiA ^= tmp;
 
-		if (bitNPlusOne) {
-			if (bitLast | tmp) uiA += (mask << 1);
-		}
-		uA.ui = uiA;
-
-
-	}
-	if (sign) uA.ui = -uA.ui & 0xFFFFFFFF;
-	return uA.p;
-
-
+        if (bitNPlusOne)
+        {
+            if (bitLast | tmp)
+                uiA += (mask << 1);
+        }
+        uA.ui = uiA;
+    }
+    if (sign)
+        uA.ui = -uA.ui & 0xFFFFFFFF;
+    return uA.p;
 }
-

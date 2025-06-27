@@ -36,57 +36,65 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit_2_t pX2_to_pX2( posit_2_t pA, int x ){
-	posit32_t p32 = {.v = pA.v};
-	return p32_to_pX2(p32, x);
+posit_2_t pX2_to_pX2(posit_2_t pA, int x)
+{
+    posit32_t p32 = {.v = pA.v};
+    return p32_to_pX2(p32, x);
 }
-posit_2_t p32_to_pX2( posit32_t pA, int x ){
+posit_2_t p32_to_pX2(posit32_t pA, int x)
+{
+    union ui32_p32 uA;
+    union ui32_pX2 uZ;
+    uint_fast32_t  uiA;
+    bool           sign;
 
-	union ui32_p32 uA;
-	union ui32_pX2 uZ;
-	uint_fast32_t uiA;
-	bool sign;
-
-
-	if (x<2 || x>32){
-		uZ.ui = 0x80000000;
-		return uZ.p;
-	}
-
-	uA.p = pA;
-	uiA = uA.ui;
-
-	if (uiA==0x80000000 || uiA==0 ){
-		uZ.ui = uiA;
-		return uZ.p;
-	}
-
-	sign = signP32UI( uiA );
-	if (sign) uiA = -uiA & 0xFFFFFFFF;
-
-    if (x==2){
-    	uZ.ui=(uiA>0)?(0x40000000):(0);
+    if (x < 2 || x > 32)
+    {
+        uZ.ui = 0x80000000;
+        return uZ.p;
     }
-    else if (x==32 || (((uint32_t)0xFFFFFFFF>>x) & uiA)==0 ){
-    	uZ.ui = uiA;
-    }
-    else {
 
-		int shift = 32-x;
-		if( (uiA>>shift)!=(0x7FFFFFFF>>shift) ){
-			if( ((uint32_t)0x80000000>>x) & uiA){
-				if ( ( ((uint32_t)0x80000000>>(x-1)) & uiA) || (((uint32_t)0x7FFFFFFF>>x) & uiA) )
-					uiA += (0x1<<shift);
-			}
-		}
-    	uZ.ui = uiA & ((int32_t)0x80000000>>(x-1));
-    	if (uZ.ui==0) uZ.ui = 0x1<<shift;
+    uA.p = pA;
+    uiA  = uA.ui;
 
+    if (uiA == 0x80000000 || uiA == 0)
+    {
+        uZ.ui = uiA;
+        return uZ.p;
     }
-    if (sign) uZ.ui = (-uZ.ui & 0xFFFFFFFF);
-	return uZ.p;
+
+    sign = signP32UI(uiA);
+    if (sign)
+        uiA = -uiA & 0xFFFFFFFF;
+
+    if (x == 2)
+    {
+        uZ.ui = (uiA > 0) ? (0x40000000) : (0);
+    }
+    else if (x == 32 || (((uint32_t) 0xFFFFFFFF >> x) & uiA) == 0)
+    {
+        uZ.ui = uiA;
+    }
+    else
+    {
+        int shift = 32 - x;
+        if ((uiA >> shift) != (0x7FFFFFFF >> shift))
+        {
+            if (((uint32_t) 0x80000000 >> x) & uiA)
+            {
+                if ((((uint32_t) 0x80000000 >> (x - 1)) & uiA) ||
+                    (((uint32_t) 0x7FFFFFFF >> x) & uiA))
+                    uiA += (0x1 << shift);
+            }
+        }
+        uZ.ui = uiA & ((int32_t) 0x80000000 >> (x - 1));
+        if (uZ.ui == 0)
+            uZ.ui = 0x1 << shift;
+    }
+    if (sign)
+        uZ.ui = (-uZ.ui & 0xFFFFFFFF);
+    return uZ.p;
 }
-

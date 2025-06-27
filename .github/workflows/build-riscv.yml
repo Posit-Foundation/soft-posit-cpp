@@ -1,0 +1,71 @@
+name: Build RISC-V
+
+on:
+  push:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  pull_request:
+    branches: [ "main", "refactor-cpp-soft-posits" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=build-riscv-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build-riscv
+        key: ${{ steps.cache-key.outputs.key }}
+        
+    - name: Set up runtime dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-user-static
+        sudo apt-get install -y libc6-dev-riscv64-cross
+        sudo apt-get install -y libstdc++6-riscv64-cross libgcc-s1-riscv64-cross
+        
+    - name: Set up RISC-V build toolchain
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get install -y cmake make ninja-build
+        sudo apt-get install -y gcc-riscv64-linux-gnu g++-riscv64-linux-gnu
+
+    - name: Configure and Build for RISC-V
+      if: steps.cache-build.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p build-riscv
+        cd build-riscv
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=ON \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+          -DCMAKE_C_COMPILER=riscv64-linux-gnu-gcc \
+          -DCMAKE_CXX_COMPILER=riscv64-linux-gnu-g++ \
+          -DCMAKE_FIND_ROOT_PATH=/usr/riscv64-linux-gnu \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
+          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY \
+          -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" \
+          -DREDUCE_P16_TESTS_ON_UBUNTU=ON
+        make -j$(nproc)
+        
+    - name: Upload RISC-V build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifact-riscv
+        path: build-riscv/
+        retention-days: 1 

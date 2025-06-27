@@ -1,0 +1,72 @@
+name: Local Development
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'build'
+        type: choice
+        options:
+          - build
+          - test
+          - benchmark
+          - all
+
+jobs:
+  local-action:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Generate cache key
+      id: cache-key
+      run: |
+        echo "key=local-dev-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.c', '**/CMakeLists.txt') }}" >> $GITHUB_OUTPUT
+      shell: bash
+      
+    - name: Restore build cache
+      id: cache-build
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: ${{ steps.cache-key.outputs.key }}
+
+    - name: Set up dependencies 
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake make g++ ninja-build
+
+    - name: Configure CMake
+      if: steps.cache-build.outputs.cache-hit != 'true' || github.event.inputs.action == 'build' || github.event.inputs.action == 'all'
+      run: |
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=ON
+        
+    - name: Build
+      if: steps.cache-build.outputs.cache-hit != 'true' || github.event.inputs.action == 'build' || github.event.inputs.action == 'all'
+      run: |
+        cd build
+        make -j$(nproc)
+    
+    - name: Run tests
+      if: github.event.inputs.action == 'test' || github.event.inputs.action == 'all'
+      run: |
+        cd build
+        chmod +x *_tests
+        ./p8_tests
+        ./p16_tests
+        ./p32_tests
+        ./q8_tests
+        ./q16_tests
+        ./q32_tests
+        
+    - name: Run benchmarks
+      if: github.event.inputs.action == 'benchmark' || github.event.inputs.action == 'all'
+      run: |
+        cd build
+        make bench 

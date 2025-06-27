@@ -2,17 +2,94 @@
 
 > This is a fork of the original [SoftPosit](https://gitlab.com/cerlane/SoftPosit) repository created by [Cerlane Leong](https://gitlab.com/cerlane). We would like to thank the original authors for their work.
 
-## Building and Testing
+[![Build Ubuntu](https://github.com/Posit-Foundation/soft-posit-cpp/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/Posit-Foundation/soft-posit-cpp/actions/workflows/build-ubuntu.yml)
+[![Build macOS](https://github.com/Posit-Foundation/soft-posit-cpp/actions/workflows/build-macos.yml/badge.svg)](https://github.com/Posit-Foundation/soft-posit-cpp/actions/workflows/build-macos.yml)
+[![Run Tests](https://github.com/Posit-Foundation/soft-posit-cpp/actions/workflows/tests.yml/badge.svg)](https://github.com/Posit-Foundation/soft-posit-cpp/actions/workflows/tests.yml)
+[![Code Quality](https://github.com/Posit-Foundation/soft-posit-cpp/actions/workflows/code-quality.yml/badge.svg)](https://github.com/Posit-Foundation/soft-posit-cpp/actions/workflows/code-quality.yml)
 
-Before using this software, it's recommended to build and run the tests and benchmarks:
+## Quick Reference
+
+### Basic Types
+
+```c
+#include "softposit.h"
+
+posit8_t  p8;   // 8-bit posit (0 exponent bits)
+posit16_t p16;  // 16-bit posit (1 exponent bit)  
+posit32_t p32;  // 32-bit posit (2 exponent bits)
+
+quire8_t  q8;   // 8-bit quire (for accumulation)
+quire16_t q16;  // 16-bit quire
+quire32_t q32;  // 32-bit quire
+```
+
+### Common Operations
+
+```c
+// Arithmetic
+posit16_t sum = p16_add(a, b);        // a + b
+posit16_t diff = p16_sub(a, b);       // a - b  
+posit16_t prod = p16_mul(a, b);       // a * b
+posit16_t quot = p16_div(a, b);       // a / b
+posit16_t fma = p16_mulAdd(a, b, c);  // a*b + c
+
+// Conversions
+posit16_t p = convertDoubleToP16(3.14159);
+double d = convertP16ToDouble(p);
+posit8_t p8 = p16_to_p8(p);
+
+// Comparisons  
+bool equal = p16_eq(a, b);     // a == b
+bool less = p16_lt(a, b);      // a < b
+bool less_eq = p16_le(a, b);   // a <= b
+
+// Math functions (experimental)
+posit16_t root = p16_sqrt(p);
+posit16_t sine = p16_sin_pi(p);
+posit16_t logarithm = p16_ln(p);
+```
+
+---
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Development Workflow](#development-workflow)
+- [Advanced Build Options](#advanced-build-options)
+- [Experimental Features](#experimental-features)
+- [Project Structure](#project-structure)
+- [Compatibility and Testing](#compatibility-and-testing)
+- [Quick Reference](#quick-reference)
+- [C API Documentation](#cversion)
+- [C++ API Documentation](#cppversion)
+- [Python Wrapper](#softposit-python-wrapper)
+- [Julia Integration](#jversion)
+- [Known Implementations](#known)
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- **CMake** 3.1 or higher
+- **C/C++ Compiler**: GCC, Clang, or MSVC
+- **clang-format-14** (for code formatting)
+
+### Building and Testing
 
 ```bash
+# Clone the repository
+git clone https://github.com/Posit-Foundation/soft-posit-cpp.git
+cd soft-posit-cpp
+
 # Create build directory and configure
 mkdir build && cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=ON
 
 # Build the library
-make
+make -j$(nproc)  # Linux
+# make -j$(sysctl -n hw.ncpu)  # macOS
 
 # Run all tests
 make check
@@ -21,22 +98,123 @@ make check
 make bench
 ```
 
-Some experimental math functions are still under development and their tests are disabled by default. To enable these tests, use the `ENABLE_EXPERIMENTAL_TESTS` flag when running CMake:
+## Development Workflow
+
+### Supported Branches
+
+Our CI/CD workflows run on:
+
+- **`main`** - Stable release branch
+- **`refactor-cpp-soft-posits`** - Active development branch
+
+Pull requests targeting either of these branches will trigger automated builds, tests, and code quality checks.
+
+### Code Formatting
+
+This project uses **clang-format-14** for consistent code formatting. Before submitting any changes:
+
+1. **Format your code**:
+
+   ```bash
+   # Format all C/C++ files
+   ./format_code.sh
+   
+   # Or manually with clang-format-14
+   find . -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" | \
+     xargs clang-format-14 -i
+   ```
+
+2. **Verify formatting**:
+
+   ```bash
+   clang-format-14 --dry-run --Werror src/ include/ tests/ examples/
+   ```
+
+The formatting configuration is defined in [`.clang-format`](.clang-format).
+
+### Continuous Integration
+
+Our automated workflows include:
+
+- **Build Validation**: Cross-platform builds (Ubuntu, macOS)
+- **Comprehensive Testing**: All posit operations and edge cases
+- **Code Quality Checks**:
+  - clang-format style enforcement
+- **Performance Benchmarks**: Automated performance regression detection
+
+### Contributing
+
+1. **Fork the repository** and create a feature branch from `refactor-cpp-soft-posits`
+2. **Make your changes** following the coding standards
+3. **Format your code** using `./format_code.sh`
+4. **Run tests locally**: `cd build && make check`
+5. **Submit a pull request** targeting `refactor-cpp-soft-posits` or `main`
+
+All pull requests must pass:
+
+- ✅ Build validation on Ubuntu and macOS
+- ✅ Complete test suite
+- ✅ Code formatting checks (clang-format-14)
+
+## Advanced Build Options
+
+### Build Configuration
 
 ```bash
-mkdir build && cd build
-cmake -DENABLE_EXPERIMENTAL_TESTS=ON ..
-make check
+# Development build with debug symbols
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
+
+# Release build with optimizations
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=ON
+
+# Build with experimental features
+cmake .. -DENABLE_EXPERIMENTAL_TESTS=ON
+
+# Custom installation directory
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
 ```
 
-This will run additional tests for functions that are still being implemented, including:
+### CMake Options
 
-- Trigonometric functions (sin_pi, cos_pi, tan_pi)
-- Logarithmic functions (log2)
-- Rounding functions (ceil)
-- Inverse trigonometric functions (asin_pi/sin_pi relationship)
+| Option | Default | Description |
+|--------|---------|-------------|
+| `BUILD_TESTS` | `ON` | Build test executables |
+| `BUILD_BENCHMARKS` | `OFF` | Build benchmark executables |
+| `ENABLE_EXPERIMENTAL_TESTS` | `OFF` | Enable tests for experimental features |
+| `BUILD_SHARED_LIBS` | `OFF` | Build shared libraries instead of static |
 
-For more build options, see the [CMakeLists.txt](CMakeLists.txt) file.
+### Installation
+
+```bash
+# Install the library and headers
+cd build
+make install
+
+# Create distribution packages
+make package
+```
+
+## Legacy Build Information
+
+> **Note**: The legacy Makefile-based build system is deprecated. Please use CMake as shown above.
+
+## Experimental Features
+
+Some advanced mathematical functions are under active development and can be enabled with the `ENABLE_EXPERIMENTAL_TESTS` option:
+
+```bash
+cmake .. -DENABLE_EXPERIMENTAL_TESTS=ON
+```
+
+**Experimental functions include:**
+
+- **Trigonometric**: `sin_pi`, `cos_pi`, `tan_pi`
+- **Inverse trigonometric**: `asin_pi`, `acos_pi`, `atan_pi`
+- **Logarithmic**: `log2`, `ln`
+- **Exponential**: `exp`, `exp2`
+- **Rounding**: `ceil`, `floor`
+
+> ⚠️ **Warning**: Experimental functions may not be fully tested or optimized. Use with caution in production code.
 
 This version (0.4.1) supports:
 
@@ -556,13 +734,13 @@ julia> t = ccall((:convertDoubleToP16, "/path/to/SoftPosit/build/Linux-x86_64-GC
 
 ## <a href="known"/>Known implementations on top of SoftPosit
 
-* [Andrey Zgarbul's Rust implementation](https://crates.io/crates/softposit)
-* [Milan Klöwer's Julia implementation](https://github.com/milankl/SoftPosit.jl)
-* [SpeedGo Computing's TensorFlow](https://github.com/xman/tensorflow/tree/posit)
-* [SpeedGo Computing's Numpy](https://github.com/xman/numpy-posit)
-* [Cerlane Leong's SoftPosit-Python](https://gitlab.com/cerlane/SoftPosit-Python)
-* [David Thien's SoftPosit bindings Racket](https://github.com/DavidThien/softposit-rkt)
-* [Bill Zorn's SoftPosit and SoftFloat Python](https://pypi.org/project/sfpy/)
+- [Andrey Zgarbul's Rust implementation](https://crates.io/crates/softposit)
+- [Milan Klöwer's Julia implementation](https://github.com/milankl/SoftPosit.jl)
+- [SpeedGo Computing's TensorFlow](https://github.com/xman/tensorflow/tree/posit)
+- [SpeedGo Computing's Numpy](https://github.com/xman/numpy-posit)
+- [Cerlane Leong's SoftPosit-Python](https://gitlab.com/cerlane/SoftPosit-Python)
+- [David Thien's SoftPosit bindings Racket](https://github.com/DavidThien/softposit-rkt)
+- [Bill Zorn's SoftPosit and SoftFloat Python](https://pypi.org/project/sfpy/)
 
 # SoftPosit Python Wrapper
 
@@ -572,19 +750,19 @@ This package provides Python bindings for the [SoftPosit](https://github.com/cjd
 
 Posits are a new number format proposed by John L. Gustafson as an alternative to IEEE 754 floating-point numbers. They offer several advantages:
 
-* Higher accuracy with fewer bits
-* Graceful underflow to zero
-* No separate handling for infinities, NaN, or subnormals
-* Consistent behavior across all bit widths
-* Faster and simpler hardware implementation
+- Higher accuracy with fewer bits
+- Graceful underflow to zero
+- No separate handling for infinities, NaN, or subnormals
+- Consistent behavior across all bit widths
+- Faster and simpler hardware implementation
 
 ## Installation
 
 ### Prerequisites
 
-* CMake (version 3.1 or higher)
-* C++ compiler (GCC, Clang, MSVC)
-* Python 3.6+
+- CMake (version 3.1 or higher)
+- C++ compiler (GCC, Clang, MSVC)
+- Python 3.6+
 
 ### Installation from Source
 
@@ -616,9 +794,10 @@ Posits are a new number format proposed by John L. Gustafson as an alternative t
 ## Usage
 
 The wrapper provides three main posit types:
-* `posit8`: 8-bit posit numbers
-* `posit16`: 16-bit posit numbers
-* `posit32`: 32-bit posit numbers
+
+- `posit8`: 8-bit posit numbers
+- `posit16`: 16-bit posit numbers
+- `posit32`: 32-bit posit numbers
 
 ### Basic Operations
 
@@ -680,9 +859,10 @@ print(f"posit32: {p32} (error: {abs(float(p32) - value)})")
 ## Examples
 
 The package includes several example files:
-* `basic_test.py`: Basic functionality test
-* `softposit_example.py`: Comprehensive usage examples
-* `test_softposit.py`: More extensive tests
+
+- `basic_test.py`: Basic functionality test
+- `softposit_example.py`: Comprehensive usage examples
+- `test_softposit.py`: More extensive tests
 
 Run these examples to explore the capabilities of the posit number format:
 
@@ -707,3 +887,39 @@ Posit operations in this Python wrapper are implemented in C/C++ for performance
 ## License
 
 This package is released under the same license as the original SoftPosit library.
+
+## Project Structure
+
+```
+soft-posit-cpp/
+├── src/                    # Core C implementation
+├── include/                # Public header files
+├── tests/                  # Comprehensive test suites
+│   ├── p8_tests/          # posit8 tests
+│   ├── p16_tests/         # posit16 tests
+│   ├── p32_tests/         # posit32 tests
+│   └── common_tests/      # Shared utilities
+├── examples/              # Usage examples and demos
+├── benchmarks/            # Performance benchmarks
+├── python/                # Python wrapper (optional)
+├── .github/workflows/     # CI/CD pipeline definitions
+└── cmake/                 # CMake modules and configuration
+```
+
+## Compatibility and Testing
+
+### Platform Support
+
+- **Linux**: Ubuntu 20.04+, tested with GCC 9+ and Clang 10+
+- **macOS**: macOS 11+, tested with Apple Clang 12+
+- **Windows**: Experimental support (contributions welcome)
+
+### Test Coverage
+
+- ✅ **posit8**: Exhaustively tested (all operations)
+- ✅ **posit16**: Extensively tested (most operations)
+- 🔄 **posit32**: Comprehensive testing in progress
+- ✅ **Quire operations**: Fully tested for posit8/posit16
+- ✅ **Type conversions**: All combinations tested
+
+Our automated test suite runs ~1M+ test cases across different posit sizes and operations.

@@ -4,8 +4,8 @@
 
 TEST(Posit16Comparison, LessThan)
 {
-    double a = 5.0;
-    double b = 10.0;
+    double  a  = 5.0;
+    double  b  = 10.0;
     posit16 pa = a;
     posit16 pb = b;
 
@@ -21,9 +21,9 @@ TEST(Posit16Comparison, LessThan)
 
 TEST(Posit16Comparison, LessThanEqual)
 {
-    double a = 5.0;
-    double b = 5.0;
-    double c = 10.0;
+    double  a  = 5.0;
+    double  b  = 5.0;
+    double  c  = 10.0;
     posit16 pa = a;
     posit16 pb = b;
     posit16 pc = c;
@@ -35,9 +35,9 @@ TEST(Posit16Comparison, LessThanEqual)
 
 TEST(Posit16Comparison, Equal)
 {
-    double a = 5.0;
-    double b = 5.0;
-    double c = 10.0;
+    double  a  = 5.0;
+    double  b  = 5.0;
+    double  c  = 10.0;
     posit16 pa = a;
     posit16 pb = b;
     posit16 pc = c;
@@ -48,9 +48,9 @@ TEST(Posit16Comparison, Equal)
 
 TEST(Posit16Comparison, NotEqual)
 {
-    double a = 5.0;
-    double b = 5.0;
-    double c = 10.0;
+    double  a  = 5.0;
+    double  b  = 5.0;
+    double  c  = 10.0;
     posit16 pa = a;
     posit16 pb = b;
     posit16 pc = c;
@@ -61,8 +61,8 @@ TEST(Posit16Comparison, NotEqual)
 
 TEST(Posit16Comparison, GreaterThan)
 {
-    double a = 10.0;
-    double b = 5.0;
+    double  a  = 10.0;
+    double  b  = 5.0;
     posit16 pa = a;
     posit16 pb = b;
 
@@ -78,9 +78,9 @@ TEST(Posit16Comparison, GreaterThan)
 
 TEST(Posit16Comparison, GreaterThanEqual)
 {
-    double a = 5.0;
-    double b = 5.0;
-    double c = 10.0;
+    double  a  = 5.0;
+    double  b  = 5.0;
+    double  c  = 10.0;
     posit16 pa = a;
     posit16 pb = b;
     posit16 pc = c;
@@ -88,4 +88,4 @@ TEST(Posit16Comparison, GreaterThanEqual)
     ASSERT_TRUE(pa >= pb);
     ASSERT_TRUE(pc >= pa);
     ASSERT_FALSE(pa >= pc);
-} 
+}

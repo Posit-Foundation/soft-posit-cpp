@@ -41,50 +41,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit8_t i64_to_p8( int64_t iA ){
-    int_fast8_t k, log2 = 6;//length of bit
-    union ui8_p8 uZ;
-    uint_fast8_t uiA;
+posit8_t i64_to_p8(int64_t iA)
+{
+    int_fast8_t   k, log2 = 6;  // length of bit
+    union ui8_p8  uZ;
+    uint_fast8_t  uiA;
     uint_fast64_t mask = 0x40, fracA;
-    bool sign;
+    bool          sign;
 
-    if (iA < -48){ //-48 to -MAX_INT rounds to P32 value -268435456
-		uZ.ui = 0x81; //-maxpos
-		return uZ.p;
-	}
-
-    sign = iA>>63;
-    if(sign){
-    	iA = -iA;
+    if (iA < -48)
+    {                  //-48 to -MAX_INT rounds to P32 value -268435456
+        uZ.ui = 0x81;  //-maxpos
+        return uZ.p;
     }
 
-    if ( iA > 48 ) {
+    sign = iA >> 63;
+    if (sign)
+    {
+        iA = -iA;
+    }
+
+    if (iA > 48)
+    {
         uiA = 0x7F;
     }
-    else if ( iA < 2 ){
+    else if (iA < 2)
+    {
         uiA = (iA << 6);
     }
-    else {
+    else
+    {
         fracA = iA;
-        while ( !(fracA & mask) ) {
+        while (!(fracA & mask))
+        {
             log2--;
             fracA <<= 1;
         }
 
         k = log2;
 
-		fracA = (fracA ^ mask);
+        fracA = (fracA ^ mask);
 
-        uiA = (0x7F ^ (0x3F >> k)) | ( fracA >> (k+1) ) ;
+        uiA = (0x7F ^ (0x3F >> k)) | (fracA >> (k + 1));
 
-        mask = 0x1 << k; //bitNPlusOne
-        if (mask & fracA) {
-            if (((mask - 1) & fracA) | ((mask << 1) & fracA)) uiA++;
+        mask = 0x1 << k;  // bitNPlusOne
+        if (mask & fracA)
+        {
+            if (((mask - 1) & fracA) | ((mask << 1) & fracA))
+                uiA++;
         }
     }
-    (sign) ? (uZ.ui = -uiA &0xFF) : (uZ.ui = uiA);
+    (sign) ? (uZ.ui = -uiA & 0xFF) : (uZ.ui = uiA);
     return uZ.p;
 }

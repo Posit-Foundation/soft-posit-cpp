@@ -13,6 +13,6 @@ TEST(Posit16Special, NaR)
     // Test converting NaR to double (should not crash)
     ASSERT_NO_THROW({
         double d = p.toDouble();
-        (void)d; // Avoid unused variable warning
+        (void) d;  // Avoid unused variable warning
     });
-} 
+}

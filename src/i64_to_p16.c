@@ -39,52 +39,62 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit16_t i64_to_p16( int64_t iA ) {
-	int_fast8_t k, log2 = 25;
-	union ui16_p16 uZ;
-	uint_fast16_t uiA;
-	uint_fast64_t expA, mask = 0x0000000002000000, fracA;
-	bool sign;
+posit16_t i64_to_p16(int64_t iA)
+{
+    int_fast8_t    k, log2 = 25;
+    union ui16_p16 uZ;
+    uint_fast16_t  uiA;
+    uint_fast64_t  expA, mask = 0x0000000002000000, fracA;
+    bool           sign;
 
-	if (iA < -134217728){ //-9223372036854775808 to -134217729 rounds to P32 value -268435456
-		uZ.ui = 0x8001; //-maxpos
-		return uZ.p;
-	}
+    if (iA < -134217728)
+    {                    //-9223372036854775808 to -134217729 rounds to P32 value -268435456
+        uZ.ui = 0x8001;  //-maxpos
+        return uZ.p;
+    }
 
-	sign = iA>>63;
-	if (sign) iA = -iA;
+    sign = iA >> 63;
+    if (sign)
+        iA = -iA;
 
-	if( iA > 134217728 ) { //134217729 to 9223372036854775807 rounds to  P32 value 268435456
-		uiA = 0x7FFF; //maxpos
-	}
-	else if ( iA > 0x0000000008000000 ) {
-		uiA = 0x7FFF;
-	}
-	else if ( iA > 0x0000000002FFFFFF ){
-		uiA = 0x7FFE;
-	}
-	else if ( iA < 2 ){
-		uiA = (iA << 14);
-	}
-	else {
-		fracA = iA;
-		while ( !(fracA & mask) ) {
-			log2--;
-			fracA <<= 1;
-		}
-		k = log2 >> 1;
-		expA = (log2 & 0x1) << (12 - k);
-		fracA = fracA ^ mask;
-		uiA = (0x7FFF ^ (0x3FFF >> k)) | expA | (fracA  >> (k + 13));
-		mask = 0x1000 << k;
-		if (mask & fracA) {
-			if ( ((mask - 1) & fracA) | ((mask << 1) & fracA) ) uiA++;
-		}
-	}
-	(sign) ? (uZ.ui = -uiA) : (uZ.ui = uiA);
-	return uZ.p;
-
+    if (iA > 134217728)
+    {                  // 134217729 to 9223372036854775807 rounds to  P32 value 268435456
+        uiA = 0x7FFF;  // maxpos
+    }
+    else if (iA > 0x0000000008000000)
+    {
+        uiA = 0x7FFF;
+    }
+    else if (iA > 0x0000000002FFFFFF)
+    {
+        uiA = 0x7FFE;
+    }
+    else if (iA < 2)
+    {
+        uiA = (iA << 14);
+    }
+    else
+    {
+        fracA = iA;
+        while (!(fracA & mask))
+        {
+            log2--;
+            fracA <<= 1;
+        }
+        k     = log2 >> 1;
+        expA  = (log2 & 0x1) << (12 - k);
+        fracA = fracA ^ mask;
+        uiA   = (0x7FFF ^ (0x3FFF >> k)) | expA | (fracA >> (k + 13));
+        mask  = 0x1000 << k;
+        if (mask & fracA)
+        {
+            if (((mask - 1) & fracA) | ((mask << 1) & fracA))
+                uiA++;
+        }
+    }
+    (sign) ? (uZ.ui = -uiA) : (uZ.ui = uiA);
+    return uZ.p;
 }

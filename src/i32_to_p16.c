@@ -39,52 +39,61 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit16_t i32_to_p16( int32_t iA ){
-    int_fast8_t k, log2 = 25;
+posit16_t i32_to_p16(int32_t iA)
+{
+    int_fast8_t    k, log2 = 25;
     union ui16_p16 uZ;
-    uint_fast16_t uiA;
-    uint_fast32_t expA, mask = 0x02000000, fracA;
-    bool sign;
+    uint_fast16_t  uiA;
+    uint_fast32_t  expA, mask = 0x02000000, fracA;
+    bool           sign;
 
-
-    if (iA < -134217728){ //-2147483648 to -134217729 rounds to P32 value -268435456
-		uZ.ui = 0x8001; //-maxpos
-		return uZ.p;
-	}
-
-    sign = iA>>31;
-    if(sign){
-    	iA = -iA &0xFFFFFFFF;
+    if (iA < -134217728)
+    {                    //-2147483648 to -134217729 rounds to P32 value -268435456
+        uZ.ui = 0x8001;  //-maxpos
+        return uZ.p;
     }
 
-    if( iA > 134217728 ) { //134217729 to 2147483647 rounds to  P32 value 268435456
-        uiA = 0x7FFF; //maxpos
+    sign = iA >> 31;
+    if (sign)
+    {
+        iA = -iA & 0xFFFFFFFF;
     }
-    else if ( iA > 0x02FFFFFF ){
+
+    if (iA > 134217728)
+    {                  // 134217729 to 2147483647 rounds to  P32 value 268435456
+        uiA = 0x7FFF;  // maxpos
+    }
+    else if (iA > 0x02FFFFFF)
+    {
         uiA = 0x7FFE;
     }
-    else if ( iA < 2 ){
+    else if (iA < 2)
+    {
         uiA = (iA << 14);
     }
-    else {
+    else
+    {
         fracA = iA;
-        while ( !(fracA & mask) ) {
+        while (!(fracA & mask))
+        {
             log2--;
             fracA <<= 1;
         }
-        k = log2 >> 1;
-        expA = (log2 & 0x1) << (12 - k);
-		fracA = (fracA ^ mask);
+        k     = log2 >> 1;
+        expA  = (log2 & 0x1) << (12 - k);
+        fracA = (fracA ^ mask);
 
-        uiA = (0x7FFF ^ (0x3FFF >> k)) | expA | ( fracA >> (k + 13));
-        mask = 0x1000 << k; //bitNPlusOne
-        if (mask & fracA) {
-            if (((mask - 1) & fracA) | ((mask << 1) & fracA)) uiA++;
+        uiA  = (0x7FFF ^ (0x3FFF >> k)) | expA | (fracA >> (k + 13));
+        mask = 0x1000 << k;  // bitNPlusOne
+        if (mask & fracA)
+        {
+            if (((mask - 1) & fracA) | ((mask << 1) & fracA))
+                uiA++;
         }
     }
-    (sign) ? (uZ.ui = -uiA &0xFFFF) : (uZ.ui = uiA);
+    (sign) ? (uZ.ui = -uiA & 0xFFFF) : (uZ.ui = uiA);
     return uZ.p;
 }

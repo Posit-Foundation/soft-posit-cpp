@@ -41,75 +41,93 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-posit_2_t ui64_to_pX2 ( uint64_t a, int x ) {
-	int_fast8_t k, log2 = 63;//length of bit (e.g. 18445618173802708991) in int (64 but because we have only 64 bits, so one bit off to accommodate that fact)
-	union ui32_pX2 uZ;
-	uint_fast64_t uiA=0;
-	uint_fast64_t mask = 0x8000000000000000, frac64A;
-	uint_fast32_t expA;
+posit_2_t ui64_to_pX2(uint64_t a, int x)
+{
+    int_fast8_t k, log2 = 63;  // length of bit (e.g. 18445618173802708991) in int (64 but because
+                               // we have only 64 bits, so one bit off to accommodate that fact)
+    union ui32_pX2 uZ;
+    uint_fast64_t  uiA  = 0;
+    uint_fast64_t  mask = 0x8000000000000000, frac64A;
+    uint_fast32_t  expA;
 
-	//NaR
-	if (a == 0x8000000000000000 || x<2 || x>32)
-		uiA = 0x80000000;
-	else if (x==2){
-		if (a>0) uiA=0x40000000;
-	}
-	else if ( a > 0xFFFBFFFFFFFFFFFF){//18445618173802708991
-		uiA = 0x7FFFC000; // 18446744073709552000
-		if (x<18)  uiA&=((int32_t)0x80000000>>(x-1));
-	}
-	else if ( a < 0x2 )
-		uiA = (a << 30);
-	else {
-		frac64A = a;
-		while ( !(frac64A & mask) ) {
-			log2--;
-			frac64A <<= 1;
-		}
+    // NaR
+    if (a == 0x8000000000000000 || x < 2 || x > 32)
+        uiA = 0x80000000;
+    else if (x == 2)
+    {
+        if (a > 0)
+            uiA = 0x40000000;
+    }
+    else if (a > 0xFFFBFFFFFFFFFFFF)
+    {                      // 18445618173802708991
+        uiA = 0x7FFFC000;  // 18446744073709552000
+        if (x < 18)
+            uiA &= ((int32_t) 0x80000000 >> (x - 1));
+    }
+    else if (a < 0x2)
+        uiA = (a << 30);
+    else
+    {
+        frac64A = a;
+        while (!(frac64A & mask))
+        {
+            log2--;
+            frac64A <<= 1;
+        }
 
-		k = (log2 >> 2);
+        k = (log2 >> 2);
 
-		expA = (log2 & 0x3) ;
-		frac64A = (frac64A ^ mask);
+        expA    = (log2 & 0x3);
+        frac64A = (frac64A ^ mask);
 
-		if(k>=(x-2)){//maxpos
-			uiA = 0x7FFFFFFF & ((int32_t)0x80000000>>(x-1));
-		}
-		else if (k==(x-3)){//bitNPlusOne-> first exp bit //bitLast is zero
-			uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k));
-			if( (expA & 0x2) && ((expA&0x1) | frac64A) ) //bitNPlusOne //bitsMore
-				 uiA |= ((uint32_t)0x80000000>>(x-1));
-		}
-		else if (k==(x-4)){
-			uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | ((expA &0x2)<< (27 - k));
-			if(expA&0x1){
-				if( (((uint32_t)0x80000000>>(x-1)) & uiA)|| frac64A)
-						uiA  += ((uint32_t)0x80000000>>(x-1));
-			}
-
-		}
-		else if (k==(x-5)){
-			uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | (expA<< (27 - k));
-			mask = (uint64_t)0x800000000 << (k + 32-x);
-			if (mask & frac64A){ //bitNPlusOne
-				if (((mask - 1) & frac64A) | (expA&0x1)) {
-					uiA+= ((uint32_t)0x80000000>>(x-1));
-				}
-			}
-		}
-		else{
-			uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | (expA<< (27 - k)) | ((frac64A>>(k+36)) & ((int32_t)0x80000000>>(x-1)));
-			mask = (uint64_t)0x800000000 << (k + 32-x);  //bitNPlusOne position
-			if (mask & frac64A) {
-				if (((mask - 1) & frac64A) | ((mask << 1) & frac64A)) {
-					uiA+= ((uint32_t)0x80000000>>(x-1));
-				}
-			}
-		}
-	}
-	uZ.ui = uiA;
-	return uZ.p;
+        if (k >= (x - 2))
+        {  // maxpos
+            uiA = 0x7FFFFFFF & ((int32_t) 0x80000000 >> (x - 1));
+        }
+        else if (k == (x - 3))
+        {  // bitNPlusOne-> first exp bit //bitLast is zero
+            uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k));
+            if ((expA & 0x2) && ((expA & 0x1) | frac64A))  // bitNPlusOne //bitsMore
+                uiA |= ((uint32_t) 0x80000000 >> (x - 1));
+        }
+        else if (k == (x - 4))
+        {
+            uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | ((expA & 0x2) << (27 - k));
+            if (expA & 0x1)
+            {
+                if ((((uint32_t) 0x80000000 >> (x - 1)) & uiA) || frac64A)
+                    uiA += ((uint32_t) 0x80000000 >> (x - 1));
+            }
+        }
+        else if (k == (x - 5))
+        {
+            uiA  = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | (expA << (27 - k));
+            mask = (uint64_t) 0x800000000 << (k + 32 - x);
+            if (mask & frac64A)
+            {  // bitNPlusOne
+                if (((mask - 1) & frac64A) | (expA & 0x1))
+                {
+                    uiA += ((uint32_t) 0x80000000 >> (x - 1));
+                }
+            }
+        }
+        else
+        {
+            uiA = (0x7FFFFFFF ^ (0x3FFFFFFF >> k)) | (expA << (27 - k)) |
+                  ((frac64A >> (k + 36)) & ((int32_t) 0x80000000 >> (x - 1)));
+            mask = (uint64_t) 0x800000000 << (k + 32 - x);  // bitNPlusOne position
+            if (mask & frac64A)
+            {
+                if (((mask - 1) & frac64A) | ((mask << 1) & frac64A))
+                {
+                    uiA += ((uint32_t) 0x80000000 >> (x - 1));
+                }
+            }
+        }
+    }
+    uZ.ui = uiA;
+    return uZ.p;
 }

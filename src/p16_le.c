@@ -38,21 +38,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
 #include "internals.h"
+#include "platform.h"
 
-bool p16_le( posit16_t pA, posit16_t pB ) {
+bool p16_le(posit16_t pA, posit16_t pB)
+{
     union ui16_p16 uA, uB;
-    int16_t uiA, uiB;
+    int16_t        uiA, uiB;
 
     uA.p = pA;
-    uiA = (int16_t) uA.ui;
+    uiA  = (int16_t) uA.ui;
     uB.p = pB;
-    uiB = (int16_t)uB.ui;
+    uiB  = (int16_t) uB.ui;
 
-    if (uiA<=uiB)
-    	return true;
+    if (uiA <= uiB)
+        return true;
     else
-    	return false;
+        return false;
 }
-
