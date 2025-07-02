@@ -431,3 +431,4 @@ endif()
 
 # Include CPack
 include(CPack)
+add_subdirectory(examples)

@@ -27,10 +27,10 @@ message(STATUS "SOFTPOSIT_LIBRARIES: ${SOFTPOSIT_LIBRARIES}")
 message(STATUS "SOFTPOSIT_SHARED_LIBRARIES: ${SOFTPOSIT_SHARED_LIBRARIES}")
 
 # Check if the include directory exists
-if(NOT EXISTS "${SOFTPOSIT_INCLUDE_DIRS}")
-  message(FATAL_ERROR "SoftPosit include directory not found: ${SOFTPOSIT_INCLUDE_DIRS}\n"
-                     "Please specify -DCMAKE_PREFIX_PATH=<path-to-softposit-install>")
-endif()
+# if(NOT EXISTS "${SOFTPOSIT_INCLUDE_DIRS}")
+#   message(FATAL_ERROR "SoftPosit include directory not found: ${SOFTPOSIT_INCLUDE_DIRS}\n"
+#                      "Please specify -DCMAKE_PREFIX_PATH=<path-to-softposit-install>")
+# endif()
 
 # Try to use find_package first, fall back to direct paths if it fails
 find_package(SoftPosit QUIET)
