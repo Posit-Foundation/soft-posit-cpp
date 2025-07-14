@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(${SOFTPOSIT_INCLUDE_DIRS})
 
 # Add compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
 
 # Define source files
 set(CONTROL_SOURCES control_stabilization.cpp)

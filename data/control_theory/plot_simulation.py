@@ -1,175 +1,86 @@
-# Import required libraries
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import os
 import numpy as np
-from matplotlib.gridspec import GridSpec
+import matplotlib.pyplot as plt
 
-# Set the style for better-looking plots
-plt.style.use('default')
-sns.set_theme(style="whitegrid")
+# Load CSV data
+df = pd.read_csv("simulation_data.csv", dtype=np.float64)
 
-# Set the color palette
-colors = ['#1f77b4', '#2ca02c', '#ff7f0e']  # Blue, Green, Orange
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=colors)
+# Extract data
+time = df["Time"].values
+float_pos = df["Float_Position"].values
+posit_pos = df["Posit_Position"].values
+quire_pos = df["Quire_Position"].values
 
-# Set font sizes
-plt.rcParams['font.size'] = 12
-plt.rcParams['axes.titlesize'] = 14
-plt.rcParams['axes.labelsize'] = 12
-plt.rcParams['xtick.labelsize'] = 10
-plt.rcParams['ytick.labelsize'] = 10
-plt.rcParams['legend.fontsize'] = 10
+float_ang = df["Float_Angle"].values
+posit_ang = df["Posit_Angle"].values
+quire_ang = df["Quire_Angle"].values
 
-# Read the simulation data
-base_path = "/Users/inbasekaranperumal/Developer/OpenSource/LFX/soft-posit-cpp/data/control_theory"
-df = pd.read_csv(os.path.join(base_path, "simulation_data.csv"))
+# Compute relative errors (absolute differences)
+rel_err_pos_posit = np.abs(float_pos - posit_pos)
+rel_err_pos_quire = np.abs(float_pos - quire_pos)
 
-# Create figure with GridSpec for better subplot organization
-fig = plt.figure(figsize=(20, 25))
-gs = GridSpec(4, 2, figure=fig)
-fig.suptitle("Comprehensive Analysis of Inverted Pendulum Control System", fontsize=16, y=0.95)
+rel_err_ang_posit = np.abs(float_ang - posit_ang)
+rel_err_ang_quire = np.abs(float_ang - quire_ang)
 
-# 1. Log-log plot of position over time
-ax1 = fig.add_subplot(gs[0, 0])
-for impl in ['Float', 'Posit', 'Quire']:
-    ax1.loglog(df["Time"], np.abs(df[f"{impl}_Position"]), label=impl, linewidth=2)
-ax1.set_xlabel("Time (s)", fontweight='bold')
-ax1.set_ylabel("|Cart Position| (m)", fontweight='bold')
-ax1.set_title("Position vs Time (Log-Log Scale)", pad=20)
-ax1.legend()
-ax1.grid(True, which="both", alpha=0.3)
+# Set plot style
+plt.style.use("seaborn-v0_8-whitegrid")
+colors = {
+    "float": "#1b9e77",   # nature green
+    "posit": "#7570b3",   # blue
+    "quire": "#d95f02",   # orange
+}
 
-# 2. Log-log plot of angle over time
-ax2 = fig.add_subplot(gs[0, 1])
-for impl in ['Float', 'Posit', 'Quire']:
-    ax2.loglog(df["Time"], np.abs(df[f"{impl}_Angle"]), label=impl, linewidth=2)
-ax2.set_xlabel("Time (s)", fontweight='bold')
-ax2.set_ylabel("|Pendulum Angle| (rad)", fontweight='bold')
-ax2.set_title("Angle vs Time (Log-Log Scale)", pad=20)
-ax2.legend()
-ax2.grid(True, which="both", alpha=0.3)
+# Create subplots
+fig, axs = plt.subplots(3, 2, figsize=(14, 10))
+fig.suptitle("Inverted Pendulum Simulation Results", fontsize=16)
 
-# 3. Pairwise comparison plots
-comparisons = [
-    ("Float", "Posit", "Float vs Posit"),
-    ("Float", "Quire", "Float vs Quire"),
-    ("Posit", "Quire", "Posit vs Quire")
-]
+# 1. Cart Position vs Time
+axs[0, 0].plot(time, float_pos, label="Float", color=colors["float"])
+axs[0, 0].plot(time, posit_pos, label="Posit", color=colors["posit"])
+axs[0, 0].plot(time, quire_pos, label="Quire", color=colors["quire"])
+axs[0, 0].set_title("Cart Position vs Time")
+axs[0, 0].set_xlabel("Time (s)")
+axs[0, 0].set_ylabel("Position (m)")
+axs[0, 0].legend()
 
-# Position pairwise comparisons
-ax3 = fig.add_subplot(gs[1, 0])
-for impl1, impl2, title in comparisons:
-    ax3.semilogy(df["Time"], np.abs(df[f"{impl1}_Position"] - df[f"{impl2}_Position"]), 
-                 label=title, linewidth=2)
-ax3.set_xlabel("Time (s)", fontweight='bold')
-ax3.set_ylabel("Absolute Difference in Position (m)", fontweight='bold')
-ax3.set_title("Pairwise Position Differences", pad=20)
-ax3.legend()
-ax3.grid(True, which="both", alpha=0.3)
+# 2. Pendulum Angle vs Time
+axs[0, 1].plot(time, float_ang, label="Float", color=colors["float"])
+axs[0, 1].plot(time, posit_ang, label="Posit", color=colors["posit"])
+axs[0, 1].plot(time, quire_ang, label="Quire", color=colors["quire"])
+axs[0, 1].set_title("Pendulum Angle vs Time")
+axs[0, 1].set_xlabel("Time (s)")
+axs[0, 1].set_ylabel("Angle (rad)")
+axs[0, 1].legend()
 
-# Angle pairwise comparisons
-ax4 = fig.add_subplot(gs[1, 1])
-for impl1, impl2, title in comparisons:
-    ax4.semilogy(df["Time"], np.abs(df[f"{impl1}_Angle"] - df[f"{impl2}_Angle"]), 
-                 label=title, linewidth=2)
-ax4.set_xlabel("Time (s)", fontweight='bold')
-ax4.set_ylabel("Absolute Difference in Angle (rad)", fontweight='bold')
-ax4.set_title("Pairwise Angle Differences", pad=20)
-ax4.legend()
-ax4.grid(True, which="both", alpha=0.3)
+# 3. Cart Position vs Angle
+axs[1, 0].plot(float_pos, float_ang, label="Float", color=colors["float"])
+axs[1, 0].plot(posit_pos, posit_ang, label="Posit", color=colors["posit"])
+axs[1, 0].plot(quire_pos, quire_ang, label="Quire", color=colors["quire"])
+axs[1, 0].set_title("Cart Position vs Pendulum Angle")
+axs[1, 0].set_xlabel("Position (m)")
+axs[1, 0].set_ylabel("Angle (rad)")
+axs[1, 0].legend()
 
-# 4. Phase space plots (Position vs Angle)
-ax5 = fig.add_subplot(gs[2, 0])
-for impl in ['Float', 'Posit', 'Quire']:
-    ax5.loglog(np.abs(df[f"{impl}_Position"]), np.abs(df[f"{impl}_Angle"]), 
-               label=impl, linewidth=2)
-ax5.set_xlabel("|Position| (m)", fontweight='bold')
-ax5.set_ylabel("|Angle| (rad)", fontweight='bold')
-ax5.set_title("Phase Space Plot (Log-Log Scale)", pad=20)
-ax5.legend()
-ax5.grid(True, which="both", alpha=0.3)
+# 4. Relative Error in Position
+axs[1, 1].plot(time, rel_err_pos_posit, label="Float vs Posit", color=colors["posit"])
+axs[1, 1].plot(time, rel_err_pos_quire, label="Float vs Quire", color=colors["quire"])
+axs[1, 1].set_title("Relative Error in Cart Position")
+axs[1, 1].set_xlabel("Time (s)")
+axs[1, 1].set_ylabel("Absolute Error (m)")
+axs[1, 1].legend()
 
-# 5. Growth rate analysis
-ax6 = fig.add_subplot(gs[2, 1])
-time = df["Time"]
-for impl in ['Float', 'Posit', 'Quire']:
-    # Calculate growth rate (derivative of log of position)
-    pos = np.abs(df[f"{impl}_Position"])
-    growth_rate = np.gradient(np.log(pos), time)
-    ax6.semilogy(time, growth_rate, label=impl, linewidth=2)
-ax6.set_xlabel("Time (s)", fontweight='bold')
-ax6.set_ylabel("Growth Rate (1/s)", fontweight='bold')
-ax6.set_title("Position Growth Rate", pad=20)
-ax6.legend()
-ax6.grid(True, which="both", alpha=0.3)
+# 5. Relative Error in Angle
+axs[2, 0].plot(time, rel_err_ang_posit, label="Float vs Posit", color=colors["posit"])
+axs[2, 0].plot(time, rel_err_ang_quire, label="Float vs Quire", color=colors["quire"])
+axs[2, 0].set_title("Relative Error in Pendulum Angle")
+axs[2, 0].set_xlabel("Time (s)")
+axs[2, 0].set_ylabel("Absolute Error (rad)")
+axs[2, 0].legend()
 
-# 6. Error distribution analysis
-ax7 = fig.add_subplot(gs[3, 0])
-errors = []
-labels = []
-for impl1, impl2, title in comparisons:
-    pos_error = np.abs(df[f"{impl1}_Position"] - df[f"{impl2}_Position"])
-    angle_error = np.abs(df[f"{impl1}_Angle"] - df[f"{impl2}_Angle"])
-    errors.extend([pos_error, angle_error])
-    labels.extend([f"{title} Position", f"{title} Angle"])
+# Hide empty subplot (bottom-right)
+axs[2, 1].axis("off")
 
-ax7.boxplot(errors, labels=labels)
-ax7.set_yscale('log')
-ax7.set_ylabel("Absolute Error", fontweight='bold')
-ax7.set_title("Error Distribution Analysis", pad=20)
-plt.xticks(rotation=45, ha='right')
-
-# 7. Relative error analysis
-ax8 = fig.add_subplot(gs[3, 1])
-for impl1, impl2, title in comparisons:
-    rel_error = np.abs(df[f"{impl1}_Position"] - df[f"{impl2}_Position"]) / (np.abs(df[f"{impl1}_Position"]) + 1e-10)
-    ax8.semilogy(time, rel_error, label=title, linewidth=2)
-ax8.set_xlabel("Time (s)", fontweight='bold')
-ax8.set_ylabel("Relative Error", fontweight='bold')
-ax8.set_title("Relative Error Analysis", pad=20)
-ax8.legend()
-ax8.grid(True, which="both", alpha=0.3)
-
-# Adjust layout and save
-plt.tight_layout()
-plt.savefig(os.path.join(base_path, "comprehensive_analysis.png"), dpi=300, bbox_inches="tight")
+# Layout adjustment
+plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.show()
 
-# Print comprehensive statistical analysis
-print("\nComprehensive Statistical Analysis:")
-print("\nPosition Statistics:")
-for impl in ['Float', 'Posit', 'Quire']:
-    pos = np.abs(df[f"{impl}_Position"])
-    print(f"\n{impl}:")
-    print(f"Max Position: {pos.max():.2e}")
-    print(f"Mean Position: {pos.mean():.2e}")
-    print(f"Std Dev Position: {pos.std():.2e}")
-
-print("\nAngle Statistics:")
-for impl in ['Float', 'Posit', 'Quire']:
-    angle = np.abs(df[f"{impl}_Angle"])
-    print(f"\n{impl}:")
-    print(f"Max Angle: {angle.max():.2e}")
-    print(f"Mean Angle: {angle.mean():.2e}")
-    print(f"Std Dev Angle: {angle.std():.2e}")
-
-print("\nPairwise Error Analysis:")
-for impl1, impl2, title in comparisons:
-    pos_error = np.abs(df[f"{impl1}_Position"] - df[f"{impl2}_Position"])
-    angle_error = np.abs(df[f"{impl1}_Angle"] - df[f"{impl2}_Angle"])
-    print(f"\n{title}:")
-    print(f"Position - Max Error: {pos_error.max():.2e}")
-    print(f"Position - Mean Error: {pos_error.mean():.2e}")
-    print(f"Angle - Max Error: {angle_error.max():.2e}")
-    print(f"Angle - Mean Error: {angle_error.mean():.2e}")
-
-# Calculate and print growth rates
-print("\nGrowth Rate Analysis:")
-for impl in ['Float', 'Posit', 'Quire']:
-    pos = np.abs(df[f"{impl}_Position"])
-    growth_rate = np.gradient(np.log(pos), time)
-    print(f"\n{impl}:")
-    print(f"Average Growth Rate: {np.mean(growth_rate):.2e} 1/s")
-    print(f"Max Growth Rate: {np.max(growth_rate):.2e} 1/s")
