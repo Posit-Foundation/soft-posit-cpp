@@ -111,7 +111,7 @@ class Matrix
         {
             std::stringstream ss;
             ss << "Matrix multiplication dimension mismatch: (" << rows << ", " << cols << ") @ ("
-            << other.rows << ", " << other.cols << ")";
+               << other.rows << ", " << other.cols << ")";
 
             throw std::runtime_error(ss.str());
         }
@@ -285,11 +285,11 @@ class InvertedPendulumSystem
         // Initialize A matrix
         // x' = Ax + Bu
         // State: [position, velocity, angle, angular velocity]
-        T M  = convertFromDouble(CART_MASS);
-        T m  = convertFromDouble(POLE_MASS);
-        T l  = convertFromDouble(POLE_LENGTH);
-        T g  = convertFromDouble(GRAVITY);
-        
+        T M = convertFromDouble(CART_MASS);
+        T m = convertFromDouble(POLE_MASS);
+        T l = convertFromDouble(POLE_LENGTH);
+        T g = convertFromDouble(GRAVITY);
+
         dt = convertFromDouble(TIME_STEP);
 
         // Simplified continuous-time model

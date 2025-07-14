@@ -74,8 +74,8 @@ TEST(Posit8Advanced, OverflowHandling)
         << " vs 0x" << (int) max_posit.value;
 
     // Test underflow with subtraction
-    posit8 neg_max   = -max_posit;
-    result           = neg_max - max_posit;
+    posit8 neg_max = -max_posit;
+    result         = neg_max - max_posit;
 
     // Should saturate to -maxpos, not wrap around
     EXPECT_EQ(result.value, neg_max.value)

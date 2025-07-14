@@ -112,7 +112,7 @@ posit8_t pX1_to_p8(posit_1_t pA)
         }
         else
         {
-            uZ.ui = regime + (((exp_frac32A) &0x3FFFFFFF) >> (regA + 24));
+            uZ.ui = regime + (((exp_frac32A) & 0x3FFFFFFF) >> (regA + 24));
         }
     }
 

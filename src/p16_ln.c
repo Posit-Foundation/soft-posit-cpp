@@ -8,8 +8,8 @@
 static uint64_t poly(uint64_t f)
 {
     // Ported from the Rust implementation
-    const uint64_t z = ((f << 31) + 2) / (f + 8192);  // fixed-point divide – remainder discarded
-    const uint64_t zsq = (z * z) >> 30;               // z^2 in fixed-point
+    const uint64_t z   = ((f << 31) + 2) / (f + 8192);  // fixed-point divide – remainder discarded
+    const uint64_t zsq = (z * z) >> 30;                 // z^2 in fixed-point
 
     uint64_t s = (zsq * 1584ULL) >> 28;
     s          = (zsq * (26661ULL + s)) >> 29;

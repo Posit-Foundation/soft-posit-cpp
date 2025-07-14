@@ -116,7 +116,7 @@ posit8_t p16_to_p8(posit16_t pA)
             // int shift = regA+8;
             // exp_frac16A= ((exp_frac16A)&0x3FFF) >> shift; //first 2 bits already empty (for sign
             // and regime terminating bit)
-            uZ.ui = regime + (((exp_frac16A) &0x3FFF) >> (regA + 8));
+            uZ.ui = regime + (((exp_frac16A) & 0x3FFF) >> (regA + 8));
         }
     }
 
