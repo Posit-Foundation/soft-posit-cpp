@@ -95,6 +95,60 @@ TEST(Posit16Advanced, DistributiveProperty)
 }
 
 // Test for subnormal values handling
+Associativity
+TEST(Posit16Advanced, SubnormalHandling) {
+
+  // Test with very small positive values
+  posit16 min_positive = posit16().minpos();
+  posit16 half_min = min_positive / posit16(2.0);
+
+  // Should not be zero (posits don't have subnormals but have very small
+  // values)
+  ASSERT_NE(half_min.value, 0)
+      << "Half of minpos became zero, expected a small positive value";
+
+  // Test with very small negative values
+  posit16 max_negative = posit16().minneg();
+  posit16 half_max_neg = max_negative / posit16(2.0);
+
+  // Should not be zero
+  ASSERT_NE(half_max_neg.value, 0)
+      << "Half of minneg became zero, expected a small negative value";
+}
+
+// Test associativity property of posit16 addition
+TEST(Posit16Advanced, AssociativityFailureDetection) {
+
+  // Create a distribution that generates values in the range [-MAX/4, MAX/4]
+  std::uniform_int_distribution<int16_t> safe_dist(INT16_MIN / 4,
+                                                   INT16_MAX / 4);
+
+  for (int i = 0; i < NTESTS16 / 20; i++) {
+    posit16 p_a, p_b, p_c;
+    p_a.value = safe_dist(gen);
+    p_b.value = safe_dist(gen);
+    p_c.value = safe_dist(gen);
+
+    // Skip NaN/NaR values
+    if (p_a.isNaR() || p_b.isNaR() || p_c.isNaR() ||
+        std::isnan(p_a.toDouble()) || std::isnan(p_b.toDouble()) ||
+        std::isnan(p_c.toDouble())) {
+      continue;
+    }
+
+    // Test associativity: (a + b) + c == a + (b + c)
+    posit16 left_side = (p_a + p_b) + p_c;
+    posit16 right_side = p_a + (p_b + p_c);
+
+    ASSERT_TRUE(double_eq(left_side.toDouble(), right_side.toDouble(), 1e-1))
+        << "Associativity failed for values: (" << p_a.toDouble() << " + "
+        << p_b.toDouble() << ") + " << p_c.toDouble()
+        << " = " << left_side.toDouble() << " but " << p_a.toDouble()
+        << " + (" << p_b.toDouble() << " + " << p_c.toDouble()
+        << ") = " << right_side.toDouble();
+  }
+}
+
 TEST(Posit16Advanced, SubnormalHandling)
 {
     // Test with very small positive values
@@ -113,3 +167,4 @@ TEST(Posit16Advanced, SubnormalHandling)
     ASSERT_NE(half_max_neg.value, 0)
         << "Half of minneg became zero, expected a small negative value";
 }
+refactor-cpp-soft-posits
