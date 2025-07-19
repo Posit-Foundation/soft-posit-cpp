@@ -45,7 +45,6 @@ posit16_t pX2_to_p16(posit_2_t pA)
     return p32_to_p16(p32);
 }
 
-
 posit16_t p32_to_p16(posit32_t pA)
 {
     union ui32_p32 uA;
