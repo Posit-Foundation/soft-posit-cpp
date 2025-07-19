@@ -1,8 +1,23 @@
+
+/*
+This example demonstrates a control system simulation of an inverted pendulum using different number systems:
+float, posit, and posit with quire. It simulates the dynamics of the system, applies control inputs, and visualizes the results.
+
+Formulas and values for the inverted pendulum system are copied from: https://ctms.engin.umich.edu/CTMS/index.php?example=InvertedPendulum&section=ControlStateSpace
+
+Next steps: 
+Theoretically, stepWithQuire() can perform even more operations before rounding. Need to double-check check softposit.h for supported operations.
+*/
+
+#include <iostream>
+
+
 #include <softposit.h>
 #include <sys/stat.h>
 
 #include <algorithm>
 #include <chrono>
+
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -11,11 +26,17 @@
 #include <numeric>
 #include <random>
 #include <string>
+
 #include <vector>
+#include <matrix.h>
+#include <posit_ops.h>
+
+
 
 // Image dimensions
 const int IMAGE_WIDTH  = 800;
 const int IMAGE_HEIGHT = 600;
+
 const int TIME_STEPS   = 500;
 const int SYSTEM_COUNT = 3;  // float, posit, posit+quire
 
@@ -25,6 +46,7 @@ const double CART_MASS   = 1.0;   // Mass of the cart (kg)
 const double POLE_MASS   = 0.1;   // Mass of the pendulum (kg)
 const double POLE_LENGTH = 0.5;   // Half length of the pendulum (m)
 const double TIME_STEP   = 0.02;  // Simulation time step (s)
+
 
 // Define colors for visualization
 struct RGB
@@ -37,6 +59,7 @@ struct RGB
 
 // Forward declaration
 void drawLine(std::vector<RGB>& image, int x1, int y1, int x2, int y2, const RGB& color);
+
 
 // Define overloaded operators for posit32_t
 inline posit32_t operator+(const posit32_t& a, const posit32_t& b)
@@ -338,6 +361,7 @@ class Matrix
     }
 };
 
+
 // Function to save a PPM image
 void savePPM(const std::string& filename, const std::vector<RGB>& pixels, int width, int height)
 {
@@ -395,6 +419,9 @@ class InvertedPendulumSystem
     Matrix<T> K;  // Control gain matrix
     Matrix<T> x;  // State vector [position, velocity, angle, angular velocity]
 
+    // Time step for simulation
+    T dt = convertFromDouble(TIME_STEP);
+
     // Convert double to the template type
     T convertFromDouble(double value)
     {
@@ -430,6 +457,7 @@ class InvertedPendulumSystem
         // Initialize A matrix
         // x' = Ax + Bu
         // State: [position, velocity, angle, angular velocity]
+
         T m  = convertFromDouble(CART_MASS);
         T M  = convertFromDouble(POLE_MASS);
         T l  = convertFromDouble(POLE_LENGTH);
@@ -440,6 +468,7 @@ class InvertedPendulumSystem
         T one   = convertFromDouble(1.0);
         T denom = one / (m + M);
 
+
         // A matrix for continuous system
         A(0, 0) = convertFromDouble(0);
         A(0, 1) = convertFromDouble(1);
@@ -447,8 +476,8 @@ class InvertedPendulumSystem
         A(0, 3) = convertFromDouble(0);
 
         A(1, 0) = convertFromDouble(0);
-        A(1, 1) = convertFromDouble(0);
-        A(1, 2) = M * (g * denom);
+        A(1, 1) = negOne * (I + m * l*l) * b * denom;
+        A(1, 2) = m*m * g * l*l * denom;
         A(1, 3) = convertFromDouble(0);
 
         A(2, 0) = convertFromDouble(0);
@@ -457,14 +486,15 @@ class InvertedPendulumSystem
         A(2, 3) = convertFromDouble(1);
 
         A(3, 0) = convertFromDouble(0);
-        A(3, 1) = convertFromDouble(0);
-        A(3, 2) = g * ((m + M) * denom) / l;
+        A(3, 1) = negOne * m*l*b * denom;
+        A(3, 2) = m * g * l * (M+m) * denom;
         A(3, 3) = convertFromDouble(0);
 
         // B matrix for control input
         B(0, 0) = convertFromDouble(0);
-        B(1, 0) = denom;
+        B(1, 0) = I + m*l*l * denom;
         B(2, 0) = convertFromDouble(0);
+
         B(3, 0) = denom / l;
 
         // Discretize the system using Euler method: A_d = I + dt*A, B_d = dt*B
@@ -485,21 +515,26 @@ class InvertedPendulumSystem
         x(3, 0) = convertFromDouble(0.0);   // Initial angular velocity
 
         // Initialize K with LQR-like gains (simplified)
+
         K(0, 0) = convertFromDouble(-1.0);   // Position gain
         K(0, 1) = convertFromDouble(-1.5);   // Velocity gain
         K(0, 2) = convertFromDouble(-20.0);  // Angle gain (high to prioritize angle stabilization)
         K(0, 3) = convertFromDouble(-3.0);   // Angular velocity gain
+
     }
 
     // Step the system forward in time
     void step()
     {
         // Compute control input u = -Kx
+
         Matrix<T> u    = K * x;
         Matrix<T> negU = u * convertFromDouble(-1.0);  // Negative feedback
 
         // Update state: x' = Ax + Bu
-        x = A * x + B * negU;
+        Matrix<T> dxdt = A*x + B*u;
+        Matrix<T> dx = dxdt * dt; // Compute change in state
+        x = x + dx;     // Update state
     }
 
     // Special step for posit with quire accumulation
@@ -512,9 +547,11 @@ class InvertedPendulumSystem
         Matrix<T> u    = K.multiplyWithQuire(x);
         Matrix<T> negU = u * convertFromDouble(-1.0);  // Negative feedback
 
+
         // Update state: x' = Ax + Bu
         Matrix<T> Ax = A.multiplyWithQuire(x);
         Matrix<T> Bu = B.multiplyWithQuire(negU);
+
         x            = Ax + Bu;
     }
 
@@ -575,6 +612,7 @@ void runSimulation()
         floatPositions, floatAngles, positPositions, positAngles, quirePositions, quireAngles);
 
     // Find min/max values for normalization
+
     double minPos = std::min({*std::min_element(floatPositions.begin(), floatPositions.end()),
                               *std::min_element(positPositions.begin(), positPositions.end()),
                               *std::min_element(quirePositions.begin(), quirePositions.end())});
@@ -590,6 +628,7 @@ void runSimulation()
     double maxAngle = std::max({*std::max_element(floatAngles.begin(), floatAngles.end()),
                                 *std::max_element(positAngles.begin(), positAngles.end()),
                                 *std::max_element(quireAngles.begin(), quireAngles.end())});
+
 
     // Create visualization images
     std::vector<RGB> floatImage(IMAGE_WIDTH * IMAGE_HEIGHT);

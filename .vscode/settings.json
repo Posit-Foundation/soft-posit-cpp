@@ -13,6 +13,9 @@
         "cmath": "cpp",
         "complex": "cpp",
         "chrono": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "random": "cpp",
+        "queue": "cpp",
+        "stack": "cpp"
     }
 }

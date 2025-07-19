@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/aesters/projects/posits/soft-posit-cpp/examples/control_theory_stabilization/control_stabilization'
+relocations:     []
+...

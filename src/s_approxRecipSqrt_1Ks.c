@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 
 #include "platform.h"
+#include "primitives.h"
 
 const uint_fast16_t softposit_approxRecipSqrt0[16] = {0xb4c9,
                                                       0xffab,
