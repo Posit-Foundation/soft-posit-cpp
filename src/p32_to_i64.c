@@ -74,7 +74,7 @@ int_fast64_t p32_to_i64(posit32_t pA)
         iZ = 2;  // 3/2 <= x <= 5/2 rounds to 2.
     // overflow so return max integer value
     else if (uiA > 0x7FFFAFFF)
-        return (sign) ? (-9223372036854775808) : (0x7FFFFFFFFFFFFFFF);
+        return (sign) ? (-0x8000000000000000) : (0x7FFFFFFFFFFFFFFF);
     else
     {
         uiA -= 0x40000000;

@@ -74,7 +74,6 @@ TEST(Posit8Advanced, OverflowHandling)
         << " vs 0x" << (int) max_posit.value;
 
     // Test underflow with subtraction
-    posit8 min_posit = posit8().minpos();
     posit8 neg_max   = -max_posit;
     result           = neg_max - max_posit;
 
