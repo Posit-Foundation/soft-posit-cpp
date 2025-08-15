@@ -1,86 +1,78 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from matplotlib.colors import Normalize
 
-# Load CSV data
-df = pd.read_csv("simulation_data.csv", dtype=np.float64)
+# Read data and construct dataframe.
+df = pd.read_csv('simulation_data.csv', dtype=np.float64)
 
-# Extract data
-time = df["Time"].values
-float_pos = df["Float_Position"].values
-posit_pos = df["Posit_Position"].values
-quire_pos = df["Quire_Position"].values
+# Time
+time = df['Time'].values
 
-float_ang = df["Float_Angle"].values
-posit_ang = df["Posit_Angle"].values
-quire_ang = df["Quire_Angle"].values
+# Cart positions
+float_pos = df['Float_Position'].values
+posit_pos = df['Posit_Position'].values
+quire_pos = df['Quire_Position'].values
 
-# Compute relative errors (absolute differences)
-rel_err_pos_posit = np.abs(float_pos - posit_pos)
-rel_err_pos_quire = np.abs(float_pos - quire_pos)
+# Pendulum angles
+float_ang = df['Float_Angle'].values
+posit_ang = df['Posit_Angle'].values
+quire_ang = df['Quire_Angle'].values
 
-rel_err_ang_posit = np.abs(float_ang - posit_ang)
-rel_err_ang_quire = np.abs(float_ang - quire_ang)
+def plot_3d(x, y, z, time, title, xlabel, ylabel, zlabel):
+    # Create colormap w.r.t time.
+    norm = Normalize(vmin=time.min(), vmax=time.max())
+    cmap = plt.get_cmap('viridis')
 
-# Set plot style
-plt.style.use("seaborn-v0_8-whitegrid")
-colors = {
-    "float": "#1b9e77",   # nature green
-    "posit": "#7570b3",   # blue
-    "quire": "#d95f02",   # orange
-}
+    # Create enormous figure and 3D axes
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
 
-# Create subplots
-fig, axs = plt.subplots(3, 2, figsize=(14, 10))
-fig.suptitle("Inverted Pendulum Simulation Results", fontsize=16)
+    # Create scatar plot
+    sc = ax.scatter([], [], [], c=[], cmap=cmap, norm=norm)
 
-# 1. Cart Position vs Time
-axs[0, 0].plot(time, float_pos, label="Float", color=colors["float"])
-axs[0, 0].plot(time, posit_pos, label="Posit", color=colors["posit"])
-axs[0, 0].plot(time, quire_pos, label="Quire", color=colors["quire"])
-axs[0, 0].set_title("Cart Position vs Time")
-axs[0, 0].set_xlabel("Time (s)")
-axs[0, 0].set_ylabel("Position (m)")
-axs[0, 0].legend()
+    # Set limits
+    lim = np.concatenate([x, y, z])
+    min, max = lim.min(), lim.max()
 
-# 2. Pendulum Angle vs Time
-axs[0, 1].plot(time, float_ang, label="Float", color=colors["float"])
-axs[0, 1].plot(time, posit_ang, label="Posit", color=colors["posit"])
-axs[0, 1].plot(time, quire_ang, label="Quire", color=colors["quire"])
-axs[0, 1].set_title("Pendulum Angle vs Time")
-axs[0, 1].set_xlabel("Time (s)")
-axs[0, 1].set_ylabel("Angle (rad)")
-axs[0, 1].legend()
+    # Set limits and labels
+    ax.set_xlim(min, max)
+    ax.set_ylim(min, max)
+    ax.set_zlim(min, max)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_zlabel(zlabel)
+    ax.set_title(title)
 
-# 3. Cart Position vs Angle
-axs[1, 0].plot(float_pos, float_ang, label="Float", color=colors["float"])
-axs[1, 0].plot(posit_pos, posit_ang, label="Posit", color=colors["posit"])
-axs[1, 0].plot(quire_pos, quire_ang, label="Quire", color=colors["quire"])
-axs[1, 0].set_title("Cart Position vs Pendulum Angle")
-axs[1, 0].set_xlabel("Position (m)")
-axs[1, 0].set_ylabel("Angle (rad)")
-axs[1, 0].legend()
+    # Add colorbar denoting time
+    cbar = plt.colorbar(sc, ax=ax, pad=0.1)
+    cbar.set_label('Time (s)')
 
-# 4. Relative Error in Position
-axs[1, 1].plot(time, rel_err_pos_posit, label="Float vs Posit", color=colors["posit"])
-axs[1, 1].plot(time, rel_err_pos_quire, label="Float vs Quire", color=colors["quire"])
-axs[1, 1].set_title("Relative Error in Cart Position")
-axs[1, 1].set_xlabel("Time (s)")
-axs[1, 1].set_ylabel("Absolute Error (m)")
-axs[1, 1].legend()
+    # Update fn
+    def update(frame):
+        sc._offsets3d = (x[:frame], y[:frame], z[:frame])
+        sc.set_array(time[:frame])
+    
+    _ = FuncAnimation(fig, update, frames=len(df), interval=60, blit=False, repeat=True)
+    plt.show()
 
-# 5. Relative Error in Angle
-axs[2, 0].plot(time, rel_err_ang_posit, label="Float vs Posit", color=colors["posit"])
-axs[2, 0].plot(time, rel_err_ang_quire, label="Float vs Quire", color=colors["quire"])
-axs[2, 0].set_title("Relative Error in Pendulum Angle")
-axs[2, 0].set_xlabel("Time (s)")
-axs[2, 0].set_ylabel("Absolute Error (rad)")
-axs[2, 0].legend()
 
-# Hide empty subplot (bottom-right)
-axs[2, 1].axis("off")
+# Plot positions colored by time
+plot_3d(
+    float_pos, posit_pos, quire_pos, time,
+    title='Cart position vs Time',
+    xlabel='Float Position',
+    ylabel='Posit Position',
+    zlabel='Quire Position',
+)
 
-# Layout adjustment
-plt.tight_layout(rect=[0, 0, 1, 0.96])
-plt.show()
+# Plot angles colored by time
+plot_3d(
+    float_ang, posit_ang, quire_ang, time,
+    title='Pendulum angle vs Time',
+    xlabel='Float Angle',
+    ylabel='Posit Angle',
+    zlabel='Quire Angle',
+)
 

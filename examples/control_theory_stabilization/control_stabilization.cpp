@@ -121,24 +121,12 @@ class Matrix
         {
             for (size_t j = 0; j < other.cols; ++j)
             {
-                if constexpr (std::is_same_v<T, posit32>)
+                T sum = 0;
+                for (size_t k = 0; k < cols; ++k)
                 {
-                    T sum = posit32(0);
-                    for (size_t k = 0; k < cols; ++k)
-                    {
-                        sum = sum + ((*this)(i, k) * other(k, j));
-                    }
-                    result(i, j) = sum;
+                    sum += (*this)(i, k) * other(k, j);
                 }
-                else
-                {
-                    T sum = 0;
-                    for (size_t k = 0; k < cols; ++k)
-                    {
-                        sum += (*this)(i, k) * other(k, j);
-                    }
-                    result(i, j) = sum;
-                }
+                result(i, j) = sum;
             }
         }
         return result;
@@ -227,7 +215,7 @@ void saveSimulationData(const std::vector<double>& floatPositions,
     // Write data
     for (int t = 0; t < TIME_STEPS; ++t)
     {
-        csvFile << t * TIME_STEP << "," << floatPositions[t] << "," << floatAngles[t] << ","
+        csvFile << std::fixed << std::setprecision(10) << t * TIME_STEP  << "," << floatPositions[t] << "," << floatAngles[t] << ","
                 << positPositions[t] << "," << positAngles[t] << "," << quirePositions[t] << ","
                 << quireAngles[t] << "\n";
     }
