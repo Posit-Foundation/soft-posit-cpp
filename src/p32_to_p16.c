@@ -97,8 +97,8 @@ posit16_t p32_to_p16(posit32_t pA)
         }
         // exp and frac
         exp_frac32A = tmp << 1;
-        printBinary(&exp_frac32A, 32);
-        printf("kA: %d\n", kA);
+        //printBinary(&exp_frac32A, 32);
+        //printf("kA: %d\n", kA);
         if (kA < 0)
         {
             regA = (-kA) << 1;
@@ -135,3 +135,4 @@ posit16_t p32_to_p16(posit32_t pA)
         uZ.ui = (-uZ.ui & 0xFFFF);
     return uZ.p;
 }
+
