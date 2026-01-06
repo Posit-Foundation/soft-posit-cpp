@@ -64,8 +64,8 @@ posit_1_t ui64_to_pX1(uint64_t a, int x)
     }
     else if (a > 0x8000000000000000)
     {  // 576460752303423488 -> wrong number need to change
-        uint64_t test = ((uint64_t) 0x80000000 >> (x - 1));
-        printBinary(&test, 32);
+        //uint64_t test = ((uint64_t) 0x80000000 >> (x - 1));
+        //printBinary(&test, 32);
         uiA = 0x7FFFFFFF & ((uint64_t) 0x80000000 >> (x - 1));  // 1152921504606847000
     }
     else if (a < 0x2)
@@ -137,3 +137,4 @@ posit_1_t ui64_to_pX1(uint64_t a, int x)
     uZ.ui = uiA;
     return uZ.p;
 }
+
